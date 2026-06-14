@@ -5,12 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapPin, Clock, AlertTriangle, CheckCircle, MessageSquare, Heart, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/language-context";
+import { WhatsAppShare } from "@/components/whatsapp-share";
 
 const PHASE_CONFIG: Record<string, { color: string; bg: string; border: string; dot: string }> = {
   initial: { color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-950/40", border: "border-blue-200 dark:border-blue-800/60", dot: "bg-blue-500" },
@@ -20,27 +19,39 @@ const PHASE_CONFIG: Record<string, { color: string; bg: string; border: string; 
   ongoing_management: { color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-950/40", border: "border-orange-200 dark:border-orange-800/60", dot: "bg-orange-500" },
 };
 
-const EXAMPLE_DISEASES = ["Type 2 Diabetes", "Hypothyroidism", "Hypertension", "Dengue Fever", "Tuberculosis"];
+const EXAMPLE_EN = ["Type 2 Diabetes", "Hypothyroidism", "Hypertension", "Dengue Fever", "Tuberculosis"];
+const EXAMPLE_HI = ["टाइप 2 मधुमेह", "हाइपोथायरायडिज्म", "उच्च रक्तचाप", "डेंगू बुखार", "तपेदिक (TB)"];
+
+function buildShareText(result: ReturnType<typeof useGetDiseaseJourney>["data"], language: "en" | "hi") {
+  if (!result) return "";
+  if (language === "hi") {
+    return `🗺️ *CureCheck - ${result.disease} रोग यात्रा*\n\n${result.overview}\n\n*मुख्य चरण:*\n${result.phases.slice(0, 3).map((p, i) => `${i + 1}. ${p.title} (${p.duration})`).join("\n")}\n\n*सामान्य प्रश्न:*\n${result.commonQuestions.slice(0, 2).map((q, i) => `${i + 1}. ${q}`).join("\n")}\n\n_CureCheck - केवल शैक्षिक जानकारी। डॉक्टर की सलाह लें।_`;
+  }
+  return `🗺️ *CureCheck — ${result.disease} Disease Journey*\n\n${result.overview}\n\n*Key Phases:*\n${result.phases.slice(0, 3).map((p, i) => `${i + 1}. ${p.title} (${p.duration})`).join("\n")}\n\n*Common Questions to Ask Doctor:*\n${result.commonQuestions.slice(0, 2).map((q, i) => `${i + 1}. ${q}`).join("\n")}\n\n_CureCheck — Educational only. Always consult your doctor._\ncurecheck.in`;
+}
 
 export default function DiseaseJourney() {
   const [disease, setDisease] = useState("");
   const [ageGroup, setAgeGroup] = useState<string>("");
   const { toast } = useToast();
+  const { language, t } = useLanguage();
   const getJourney = useGetDiseaseJourney();
+  const examples = language === "hi" ? EXAMPLE_HI : EXAMPLE_EN;
 
   const handleSubmit = () => {
     if (!disease.trim() || disease.trim().length < 2) {
-      toast({ title: "Please enter a disease name" });
+      toast({ title: t("Please enter a disease name", "कृपया रोग का नाम दर्ज करें") });
       return;
     }
     if (!ageGroup) {
-      toast({ title: "Please select an age group" });
+      toast({ title: t("Please select an age group", "कृपया आयु समूह चुनें") });
       return;
     }
-    getJourney.mutate({ data: { disease, ageGroup: ageGroup as "child" | "teen" | "adult" | "senior" } });
+    getJourney.mutate({ data: { disease, ageGroup: ageGroup as "child" | "teen" | "adult" | "senior", language: language as "en" | "hi" } });
   };
 
   const result = getJourney.data;
+  const shareText = result ? buildShareText(result, language) : "";
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
@@ -50,31 +61,23 @@ export default function DiseaseJourney() {
             <MapPin className="w-5 h-5 text-teal-500" />
           </div>
           <div>
-            <h1 className="text-2xl font-serif font-700 text-foreground">Disease Journey Map</h1>
-            <p className="text-sm text-muted-foreground">Understand what happens after a diagnosis, phase by phase</p>
+            <h1 className="text-2xl font-serif font-700 text-foreground">{t("Disease Journey Map", "रोग यात्रा मानचित्र")}</h1>
+            <p className="text-sm text-muted-foreground">{t("Understand what happens after a diagnosis, phase by phase", "निदान के बाद क्या होता है, phase दर phase समझें")}</p>
           </div>
         </div>
 
         <Card className="mt-8 border-border">
           <CardContent className="pt-6 space-y-4">
             <div>
-              <label className="text-sm font-500 text-foreground mb-1.5 block">Disease or condition name</label>
-              <Input
-                placeholder="e.g. Type 2 Diabetes, Hypertension, Hypothyroidism..."
-                value={disease}
-                onChange={(e) => setDisease(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                className="text-base"
-                data-testid="input-disease"
-              />
+              <label className="text-sm font-500 text-foreground mb-1.5 block">{t("Disease or condition name", "रोग या स्थिति का नाम")}</label>
+              <Input placeholder={t("e.g. Type 2 Diabetes, Hypertension, Hypothyroidism...", "जैसे Type 2 Diabetes, Hypertension, Hypothyroidism...")}
+                value={disease} onChange={(e) => setDisease(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                className="text-base" data-testid="input-disease" />
               <div className="mt-2 flex flex-wrap gap-1.5">
-                {EXAMPLE_DISEASES.map((ex) => (
-                  <button
-                    key={ex}
-                    onClick={() => setDisease(ex)}
+                {examples.map((ex) => (
+                  <button key={ex} onClick={() => setDisease(ex)}
                     className="text-xs px-2.5 py-1 rounded-full bg-muted hover:bg-muted-foreground/10 text-muted-foreground hover:text-foreground transition-colors border border-border"
-                    data-testid={`button-example-disease-${ex.replace(/\s+/g, "-").toLowerCase()}`}
-                  >
+                    data-testid={`button-example-${ex.replace(/\s+/g, "-").toLowerCase()}`}>
                     {ex}
                   </button>
                 ))}
@@ -82,33 +85,29 @@ export default function DiseaseJourney() {
             </div>
 
             <div>
-              <label className="text-sm font-500 text-foreground mb-1.5 block">Patient age group</label>
+              <label className="text-sm font-500 text-foreground mb-1.5 block">{t("Patient age group", "रोगी की आयु समूह")}</label>
               <Select value={ageGroup} onValueChange={setAgeGroup}>
                 <SelectTrigger className="text-base" data-testid="select-age-group">
-                  <SelectValue placeholder="Select age group..." />
+                  <SelectValue placeholder={t("Select age group...", "आयु समूह चुनें...")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="child">Child (0–12 years)</SelectItem>
-                  <SelectItem value="teen">Teen (13–19 years)</SelectItem>
-                  <SelectItem value="adult">Adult (20–59 years)</SelectItem>
-                  <SelectItem value="senior">Senior (60+ years)</SelectItem>
+                  <SelectItem value="child">{t("Child (0–12 years)", "बच्चा (0–12 वर्ष)")}</SelectItem>
+                  <SelectItem value="teen">{t("Teen (13–19 years)", "किशोर (13–19 वर्ष)")}</SelectItem>
+                  <SelectItem value="adult">{t("Adult (20–59 years)", "वयस्क (20–59 वर्ष)")}</SelectItem>
+                  <SelectItem value="senior">{t("Senior (60+ years)", "वरिष्ठ (60+ वर्ष)")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <Button
-              onClick={handleSubmit}
-              disabled={getJourney.isPending || !disease.trim() || !ageGroup}
-              className="w-full rounded-xl gap-2"
-              size="lg"
-              data-testid="button-get-journey"
-            >
-              {getJourney.isPending ? "Generating journey map..." : <><span>Generate Journey Map</span><ArrowRight className="w-4 h-4" /></>}
+            <Button onClick={handleSubmit} disabled={getJourney.isPending || !disease.trim() || !ageGroup}
+              className="w-full rounded-xl gap-2" size="lg" data-testid="button-get-journey">
+              {getJourney.isPending
+                ? t("Generating journey map…", "यात्रा मानचित्र बन रहा है…")
+                : <><span>{t("Generate Journey Map", "यात्रा मानचित्र बनाएं")}</span><ArrowRight className="w-4 h-4" /></>}
             </Button>
           </CardContent>
         </Card>
 
-        {/* Loading */}
         <AnimatePresence>
           {getJourney.isPending && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="mt-8 space-y-4">
@@ -119,10 +118,7 @@ export default function DiseaseJourney() {
                     <Skeleton className="w-0.5 h-24 mt-2" />
                   </div>
                   <Card className="flex-1"><CardContent className="pt-5 space-y-3">
-                    <Skeleton className="h-5 w-48" />
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-5 w-48" /><Skeleton className="h-4 w-24" /><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-3/4" />
                   </CardContent></Card>
                 </div>
               ))}
@@ -130,45 +126,32 @@ export default function DiseaseJourney() {
           )}
         </AnimatePresence>
 
-        {/* Results */}
         <AnimatePresence>
           {result && !getJourney.isPending && (
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mt-8 space-y-6">
-              {/* Overview */}
               <Card className="border-border">
                 <CardContent className="pt-5">
                   <div className="flex items-start gap-3">
                     <Heart className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                     <div>
-                      <h2 className="font-serif font-700 text-lg text-foreground mb-1">
-                        {result.disease} — {result.ageGroup} journey
-                      </h2>
+                      <h2 className="font-serif font-700 text-lg text-foreground mb-1">{result.disease} — {result.ageGroup} journey</h2>
                       <p className="text-sm text-muted-foreground leading-relaxed">{result.overview}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Timeline */}
               <div className="space-y-0">
                 <h3 className="font-serif font-600 text-foreground mb-4 flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-primary" /> Journey Phases
+                  <MapPin className="w-4 h-4 text-primary" /> {t("Journey Phases", "यात्रा के चरण")}
                 </h3>
                 {result.phases.map((phase, i) => {
                   const cfg = PHASE_CONFIG[phase.phase] || PHASE_CONFIG.monitoring;
                   return (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, x: -16 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.1, duration: 0.4 }}
-                      className="flex gap-4"
-                    >
+                    <motion.div key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1, duration: 0.4 }} className="flex gap-4">
                       <div className="flex flex-col items-center">
                         <div className={`w-4 h-4 rounded-full ${cfg.dot} ring-4 ring-background mt-5 flex-shrink-0`} />
-                        {i < result.phases.length - 1 && (
-                          <div className="w-0.5 flex-1 bg-border mt-1 min-h-8" />
-                        )}
+                        {i < result.phases.length - 1 && <div className="w-0.5 flex-1 bg-border mt-1 min-h-8" />}
                       </div>
                       <Card className={`flex-1 mb-4 border ${cfg.border} ${cfg.bg}`}>
                         <CardContent className="pt-5 pb-5">
@@ -179,33 +162,18 @@ export default function DiseaseJourney() {
                             </span>
                           </div>
                           <p className="text-sm text-muted-foreground leading-relaxed mb-4">{phase.description}</p>
-
                           <div className="grid sm:grid-cols-2 gap-4">
                             <div>
-                              <p className="text-xs font-600 text-foreground mb-2 flex items-center gap-1">
-                                <CheckCircle className="w-3.5 h-3.5 text-green-500" /> Common Experiences
-                              </p>
-                              <ul className="space-y-1">
-                                {phase.commonExperiences.map((exp, j) => (
-                                  <li key={j} className="text-xs text-muted-foreground flex gap-1.5">
-                                    <span className="text-green-500 mt-0.5">•</span>
-                                    <span>{exp}</span>
-                                  </li>
-                                ))}
-                              </ul>
+                              <p className="text-xs font-600 text-foreground mb-2 flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 text-green-500" /> {t("Common Experiences", "सामान्य अनुभव")}</p>
+                              <ul className="space-y-1">{phase.commonExperiences.map((exp, j) => (
+                                <li key={j} className="text-xs text-muted-foreground flex gap-1.5"><span className="text-green-500 mt-0.5">•</span><span>{exp}</span></li>
+                              ))}</ul>
                             </div>
                             <div>
-                              <p className="text-xs font-600 text-foreground mb-2 flex items-center gap-1">
-                                <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> Watch For
-                              </p>
-                              <ul className="space-y-1">
-                                {phase.warningSignsToWatch.map((sign, j) => (
-                                  <li key={j} className="text-xs text-muted-foreground flex gap-1.5">
-                                    <span className="text-amber-500 mt-0.5">•</span>
-                                    <span>{sign}</span>
-                                  </li>
-                                ))}
-                              </ul>
+                              <p className="text-xs font-600 text-foreground mb-2 flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> {t("Watch For", "सावधान रहें")}</p>
+                              <ul className="space-y-1">{phase.warningSignsToWatch.map((sign, j) => (
+                                <li key={j} className="text-xs text-muted-foreground flex gap-1.5"><span className="text-amber-500 mt-0.5">•</span><span>{sign}</span></li>
+                              ))}</ul>
                             </div>
                           </div>
                         </CardContent>
@@ -215,49 +183,41 @@ export default function DiseaseJourney() {
                 })}
               </div>
 
-              {/* Common Questions */}
               {result.commonQuestions.length > 0 && (
                 <Card className="border-border">
                   <CardHeader className="pb-3 pt-5 px-5">
                     <CardTitle className="text-base font-600 text-foreground flex items-center gap-2">
-                      <MessageSquare className="w-4 h-4 text-primary" /> Questions Patients Often Ask
+                      <MessageSquare className="w-4 h-4 text-primary" /> {t("Questions Patients Often Ask", "मरीज़ अक्सर पूछते हैं")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="px-5 pb-5">
-                    <ul className="space-y-2">
-                      {result.commonQuestions.map((q, i) => (
-                        <li key={i} className="flex gap-2 text-sm text-muted-foreground">
-                          <span className="text-primary font-700 mt-0.5">{i + 1}.</span>
-                          <span>{q}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <ul className="space-y-2">{result.commonQuestions.map((q, i) => (
+                      <li key={i} className="flex gap-2 text-sm text-muted-foreground">
+                        <span className="text-primary font-700 mt-0.5">{i + 1}.</span><span>{q}</span>
+                      </li>
+                    ))}</ul>
                   </CardContent>
                 </Card>
               )}
 
-              {/* Support */}
               {result.supportResources.length > 0 && (
                 <Card className="border-border bg-muted/30">
                   <CardHeader className="pb-2 pt-5 px-5">
-                    <CardTitle className="text-sm font-600 text-muted-foreground">Support Resources in India</CardTitle>
+                    <CardTitle className="text-sm font-600 text-muted-foreground">{t("Support Resources in India", "भारत में सहायता संसाधन")}</CardTitle>
                   </CardHeader>
                   <CardContent className="px-5 pb-5">
-                    <ul className="space-y-1.5">
-                      {result.supportResources.map((r, i) => (
-                        <li key={i} className="text-sm text-muted-foreground flex gap-2">
-                          <span className="text-primary">•</span>
-                          <span>{r}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <ul className="space-y-1.5">{result.supportResources.map((r, i) => (
+                      <li key={i} className="text-sm text-muted-foreground flex gap-2"><span className="text-primary">•</span><span>{r}</span></li>
+                    ))}</ul>
                   </CardContent>
                 </Card>
               )}
 
-              <p className="text-xs text-muted-foreground text-center px-4 py-3 rounded-lg bg-muted/50 border border-border">
-                {result.disclaimer}
-              </p>
+              <div className="flex justify-center pt-2">
+                <WhatsAppShare text={shareText} label={t("Share Journey Summary on WhatsApp", "WhatsApp पर सारांश शेयर करें")} />
+              </div>
+
+              <p className="text-xs text-muted-foreground text-center px-4 py-3 rounded-lg bg-muted/50 border border-border">{result.disclaimer}</p>
             </motion.div>
           )}
         </AnimatePresence>

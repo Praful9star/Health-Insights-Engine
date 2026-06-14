@@ -7,11 +7,13 @@
  */
 
 export * from './claimInput';
+export * from './claimInputLanguage';
 export * from './claimResult';
 export * from './claimResultEvidenceStrength';
 export * from './claimResultVerdict';
 export * from './diseaseJourneyInput';
 export * from './diseaseJourneyInputAgeGroup';
+export * from './diseaseJourneyInputLanguage';
 export * from './diseaseJourneyPhase';
 export * from './diseaseJourneyPhasePhase';
 export * from './diseaseJourneyResult';
@@ -20,6 +22,14 @@ export * from './healthStatus';
 export * from './reportFinding';
 export * from './reportFindingImportance';
 export * from './reportInput';
+export * from './reportInputLanguage';
 export * from './reportResult';
 export * from './reportResultOverallAssessment';
 export * from './reportTerm';
+export * from './symptomCause';
+export * from './symptomCauseLikelihood';
+export * from './symptomInput';
+export * from './symptomInputGender';
+export * from './symptomInputLanguage';
+export * from './symptomResult';
+export * from './symptomResultUrgencyLevel';

@@ -5,6 +5,7 @@
  * CureCheck API - AI-powered health information platform
  * OpenAPI spec version: 0.1.0
  */
+import type { ReportInputLanguage } from './reportInputLanguage';
 
 export interface ReportInput {
   /**
@@ -12,4 +13,6 @@ export interface ReportInput {
      * @minLength 20
      */
   reportText: string;
+  /** Response language */
+  language?: ReportInputLanguage;
 }

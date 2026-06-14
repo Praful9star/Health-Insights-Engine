@@ -16,6 +16,8 @@ tags:
     description: Disease journey mapping
   - name: report-explainer
     description: Medical report explanation
+  - name: symptom-checker
+    description: Symptom analysis
 paths:
   /healthz:
     get:
@@ -109,6 +111,32 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /symptom-checker:
+    post:
+      operationId: checkSymptoms
+      tags: [symptom-checker]
+      summary: Analyze symptoms
+      description: Analyze patient symptoms and provide urgency assessment and guidance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SymptomInput"
+      responses:
+        "200":
+          description: Symptom analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SymptomResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -136,6 +164,10 @@ components:
           type: string
           minLength: 10
           description: The health claim text to verify
+        language:
+          type: string
+          enum: [en, hi]
+          description: Response language
 
     ClaimResult:
       type: object
@@ -196,6 +228,10 @@ components:
           type: string
           enum: [child, teen, adult, senior]
           description: Patient age group
+        language:
+          type: string
+          enum: [en, hi]
+          description: Response language
 
     DiseaseJourneyPhase:
       type: object
@@ -267,6 +303,10 @@ components:
           type: string
           minLength: 20
           description: The medical report text to explain
+        language:
+          type: string
+          enum: [en, hi]
+          description: Response language
 
     ReportTerm:
       type: object
@@ -322,5 +362,80 @@ components:
         overallAssessment:
           type: string
           enum: [requires_urgent_attention, needs_follow_up, routine_monitoring, all_clear]
+        disclaimer:
+          type: string
+
+    SymptomInput:
+      type: object
+      required:
+        - symptoms
+      properties:
+        symptoms:
+          type: string
+          minLength: 5
+          description: Description of symptoms
+        age:
+          type: string
+          description: Patient age (optional)
+        gender:
+          type: string
+          enum: [male, female, other]
+          description: Patient gender (optional)
+        duration:
+          type: string
+          description: How long symptoms have been present
+        language:
+          type: string
+          enum: [en, hi]
+          description: Response language
+
+    SymptomCause:
+      type: object
+      required:
+        - cause
+        - likelihood
+        - explanation
+      properties:
+        cause:
+          type: string
+        likelihood:
+          type: string
+          enum: [common, possible, rare]
+        explanation:
+          type: string
+
+    SymptomResult:
+      type: object
+      required:
+        - urgencyLevel
+        - urgencyExplanation
+        - possibleCauses
+        - redFlags
+        - immediateSteps
+        - whenToSeekHelp
+        - doctorSpeciality
+        - disclaimer
+      properties:
+        urgencyLevel:
+          type: string
+          enum: [emergency, see_doctor_today, see_doctor_soon, home_care, monitor]
+        urgencyExplanation:
+          type: string
+        possibleCauses:
+          type: array
+          items:
+            $ref: "#/components/schemas/SymptomCause"
+        redFlags:
+          type: array
+          items:
+            type: string
+        immediateSteps:
+          type: array
+          items:
+            type: string
+        whenToSeekHelp:
+          type: string
+        doctorSpeciality:
+          type: string
         disclaimer:
           type: string

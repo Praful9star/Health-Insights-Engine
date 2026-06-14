@@ -27,7 +27,9 @@ import type {
   ErrorResponse,
   HealthStatus,
   ReportInput,
-  ReportResult
+  ReportResult,
+  SymptomInput,
+  SymptomResult
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -334,5 +336,77 @@ export const useExplainMedicalReport = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getExplainMedicalReportMutationOptions(options));
+    }
+
+export const getCheckSymptomsUrl = () => {
+
+
+
+
+  return `/api/symptom-checker`
+}
+
+/**
+ * Analyze patient symptoms and provide urgency assessment and guidance
+ * @summary Analyze symptoms
+ */
+export const checkSymptoms = async (symptomInput: SymptomInput, options?: RequestInit): Promise<SymptomResult> => {
+
+  return customFetch<SymptomResult>(getCheckSymptomsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      symptomInput,)
+  }
+);}
+
+
+
+
+export const getCheckSymptomsMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkSymptoms>>, TError,{data: BodyType<SymptomInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof checkSymptoms>>, TError,{data: BodyType<SymptomInput>}, TContext> => {
+
+const mutationKey = ['checkSymptoms'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof checkSymptoms>>, {data: BodyType<SymptomInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  checkSymptoms(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CheckSymptomsMutationResult = NonNullable<Awaited<ReturnType<typeof checkSymptoms>>>
+    export type CheckSymptomsMutationBody = BodyType<SymptomInput>
+    export type CheckSymptomsMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Analyze symptoms
+ */
+export const useCheckSymptoms = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkSymptoms>>, TError,{data: BodyType<SymptomInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof checkSymptoms>>,
+        TError,
+        {data: BodyType<SymptomInput>},
+        TContext
+      > => {
+      return useMutation(getCheckSymptomsMutationOptions(options));
     }
 

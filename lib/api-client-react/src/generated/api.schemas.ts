@@ -13,12 +13,25 @@ export interface ErrorResponse {
   error: string;
 }
 
+/**
+ * Response language
+ */
+export type ClaimInputLanguage = typeof ClaimInputLanguage[keyof typeof ClaimInputLanguage];
+
+
+export const ClaimInputLanguage = {
+  en: 'en',
+  hi: 'hi',
+} as const;
+
 export interface ClaimInput {
   /**
      * The health claim text to verify
      * @minLength 10
      */
   claim: string;
+  /** Response language */
+  language?: ClaimInputLanguage;
 }
 
 export type ClaimResultEvidenceStrength = typeof ClaimResultEvidenceStrength[keyof typeof ClaimResultEvidenceStrength];
@@ -77,6 +90,17 @@ export const DiseaseJourneyInputAgeGroup = {
   senior: 'senior',
 } as const;
 
+/**
+ * Response language
+ */
+export type DiseaseJourneyInputLanguage = typeof DiseaseJourneyInputLanguage[keyof typeof DiseaseJourneyInputLanguage];
+
+
+export const DiseaseJourneyInputLanguage = {
+  en: 'en',
+  hi: 'hi',
+} as const;
+
 export interface DiseaseJourneyInput {
   /**
      * Disease or condition name
@@ -85,6 +109,8 @@ export interface DiseaseJourneyInput {
   disease: string;
   /** Patient age group */
   ageGroup: DiseaseJourneyInputAgeGroup;
+  /** Response language */
+  language?: DiseaseJourneyInputLanguage;
 }
 
 export type DiseaseJourneyPhasePhase = typeof DiseaseJourneyPhasePhase[keyof typeof DiseaseJourneyPhasePhase];
@@ -118,12 +144,25 @@ export interface DiseaseJourneyResult {
   disclaimer: string;
 }
 
+/**
+ * Response language
+ */
+export type ReportInputLanguage = typeof ReportInputLanguage[keyof typeof ReportInputLanguage];
+
+
+export const ReportInputLanguage = {
+  en: 'en',
+  hi: 'hi',
+} as const;
+
 export interface ReportInput {
   /**
      * The medical report text to explain
      * @minLength 20
      */
   reportText: string;
+  /** Response language */
+  language?: ReportInputLanguage;
 }
 
 export interface ReportTerm {
@@ -164,6 +203,82 @@ export interface ReportResult {
   importantFindings: ReportFinding[];
   doctorQuestions: string[];
   overallAssessment: ReportResultOverallAssessment;
+  disclaimer: string;
+}
+
+/**
+ * Patient gender (optional)
+ */
+export type SymptomInputGender = typeof SymptomInputGender[keyof typeof SymptomInputGender];
+
+
+export const SymptomInputGender = {
+  male: 'male',
+  female: 'female',
+  other: 'other',
+} as const;
+
+/**
+ * Response language
+ */
+export type SymptomInputLanguage = typeof SymptomInputLanguage[keyof typeof SymptomInputLanguage];
+
+
+export const SymptomInputLanguage = {
+  en: 'en',
+  hi: 'hi',
+} as const;
+
+export interface SymptomInput {
+  /**
+     * Description of symptoms
+     * @minLength 5
+     */
+  symptoms: string;
+  /** Patient age (optional) */
+  age?: string;
+  /** Patient gender (optional) */
+  gender?: SymptomInputGender;
+  /** How long symptoms have been present */
+  duration?: string;
+  /** Response language */
+  language?: SymptomInputLanguage;
+}
+
+export type SymptomCauseLikelihood = typeof SymptomCauseLikelihood[keyof typeof SymptomCauseLikelihood];
+
+
+export const SymptomCauseLikelihood = {
+  common: 'common',
+  possible: 'possible',
+  rare: 'rare',
+} as const;
+
+export interface SymptomCause {
+  cause: string;
+  likelihood: SymptomCauseLikelihood;
+  explanation: string;
+}
+
+export type SymptomResultUrgencyLevel = typeof SymptomResultUrgencyLevel[keyof typeof SymptomResultUrgencyLevel];
+
+
+export const SymptomResultUrgencyLevel = {
+  emergency: 'emergency',
+  see_doctor_today: 'see_doctor_today',
+  see_doctor_soon: 'see_doctor_soon',
+  home_care: 'home_care',
+  monitor: 'monitor',
+} as const;
+
+export interface SymptomResult {
+  urgencyLevel: SymptomResultUrgencyLevel;
+  urgencyExplanation: string;
+  possibleCauses: SymptomCause[];
+  redFlags: string[];
+  immediateSteps: string[];
+  whenToSeekHelp: string;
+  doctorSpeciality: string;
   disclaimer: string;
 }
 

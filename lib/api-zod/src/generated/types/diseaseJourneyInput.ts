@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { DiseaseJourneyInputAgeGroup } from './diseaseJourneyInputAgeGroup';
+import type { DiseaseJourneyInputLanguage } from './diseaseJourneyInputLanguage';
 
 export interface DiseaseJourneyInput {
   /**
@@ -15,4 +16,6 @@ export interface DiseaseJourneyInput {
   disease: string;
   /** Patient age group */
   ageGroup: DiseaseJourneyInputAgeGroup;
+  /** Response language */
+  language?: DiseaseJourneyInputLanguage;
 }
