@@ -282,3 +282,57 @@ export interface SymptomResult {
   disclaimer: string;
 }
 
+/**
+ * Response language
+ */
+export type MedicineInputLanguage = typeof MedicineInputLanguage[keyof typeof MedicineInputLanguage];
+
+
+export const MedicineInputLanguage = {
+  en: 'en',
+  hi: 'hi',
+} as const;
+
+export interface MedicineInput {
+  /**
+     * Medicine name or prescription text
+     * @minLength 2
+     */
+  medicine: string;
+  /** Response language */
+  language?: MedicineInputLanguage;
+}
+
+export type MedicineSideEffectFrequency = typeof MedicineSideEffectFrequency[keyof typeof MedicineSideEffectFrequency];
+
+
+export const MedicineSideEffectFrequency = {
+  very_common: 'very_common',
+  common: 'common',
+  uncommon: 'uncommon',
+  rare: 'rare',
+} as const;
+
+export interface MedicineSideEffect {
+  effect: string;
+  frequency: MedicineSideEffectFrequency;
+  whatToDo: string;
+}
+
+export interface MedicineResult {
+  medicineName: string;
+  genericName: string;
+  medicineClass: string;
+  whatItTreats: string[];
+  howItWorks: string;
+  commonSideEffects: MedicineSideEffect[];
+  foodInteractions: string[];
+  drugInteractions: string[];
+  importantWarnings: string[];
+  bestTimeTake: string;
+  missedDose: string;
+  storage: string;
+  pharmacistQuestions: string[];
+  disclaimer: string;
+}
+

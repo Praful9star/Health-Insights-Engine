@@ -1,0 +1,1 @@
+- [CureCheck architecture](curecheck-arch.md) — contract-first monorepo; all new features need spec → codegen → API route → frontend page in that order.

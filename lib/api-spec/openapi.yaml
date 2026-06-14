@@ -18,6 +18,8 @@ tags:
     description: Medical report explanation
   - name: symptom-checker
     description: Symptom analysis
+  - name: medicine-explainer
+    description: Medicine information
 paths:
   /healthz:
     get:
@@ -130,6 +132,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SymptomResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /medicine-explainer:
+    post:
+      operationId: explainMedicine
+      tags: [medicine-explainer]
+      summary: Explain a medicine
+      description: Get plain-language explanation of a medicine, its side effects, and interactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MedicineInput"
+      responses:
+        "200":
+          description: Medicine explanation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MedicineResult"
         "400":
           description: Bad request
           content:
@@ -437,5 +465,93 @@ components:
           type: string
         doctorSpeciality:
           type: string
+        disclaimer:
+          type: string
+
+    MedicineInput:
+      type: object
+      required:
+        - medicine
+      properties:
+        medicine:
+          type: string
+          minLength: 2
+          description: Medicine name or prescription text
+        language:
+          type: string
+          enum: [en, hi]
+          description: Response language
+
+    MedicineSideEffect:
+      type: object
+      required:
+        - effect
+        - frequency
+        - whatToDo
+      properties:
+        effect:
+          type: string
+        frequency:
+          type: string
+          enum: [very_common, common, uncommon, rare]
+        whatToDo:
+          type: string
+
+    MedicineResult:
+      type: object
+      required:
+        - medicineName
+        - genericName
+        - medicineClass
+        - whatItTreats
+        - howItWorks
+        - commonSideEffects
+        - foodInteractions
+        - drugInteractions
+        - importantWarnings
+        - bestTimeTake
+        - missedDose
+        - storage
+        - pharmacistQuestions
+        - disclaimer
+      properties:
+        medicineName:
+          type: string
+        genericName:
+          type: string
+        medicineClass:
+          type: string
+        whatItTreats:
+          type: array
+          items:
+            type: string
+        howItWorks:
+          type: string
+        commonSideEffects:
+          type: array
+          items:
+            $ref: "#/components/schemas/MedicineSideEffect"
+        foodInteractions:
+          type: array
+          items:
+            type: string
+        drugInteractions:
+          type: array
+          items:
+            type: string
+        importantWarnings:
+          type: array
+          items:
+            type: string
+        bestTimeTake:
+          type: string
+        missedDose:
+          type: string
+        storage:
+          type: string
+        pharmacistQuestions:
+          type: array
+          items:
+            type: string
         disclaimer:
           type: string

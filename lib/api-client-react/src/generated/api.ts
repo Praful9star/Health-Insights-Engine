@@ -26,6 +26,8 @@ import type {
   DiseaseJourneyResult,
   ErrorResponse,
   HealthStatus,
+  MedicineInput,
+  MedicineResult,
   ReportInput,
   ReportResult,
   SymptomInput,
@@ -408,5 +410,77 @@ export const useCheckSymptoms = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getCheckSymptomsMutationOptions(options));
+    }
+
+export const getExplainMedicineUrl = () => {
+
+
+
+
+  return `/api/medicine-explainer`
+}
+
+/**
+ * Get plain-language explanation of a medicine, its side effects, and interactions
+ * @summary Explain a medicine
+ */
+export const explainMedicine = async (medicineInput: MedicineInput, options?: RequestInit): Promise<MedicineResult> => {
+
+  return customFetch<MedicineResult>(getExplainMedicineUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      medicineInput,)
+  }
+);}
+
+
+
+
+export const getExplainMedicineMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof explainMedicine>>, TError,{data: BodyType<MedicineInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof explainMedicine>>, TError,{data: BodyType<MedicineInput>}, TContext> => {
+
+const mutationKey = ['explainMedicine'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof explainMedicine>>, {data: BodyType<MedicineInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  explainMedicine(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ExplainMedicineMutationResult = NonNullable<Awaited<ReturnType<typeof explainMedicine>>>
+    export type ExplainMedicineMutationBody = BodyType<MedicineInput>
+    export type ExplainMedicineMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Explain a medicine
+ */
+export const useExplainMedicine = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof explainMedicine>>, TError,{data: BodyType<MedicineInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof explainMedicine>>,
+        TError,
+        {data: BodyType<MedicineInput>},
+        TContext
+      > => {
+      return useMutation(getExplainMedicineMutationOptions(options));
     }
 

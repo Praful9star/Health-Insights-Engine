@@ -9,6 +9,7 @@ const navLinks = [
   { href: "/", labelEn: "Home", labelHi: "होम" },
   { href: "/symptom-checker", labelEn: "Symptom Checker", labelHi: "लक्षण जांच" },
   { href: "/claim-checker", labelEn: "Claim Checker", labelHi: "दावा जांच" },
+  { href: "/medicine-explainer", labelEn: "Medicine Info", labelHi: "दवा जानकारी" },
   { href: "/disease-journey", labelEn: "Disease Journey", labelHi: "रोग यात्रा" },
   { href: "/report-explainer", labelEn: "Report Explainer", labelHi: "रिपोर्ट समझें" },
   { href: "/about", labelEn: "About", labelHi: "परिचय" },
@@ -23,11 +24,11 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 glass">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group flex-shrink-0">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-              <Shield className="w-4.5 h-4.5 text-primary-foreground" strokeWidth={2.5} />
+              <Shield className="w-4 h-4 text-primary-foreground" strokeWidth={2.5} />
             </div>
             <span className="font-serif font-700 text-xl tracking-tight text-foreground">
               Cure<span className="text-primary">Check</span>
@@ -35,7 +36,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-0.5">
+          <nav className="hidden xl:flex items-center gap-0.5 flex-1 justify-center">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href}>
                 <span
@@ -51,15 +52,15 @@ export default function Navbar() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-shrink-0">
             {/* Language toggle */}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setLanguage(language === "en" ? "hi" : "en")}
-              className="rounded-full gap-1.5 text-xs font-600 px-3 h-8"
+              className="rounded-full gap-1.5 text-xs font-600 px-3 h-8 border border-border/60 hover:border-primary/30"
               data-testid="button-language-toggle"
-              title="Toggle Hindi/English"
+              title={language === "en" ? "Switch to Hindi" : "Switch to English"}
             >
               <Languages className="w-3.5 h-3.5" />
               {language === "en" ? "हिंदी" : "EN"}
@@ -80,7 +81,7 @@ export default function Navbar() {
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden rounded-full w-8 h-8"
+              className="xl:hidden rounded-full w-8 h-8"
               onClick={() => setOpen(!open)}
               data-testid="button-menu-toggle"
             >
@@ -91,12 +92,12 @@ export default function Navbar() {
 
         {/* Mobile Nav */}
         {open && (
-          <div className="lg:hidden pb-4 space-y-1">
+          <div className="xl:hidden pb-4 space-y-0.5 border-t border-border/50 pt-3 mt-0">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href}>
                 <span
                   onClick={() => setOpen(false)}
-                  className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                  className={`block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                     location === link.href
                       ? "bg-primary/10 text-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"

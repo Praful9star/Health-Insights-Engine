@@ -11,6 +11,7 @@ import ClaimChecker from "@/pages/claim-checker";
 import DiseaseJourney from "@/pages/disease-journey";
 import ReportExplainer from "@/pages/report-explainer";
 import SymptomChecker from "@/pages/symptom-checker";
+import MedicineExplainer from "@/pages/medicine-explainer";
 import About from "@/pages/about";
 import NotFound from "@/pages/not-found";
 
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/disease-journey" component={DiseaseJourney} />
       <Route path="/report-explainer" component={ReportExplainer} />
       <Route path="/symptom-checker" component={SymptomChecker} />
+      <Route path="/medicine-explainer" component={MedicineExplainer} />
       <Route path="/about" component={About} />
       <Route component={NotFound} />
     </Switch>

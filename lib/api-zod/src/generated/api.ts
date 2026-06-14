@@ -142,3 +142,38 @@ export const CheckSymptomsResponse = zod.object({
 })
 
 
+/**
+ * Get plain-language explanation of a medicine, its side effects, and interactions
+ * @summary Explain a medicine
+ */
+export const explainMedicineBodyMedicineMin = 2;
+
+
+
+export const ExplainMedicineBody = zod.object({
+  "medicine": zod.string().min(explainMedicineBodyMedicineMin).describe('Medicine name or prescription text'),
+  "language": zod.enum(['en', 'hi']).optional().describe('Response language')
+})
+
+export const ExplainMedicineResponse = zod.object({
+  "medicineName": zod.string(),
+  "genericName": zod.string(),
+  "medicineClass": zod.string(),
+  "whatItTreats": zod.array(zod.string()),
+  "howItWorks": zod.string(),
+  "commonSideEffects": zod.array(zod.object({
+  "effect": zod.string(),
+  "frequency": zod.enum(['very_common', 'common', 'uncommon', 'rare']),
+  "whatToDo": zod.string()
+})),
+  "foodInteractions": zod.array(zod.string()),
+  "drugInteractions": zod.array(zod.string()),
+  "importantWarnings": zod.array(zod.string()),
+  "bestTimeTake": zod.string(),
+  "missedDose": zod.string(),
+  "storage": zod.string(),
+  "pharmacistQuestions": zod.array(zod.string()),
+  "disclaimer": zod.string()
+})
+
+
