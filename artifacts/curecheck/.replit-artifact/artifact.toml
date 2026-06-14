@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "CureCheck"
+version = "1.0.0"
+id = "artifacts/curecheck"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25201
+
+[services.development]
+run = "pnpm --filter @workspace/curecheck run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/curecheck", "run", "build" ]
+publicDir = "artifacts/curecheck/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25201"
+BASE_PATH = "/"

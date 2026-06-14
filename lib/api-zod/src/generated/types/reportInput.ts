@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface ReportInput {
+  /**
+     * The medical report text to explain
+     * @minLength 20
+     */
+  reportText: string;
 }

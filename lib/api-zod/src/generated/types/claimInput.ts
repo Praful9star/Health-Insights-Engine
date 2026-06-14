@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface ClaimInput {
+  /**
+     * The health claim text to verify
+     * @minLength 10
+     */
+  claim: string;
 }

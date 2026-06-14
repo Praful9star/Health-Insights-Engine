@@ -3,13 +3,19 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: CureCheck API - AI-powered health information platform
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: claim-checker
+    description: Health claim verification
+  - name: disease-journey
+    description: Disease journey mapping
+  - name: report-explainer
+    description: Medical report explanation
 paths:
   /healthz:
     get:
@@ -24,6 +30,85 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /claim-checker:
+    post:
+      operationId: checkHealthClaim
+      tags: [claim-checker]
+      summary: Verify a health claim
+      description: Analyze a health claim for credibility and evidence strength
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClaimInput"
+      responses:
+        "200":
+          description: Claim analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /disease-journey:
+    post:
+      operationId: getDiseaseJourney
+      tags: [disease-journey]
+      summary: Get disease journey map
+      description: Generate an interactive disease journey timeline
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiseaseJourneyInput"
+      responses:
+        "200":
+          description: Disease journey timeline
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiseaseJourneyResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /report-explainer:
+    post:
+      operationId: explainMedicalReport
+      tags: [report-explainer]
+      summary: Explain a medical report
+      description: Convert complex medical terminology into simple language
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportInput"
+      responses:
+        "200":
+          description: Report explanation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +119,208 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    ClaimInput:
+      type: object
+      required:
+        - claim
+      properties:
+        claim:
+          type: string
+          minLength: 10
+          description: The health claim text to verify
+
+    ClaimResult:
+      type: object
+      required:
+        - credibilityScore
+        - evidenceStrength
+        - verdict
+        - redFlags
+        - whyMisleading
+        - saferInterpretation
+        - doctorQuestions
+        - disclaimer
+      properties:
+        credibilityScore:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Credibility score from 0 to 100
+        evidenceStrength:
+          type: string
+          enum: [strong, moderate, weak, insufficient]
+        verdict:
+          type: string
+          enum: [likely_true, partially_true, misleading, likely_false, unverifiable]
+        summary:
+          type: string
+          description: Brief summary of the analysis
+        redFlags:
+          type: array
+          items:
+            type: string
+          description: List of red flags identified
+        whyMisleading:
+          type: string
+          description: Explanation of why the claim may be misleading
+        saferInterpretation:
+          type: string
+          description: A more accurate, safer interpretation of the claim
+        doctorQuestions:
+          type: array
+          items:
+            type: string
+          description: Recommended questions to ask a doctor
+        disclaimer:
+          type: string
+
+    DiseaseJourneyInput:
+      type: object
+      required:
+        - disease
+        - ageGroup
+      properties:
+        disease:
+          type: string
+          minLength: 2
+          description: Disease or condition name
+        ageGroup:
+          type: string
+          enum: [child, teen, adult, senior]
+          description: Patient age group
+
+    DiseaseJourneyPhase:
+      type: object
+      required:
+        - phase
+        - title
+        - description
+        - duration
+        - commonExperiences
+        - warningSignsToWatch
+      properties:
+        phase:
+          type: string
+          enum: [initial, monitoring, treatment, recovery, ongoing_management]
+        title:
+          type: string
+        description:
+          type: string
+        duration:
+          type: string
+          description: Typical duration of this phase
+        commonExperiences:
+          type: array
+          items:
+            type: string
+        warningSignsToWatch:
+          type: array
+          items:
+            type: string
+
+    DiseaseJourneyResult:
+      type: object
+      required:
+        - disease
+        - ageGroup
+        - overview
+        - phases
+        - commonQuestions
+        - supportResources
+        - disclaimer
+      properties:
+        disease:
+          type: string
+        ageGroup:
+          type: string
+        overview:
+          type: string
+        phases:
+          type: array
+          items:
+            $ref: "#/components/schemas/DiseaseJourneyPhase"
+        commonQuestions:
+          type: array
+          items:
+            type: string
+        supportResources:
+          type: array
+          items:
+            type: string
+        disclaimer:
+          type: string
+
+    ReportInput:
+      type: object
+      required:
+        - reportText
+      properties:
+        reportText:
+          type: string
+          minLength: 20
+          description: The medical report text to explain
+
+    ReportTerm:
+      type: object
+      required:
+        - term
+        - simplifiedExplanation
+      properties:
+        term:
+          type: string
+        simplifiedExplanation:
+          type: string
+
+    ReportFinding:
+      type: object
+      required:
+        - finding
+        - importance
+        - explanation
+      properties:
+        finding:
+          type: string
+        importance:
+          type: string
+          enum: [critical, important, normal, informational]
+        explanation:
+          type: string
+
+    ReportResult:
+      type: object
+      required:
+        - simpleSummary
+        - keyTerms
+        - importantFindings
+        - doctorQuestions
+        - overallAssessment
+        - disclaimer
+      properties:
+        simpleSummary:
+          type: string
+          description: Plain-language summary of the report
+        keyTerms:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportTerm"
+        importantFindings:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportFinding"
+        doctorQuestions:
+          type: array
+          items:
+            type: string
+        overallAssessment:
+          type: string
+          enum: [requires_urgent_attention, needs_follow_up, routine_monitoring, all_clear]
+        disclaimer:
+          type: string
