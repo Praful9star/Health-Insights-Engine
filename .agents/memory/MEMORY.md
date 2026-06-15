@@ -1,1 +1,2 @@
 - [CureCheck architecture](curecheck-arch.md) — contract-first monorepo; all new features need spec → codegen → API route → frontend page in that order.
+- [framer-motion ease typing](framer-motion-ease-typing.md) — inline cubic-bezier `ease: [...]` needs `as [number, number, number, number]` cast or tsc fails (vite build hides it).

@@ -52,7 +52,7 @@ function ScoreGauge({ score }: { score: number }) {
           <circle cx="60" cy="60" r={radius} fill="none" stroke="currentColor" strokeWidth="10" className="text-muted/40" />
           <motion.circle cx="60" cy="60" r={radius} fill="none" stroke={color} strokeWidth="10" strokeLinecap="round"
             strokeDasharray={circumference} initial={{ strokeDashoffset: circumference }}
-            animate={{ strokeDashoffset: offset }} transition={{ duration: 1.4, ease: [0.4, 0, 0.2, 1], delay: 0.2 }} />
+            animate={{ strokeDashoffset: offset }} transition={{ duration: 1.4, ease: [0.4, 0, 0.2, 1] as [number, number, number, number], delay: 0.2 }} />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <motion.span className="text-3xl font-serif font-700" style={{ color }}

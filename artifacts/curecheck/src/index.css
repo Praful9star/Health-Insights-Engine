@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Bricolage+Grotesque:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -142,10 +142,10 @@
   --chart-4: 38 92% 50%;
   --chart-5: 0 72% 51%;
 
-  --app-font-sans: 'Inter', sans-serif;
-  --app-font-serif: 'Bricolage Grotesque', sans-serif;
-  --app-font-mono: Menlo, monospace;
-  --radius: 0.625rem;
+  --app-font-sans: 'Geist', system-ui, sans-serif;
+  --app-font-serif: 'Geist', system-ui, sans-serif;
+  --app-font-mono: 'JetBrains Mono', monospace;
+  --radius: 0.875rem;
 
   --shadow-2xs: 0px 1px 2px 0px rgba(0,70,120,0.04);
   --shadow-xs: 0px 1px 3px 0px rgba(0,70,120,0.06);
@@ -175,49 +175,49 @@
   --elevate-1: rgba(255,255,255,.04);
   --elevate-2: rgba(255,255,255,.09);
 
-  --background: 222 35% 7%;
-  --foreground: 210 30% 93%;
-  --border: 217 22% 18%;
-  --input: 217 22% 20%;
-  --ring: 199 89% 55%;
+  --background: 190 32% 5%;
+  --foreground: 180 14% 90%;
+  --border: 185 18% 15%;
+  --input: 185 18% 16%;
+  --ring: 183 100% 50%;
 
-  --card: 222 32% 10%;
-  --card-foreground: 210 30% 93%;
-  --card-border: 217 22% 18%;
+  --card: 186 26% 8%;
+  --card-foreground: 180 14% 90%;
+  --card-border: 185 16% 15%;
 
-  --sidebar: 222 35% 8%;
-  --sidebar-foreground: 210 30% 88%;
-  --sidebar-border: 217 22% 16%;
-  --sidebar-primary: 199 89% 55%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 217 22% 14%;
-  --sidebar-accent-foreground: 210 30% 88%;
-  --sidebar-ring: 199 89% 55%;
+  --sidebar: 188 30% 5%;
+  --sidebar-foreground: 180 12% 84%;
+  --sidebar-border: 185 16% 13%;
+  --sidebar-primary: 183 100% 50%;
+  --sidebar-primary-foreground: 187 100% 8%;
+  --sidebar-accent: 185 20% 12%;
+  --sidebar-accent-foreground: 183 90% 75%;
+  --sidebar-ring: 183 100% 50%;
 
-  --popover: 222 32% 10%;
-  --popover-foreground: 210 30% 93%;
-  --popover-border: 217 22% 18%;
+  --popover: 186 28% 8%;
+  --popover-foreground: 180 14% 90%;
+  --popover-border: 185 16% 15%;
 
-  --primary: 199 89% 55%;
-  --primary-foreground: 222 35% 7%;
+  --primary: 183 100% 50%;
+  --primary-foreground: 187 100% 8%;
 
-  --secondary: 174 60% 45%;
+  --secondary: 207 78% 55%;
   --secondary-foreground: 0 0% 100%;
 
-  --muted: 217 22% 14%;
-  --muted-foreground: 215 18% 58%;
+  --muted: 185 20% 12%;
+  --muted-foreground: 184 11% 64%;
 
-  --accent: 217 22% 16%;
-  --accent-foreground: 199 89% 65%;
+  --accent: 185 22% 13%;
+  --accent-foreground: 183 95% 72%;
 
-  --destructive: 0 68% 60%;
+  --destructive: 5 85% 68%;
   --destructive-foreground: 0 0% 100%;
 
-  --chart-1: 199 89% 55%;
-  --chart-2: 174 60% 45%;
-  --chart-3: 142 60% 52%;
-  --chart-4: 38 85% 58%;
-  --chart-5: 0 68% 60%;
+  --chart-1: 183 100% 50%;
+  --chart-2: 207 78% 55%;
+  --chart-3: 150 70% 50%;
+  --chart-4: 48 98% 61%;
+  --chart-5: 5 85% 68%;
 
   --shadow-2xs: 0px 1px 2px 0px rgba(0,0,0,0.5);
   --shadow-xs: 0px 1px 3px 0px rgba(0,0,0,0.55);
@@ -240,13 +240,15 @@
 @layer base {
   * { @apply border-border; }
   body { @apply font-sans antialiased bg-background text-foreground; }
-  h1, h2, h3 { font-family: var(--app-font-serif); }
+  h1, h2, h3, h4 { font-family: var(--app-font-serif); letter-spacing: -0.025em; }
+
+  ::selection { background: hsl(var(--primary) / 0.28); color: hsl(var(--foreground)); }
 
   /* Smooth scrollbar */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar { width: 7px; height: 7px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 99px; }
-  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.5); }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--primary) / 0.4); }
 }
 
 @layer utilities {
@@ -260,15 +262,22 @@
     border: 1px solid rgba(255,255,255,0.55);
   }
   .dark .glass {
-    background: rgba(12,20,38,0.75);
-    backdrop-filter: blur(16px) saturate(1.2);
-    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    background: rgba(8,16,16,0.55);
+    backdrop-filter: blur(28px) saturate(1.3);
+    -webkit-backdrop-filter: blur(28px) saturate(1.3);
     border: 1px solid rgba(255,255,255,0.07);
+  }
+  /* Stronger frosted panel for bento cards */
+  .glass-panel {
+    background: rgba(13,21,21,0.5);
+    backdrop-filter: blur(24px) saturate(1.25);
+    -webkit-backdrop-filter: blur(24px) saturate(1.25);
+    border: 1px solid rgba(255,255,255,0.08);
   }
 
   /* Gradient text */
   .gradient-text {
-    background: linear-gradient(135deg, hsl(199 89% 42%), hsl(174 72% 38%), hsl(199 89% 55%));
+    background: linear-gradient(135deg, hsl(183 100% 62%), hsl(195 100% 70%), hsl(207 90% 66%));
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -290,9 +299,9 @@
   }
   .dark .hero-gradient {
     background:
-      radial-gradient(ellipse 90% 70% at 50% -15%, hsl(199 89% 22% / 0.35), transparent 70%),
-      radial-gradient(ellipse 55% 45% at 85% 25%, hsl(174 72% 18% / 0.25), transparent 60%),
-      radial-gradient(ellipse 40% 35% at 10% 60%, hsl(256 80% 20% / 0.2), transparent 55%);
+      radial-gradient(ellipse 90% 70% at 50% -15%, hsl(183 100% 30% / 0.22), transparent 70%),
+      radial-gradient(ellipse 55% 45% at 85% 20%, hsl(207 90% 35% / 0.18), transparent 60%),
+      radial-gradient(ellipse 45% 40% at 8% 65%, hsl(174 90% 28% / 0.15), transparent 58%);
   }
 
   /* Floating orb animations */
@@ -447,4 +456,130 @@
     transition: opacity 0.3s ease;
   }
   .spotlight-card:hover::after { opacity: 1; }
+
+  /* ============ PREMIUM (Stitch) UTILITIES ============ */
+
+  /* Film grain overlay (inline SVG noise — no external asset) */
+  .grain::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Animated premium background (CSS, mobile-friendly — no WebGL) */
+  .premium-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 120% 80% at 50% -20%, hsl(183 100% 24% / 0.20), transparent 60%),
+      radial-gradient(ellipse 80% 60% at 100% 0%, hsl(207 90% 32% / 0.16), transparent 55%),
+      radial-gradient(ellipse 90% 70% at 0% 100%, hsl(174 90% 24% / 0.14), transparent 55%),
+      hsl(var(--background));
+  }
+  .premium-bg::after {
+    content: '';
+    position: absolute;
+    inset: -40%;
+    background:
+      radial-gradient(circle at 30% 30%, hsl(183 100% 50% / 0.10), transparent 35%),
+      radial-gradient(circle at 70% 65%, hsl(207 90% 55% / 0.08), transparent 35%);
+    animation: aurora 22s ease-in-out infinite alternate;
+  }
+  @keyframes aurora {
+    0%   { transform: translate(0,0) rotate(0deg) scale(1); }
+    50%  { transform: translate(3%,-4%) rotate(8deg) scale(1.1); }
+    100% { transform: translate(-3%,3%) rotate(-6deg) scale(1.05); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .premium-bg::after { animation: none; }
+  }
+
+  /* Faint grid texture overlay */
+  .grid-overlay {
+    background-image:
+      linear-gradient(hsl(var(--border) / 0.5) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.5) 1px, transparent 1px);
+    background-size: 48px 48px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black, transparent 75%);
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black, transparent 75%);
+  }
+
+  /* Bento grid */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  @media (min-width: 768px) {
+    .bento-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  }
+
+  /* JetBrains mono label */
+  .mono-label {
+    font-family: var(--app-font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.7rem;
+    font-weight: 500;
+  }
+
+  /* Shimmer / sweep button */
+  .shimmer-btn {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .shimmer-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.35) 50%, transparent 75%);
+    background-size: 250% 100%;
+    background-position: 150% 0;
+    transition: background-position 0.7s ease;
+  }
+  .shimmer-btn:hover::before { background-position: -150% 0; }
+
+  /* Cyan glow */
+  .glow-cyan { box-shadow: 0 0 0 1px hsl(183 100% 50% / 0.25), 0 0 30px hsl(183 100% 50% / 0.18); }
+  .text-glow { text-shadow: 0 0 24px hsl(183 100% 50% / 0.45); }
+
+  /* Premium transitions */
+  .premium-transition { transition: transform .4s cubic-bezier(.22,1,.36,1), box-shadow .4s ease, border-color .4s ease, background-color .4s ease; }
+
+  /* Glow on focus-within (inputs/cards) */
+  .glow-border { transition: border-color .3s ease, box-shadow .3s ease; }
+  .glow-border:focus-within {
+    border-color: hsl(var(--primary) / 0.6);
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.12);
+  }
+
+  /* Hover lift for bento tiles */
+  .tile {
+    transition: transform .4s cubic-bezier(.22,1,.36,1), border-color .4s ease, box-shadow .4s ease;
+  }
+  .tile:hover {
+    transform: translateY(-4px);
+    border-color: hsl(var(--primary) / 0.35);
+    box-shadow: 0 18px 50px -12px hsl(183 100% 50% / 0.18);
+  }
+
+  /* 3D flip card (myth buster) */
+  .flip-3d { perspective: 1600px; }
+  .flip-inner { transform-style: preserve-3d; transition: transform .7s cubic-bezier(.22,1,.36,1); }
+  .flip-3d.flipped .flip-inner { transform: rotateY(180deg); }
+  .flip-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .flip-back { transform: rotateY(180deg); }
+
+  /* Slow spin for accents */
+  .spin-slow { animation: spin 14s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 }

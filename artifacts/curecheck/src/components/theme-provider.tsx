@@ -5,11 +5,18 @@ interface ThemeProviderProps {
   children: React.ReactNode;
   defaultTheme?: string;
   storageKey?: string;
+  forcedTheme?: string;
 }
 
-export function ThemeProvider({ children, defaultTheme = "light", storageKey = "theme" }: ThemeProviderProps) {
+export function ThemeProvider({ children, defaultTheme = "light", storageKey = "theme", forcedTheme }: ThemeProviderProps) {
   return (
-    <NextThemesProvider attribute="class" defaultTheme={defaultTheme} storageKey={storageKey} enableSystem={false}>
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme={defaultTheme}
+      forcedTheme={forcedTheme}
+      storageKey={storageKey}
+      enableSystem={false}
+    >
       {children}
     </NextThemesProvider>
   );

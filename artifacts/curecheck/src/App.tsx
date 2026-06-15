@@ -6,12 +6,15 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/contexts/language-context";
 import Navbar from "@/components/navbar";
 import DisclaimerBanner from "@/components/disclaimer-banner";
+import PremiumBackground from "@/components/premium-background";
+import Footer from "@/components/footer";
 import Home from "@/pages/home";
 import ClaimChecker from "@/pages/claim-checker";
 import DiseaseJourney from "@/pages/disease-journey";
 import ReportExplainer from "@/pages/report-explainer";
 import SymptomChecker from "@/pages/symptom-checker";
 import MedicineExplainer from "@/pages/medicine-explainer";
+import FitnessHub from "@/pages/fitness-hub";
 import About from "@/pages/about";
 import NotFound from "@/pages/not-found";
 
@@ -30,6 +33,7 @@ function Router() {
       <Route path="/report-explainer" component={ReportExplainer} />
       <Route path="/symptom-checker" component={SymptomChecker} />
       <Route path="/medicine-explainer" component={MedicineExplainer} />
+      <Route path="/fitness-hub" component={FitnessHub} />
       <Route path="/about" component={About} />
       <Route component={NotFound} />
     </Switch>
@@ -38,16 +42,20 @@ function Router() {
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="curecheck-theme">
+    <ThemeProvider defaultTheme="dark" forcedTheme="dark" storageKey="curecheck-theme">
       <LanguageProvider>
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
             <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-              <DisclaimerBanner />
-              <Navbar />
-              <main>
-                <Router />
-              </main>
+              <div className="grain relative min-h-screen flex flex-col">
+                <PremiumBackground />
+                <DisclaimerBanner />
+                <Navbar />
+                <main className="flex-1">
+                  <Router />
+                </main>
+                <Footer />
+              </div>
               <Toaster />
             </WouterRouter>
           </TooltipProvider>

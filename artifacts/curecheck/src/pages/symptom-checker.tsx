@@ -262,7 +262,7 @@ export default function SymptomChecker() {
                   <Card className={`border-2 ${cfg.bg}`}>
                     <CardContent className="pt-5 pb-5">
                       <div className="flex items-center gap-3 mb-2">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${cfg.urgencyLevel === "emergency" ? "bg-red-100 dark:bg-red-900" : "bg-white/50 dark:bg-black/20"}`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${result.urgencyLevel === "emergency" ? "bg-red-100 dark:bg-red-900" : "bg-white/50 dark:bg-black/20"}`}>
                           <Icon className={`w-5 h-5 ${cfg.color}`} />
                         </div>
                         <div>
