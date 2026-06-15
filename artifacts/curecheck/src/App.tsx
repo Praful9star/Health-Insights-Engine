@@ -15,6 +15,8 @@ import ReportExplainer from "@/pages/report-explainer";
 import SymptomChecker from "@/pages/symptom-checker";
 import MedicineExplainer from "@/pages/medicine-explainer";
 import FitnessHub from "@/pages/fitness-hub";
+import HealthTimeline from "@/pages/health-timeline";
+import MythBuster from "@/pages/myth-buster";
 import About from "@/pages/about";
 import NotFound from "@/pages/not-found";
 
@@ -28,12 +30,14 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/claim-checker" component={ClaimChecker} />
-      <Route path="/disease-journey" component={DiseaseJourney} />
       <Route path="/report-explainer" component={ReportExplainer} />
-      <Route path="/symptom-checker" component={SymptomChecker} />
       <Route path="/medicine-explainer" component={MedicineExplainer} />
+      <Route path="/health-timeline" component={HealthTimeline} />
       <Route path="/fitness-hub" component={FitnessHub} />
+      <Route path="/myth-buster" component={MythBuster} />
+      <Route path="/symptom-checker" component={SymptomChecker} />
+      <Route path="/disease-journey" component={DiseaseJourney} />
+      <Route path="/claim-checker" component={ClaimChecker} />
       <Route path="/about" component={About} />
       <Route component={NotFound} />
     </Switch>
