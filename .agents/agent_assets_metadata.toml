@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "9NiWhuRMbpfy_35WuvpPn"
+uri = "file://artifacts/curecheck-ad/public/audio/bg_music.mp3"
+type = "audio"
+title = "CureCheck background music"
