@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Activity, Shield, Dumbbell, Pill, FileSearch, Route as RouteIcon,
   ArrowRight, ArrowUpRight, Sparkles, Zap, Microscope, CheckCircle2,
-  Lock, Heart, Award, Users, Star, RefreshCw, FlaskConical, Languages, Quote,
+  Lock, Heart, Award, Users, RefreshCw, FlaskConical, Languages,
+  MessageCircleWarning, FileText, HeartPulse, BadgeCheck, DatabaseZap, Globe2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -74,11 +75,12 @@ const tools = [
   },
 ];
 
-const stats = [
-  { value: "50,000+", label: { en: "Users helped", hi: "मदद की गई" } },
-  { value: "1,20,000+", label: { en: "Claims analyzed", hi: "दावे जांचे" } },
-  { value: "95%", label: { en: "Felt more informed", hi: "बेहतर informed" } },
-  { value: "Free", label: { en: "Always & forever", hi: "हमेशा मुफ्त" } },
+const trustChips = [
+  { icon: BadgeCheck, label: { en: "6 focused AI tools", hi: "6 AI टूल" }, color: "text-primary" },
+  { icon: DatabaseZap, label: { en: "No data stored", hi: "डेटा store नहीं" }, color: "text-emerald-400" },
+  { icon: Globe2, label: { en: "Hindi + English", hi: "हिंदी + English" }, color: "text-sky-400" },
+  { icon: BadgeCheck, label: { en: "Free forever", hi: "हमेशा मुफ्त" }, color: "text-violet-400" },
+  { icon: HeartPulse, label: { en: "No signup needed", hi: "signup नहीं" }, color: "text-rose-400" },
 ];
 
 const steps = [
@@ -94,10 +96,31 @@ const pillars = [
   { icon: Users, title: { en: "Doctor-friendly", hi: "डॉक्टर के अनुकूल" }, desc: { en: "Complements — never replaces — your physician.", hi: "डॉक्टर को complement करता है — replace नहीं।" } },
 ];
 
-const testimonials = [
-  { name: "Priya Sharma", location: "Bengaluru", role: "Software Engineer", text: { en: "My mother-in-law was convinced giloy cures thyroid problems. CureCheck gave us a clear breakdown for a calm, informed talk with her doctor.", hi: "मेरी सास को यकीन था कि गिलोय थायराइड ठीक करती है। CureCheck की मदद से हम डॉक्टर से सही बात कर पाए।" } },
-  { name: "Ramesh Gupta", location: "Lucknow", role: "Teacher", text: { en: "My father was newly diagnosed with Type 2 diabetes. The Disease Journey map gave our whole family a roadmap of what to expect.", hi: "पिताजी को Type 2 diabetes हुआ। Disease Journey map ने पूरे परिवार को roadmap दिया।" } },
-  { name: "Dr. Anjali Mehta", location: "Mumbai", role: "Physician, MBBS", text: { en: "I recommend CureCheck to patients confused by social media health claims. It helps them arrive with the right questions.", hi: "मैं social media दावों से confused मरीजों को CureCheck recommend करती हूं। यह सही सवालों के साथ आने में मदद करता है।" } },
+const scenarios = [
+  {
+    icon: MessageCircleWarning,
+    color: "text-amber-400", bg: "bg-amber-500/12", border: "border-amber-500/25 hover:border-amber-500/50",
+    bubble: { en: "\"Bhai, neem juice daily se diabetes bilkul theek ho jaati hai 🌿\"", hi: "\"भाई, नीम का रस रोज़ पीने से diabetes बिल्कुल ठीक हो जाती है 🌿\"" },
+    label: { en: "WhatsApp forward from family group", hi: "परिवार के WhatsApp group का forward" },
+    tool: { en: "Claim Checker", hi: "दावा जांच" }, href: "/claim-checker",
+    cta: { en: "Get a credibility verdict →", hi: "विश्वसनीयता verdict पाएं →" },
+  },
+  {
+    icon: FileText,
+    color: "text-sky-400", bg: "bg-sky-500/12", border: "border-sky-500/25 hover:border-sky-500/50",
+    bubble: { en: "Your report says: TSH — 6.8 H  |  T3 — 78  |  T4 — 6.2\nReference ranges in fine print you can't read.", hi: "रिपोर्ट में लिखा है: TSH — 6.8 H  |  T3 — 78  |  T4 — 6.2\nReference range बारीक अक्षरों में जो पढ़ नहीं सकते।" },
+    label: { en: "Thyroid report that makes no sense", hi: "समझ न आने वाली thyroid रिपोर्ट" },
+    tool: { en: "Report Explainer", hi: "रिपोर्ट समझें" }, href: "/report-explainer",
+    cta: { en: "Understand every number →", hi: "हर नंबर समझें →" },
+  },
+  {
+    icon: HeartPulse,
+    color: "text-rose-400", bg: "bg-rose-500/12", border: "border-rose-500/25 hover:border-rose-500/50",
+    bubble: { en: "Papa was just diagnosed with Type 2 Diabetes. You have no idea what the next months look like.", hi: "पापा को अभी Type 2 Diabetes हुआ है। आगे क्या होगा, कुछ नहीं पता।" },
+    label: { en: "Newly diagnosed family member", hi: "परिवार में नई बीमारी" },
+    tool: { en: "Disease Journey Map", hi: "रोग यात्रा मानचित्र" }, href: "/disease-journey",
+    cta: { en: "See what to expect →", hi: "आगे क्या होगा जानें →" },
+  },
 ];
 
 const faqs = [
@@ -244,17 +267,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===== STATS ===== */}
+      {/* ===== TRUST CHIPS ===== */}
       <section className="px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="glass-panel rounded-2xl grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-border/60 overflow-hidden">
-            {stats.map((s, i) => (
-              <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} className="text-center py-7 px-3">
-                <p className="text-2xl sm:text-3xl font-serif font-800 gradient-text">{s.value}</p>
-                <p className="mt-1 text-xs sm:text-sm text-muted-foreground">{language === "hi" ? s.label.hi : s.label.en}</p>
-              </motion.div>
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="flex flex-wrap justify-center gap-3">
+            {trustChips.map((chip, i) => (
+              <div key={i} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full glass-panel border border-border/60 text-sm font-600">
+                <chip.icon className={`w-4 h-4 ${chip.color}`} />
+                <span className="text-foreground/80">{language === "hi" ? chip.label.hi : chip.label.en}</span>
+              </div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -353,23 +376,40 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===== TESTIMONIALS ===== */}
+      {/* ===== SCENARIOS ===== */}
       <section className="py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
-            <p className="mono-label text-primary/80 mb-3">{t("Loved across India", "भारत भर में पसंद")}</p>
-            <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">{t("Real stories", "असली कहानियाँ")}</h2>
+            <p className="mono-label text-primary/80 mb-3">{t("Sound familiar?", "जानी-पहचानी बात?")}</p>
+            <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">
+              {t("CureCheck helps when…", "CureCheck तब काम आता है जब…")}
+            </h2>
+            <p className="mt-4 text-muted-foreground text-lg max-w-xl mx-auto">
+              {t("Three situations millions of Indians face every day.", "तीन ऐसी परिस्थितियाँ जो लाखों भारतीयों के साथ रोज़ होती हैं।")}
+            </p>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-5">
-            {testimonials.map((tm, i) => (
-              <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} className="glass-panel rounded-2xl p-6 flex flex-col gap-4">
-                <Quote className="w-7 h-7 text-primary/30" />
-                <p className="text-sm text-foreground/85 leading-relaxed flex-1">"{language === "hi" ? tm.text.hi : tm.text.en}"</p>
-                <div className="flex gap-0.5">{[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-chart-4 text-chart-4" />)}</div>
-                <div>
-                  <p className="font-700 text-foreground text-sm">{tm.name}</p>
-                  <p className="text-xs text-muted-foreground">{tm.role} · {tm.location}</p>
-                </div>
+            {scenarios.map((sc, i) => (
+              <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}>
+                <Link href={sc.href}>
+                  <div className={`group glass-panel rounded-2xl p-6 flex flex-col gap-5 cursor-pointer border ${sc.border} transition-colors h-full`}>
+                    <div className={`w-11 h-11 rounded-2xl ${sc.bg} ${sc.color} flex items-center justify-center flex-shrink-0`}>
+                      <sc.icon className="w-5 h-5" />
+                    </div>
+                    <div className={`rounded-xl ${sc.bg} border ${sc.border.split(" ")[0]} px-4 py-3`}>
+                      <p className="text-sm text-foreground/80 leading-relaxed font-500 whitespace-pre-line">
+                        {language === "hi" ? sc.bubble.hi : sc.bubble.en}
+                      </p>
+                    </div>
+                    <p className="text-xs mono-label text-muted-foreground">{language === "hi" ? sc.label.hi : sc.label.en}</p>
+                    <div className="mt-auto pt-2 border-t border-border/50 flex items-center justify-between">
+                      <span className={`text-xs font-700 ${sc.color}`}>{language === "hi" ? sc.tool.hi : sc.tool.en}</span>
+                      <span className={`text-xs font-600 ${sc.color} group-hover:translate-x-0.5 transition-transform inline-block`}>
+                        {language === "hi" ? sc.cta.hi : sc.cta.en}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
               </motion.div>
             ))}
           </div>
