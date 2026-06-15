@@ -9,17 +9,10 @@ import type { SymptomInputGender } from './symptomInputGender';
 import type { SymptomInputLanguage } from './symptomInputLanguage';
 
 export interface SymptomInput {
-  /**
-     * Description of symptoms
-     * @minLength 5
-     */
+  /** @minLength 5 */
   symptoms: string;
-  /** Patient age (optional) */
   age?: string;
-  /** Patient gender (optional) */
   gender?: SymptomInputGender;
-  /** How long symptoms have been present */
   duration?: string;
-  /** Response language */
   language?: SymptomInputLanguage;
 }

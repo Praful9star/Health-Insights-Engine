@@ -9,13 +9,8 @@ import type { DiseaseJourneyInputAgeGroup } from './diseaseJourneyInputAgeGroup'
 import type { DiseaseJourneyInputLanguage } from './diseaseJourneyInputLanguage';
 
 export interface DiseaseJourneyInput {
-  /**
-     * Disease or condition name
-     * @minLength 2
-     */
+  /** @minLength 2 */
   disease: string;
-  /** Patient age group */
   ageGroup: DiseaseJourneyInputAgeGroup;
-  /** Response language */
   language?: DiseaseJourneyInputLanguage;
 }

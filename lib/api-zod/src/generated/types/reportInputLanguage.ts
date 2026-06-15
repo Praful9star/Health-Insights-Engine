@@ -6,9 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-/**
- * Response language
- */
 export type ReportInputLanguage = typeof ReportInputLanguage[keyof typeof ReportInputLanguage];
 
 

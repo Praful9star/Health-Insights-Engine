@@ -6,9 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-/**
- * Response language
- */
 export type DiseaseJourneyInputLanguage = typeof DiseaseJourneyInputLanguage[keyof typeof DiseaseJourneyInputLanguage];
 
 

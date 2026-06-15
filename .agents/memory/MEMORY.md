@@ -1,3 +1,4 @@
 - [CureCheck architecture](curecheck-arch.md) — contract-first monorepo; all new features need spec → codegen → API route → frontend page in that order.
 - [framer-motion ease typing](framer-motion-ease-typing.md) — inline cubic-bezier `ease: [...]` needs `as [number, number, number, number]` cast or tsc fails (vite build hides it).
 - [CureCheck localStorage features](curecheck-localstorage.md) — fitness/timeline data persisted client-side; hook, keys, and types summarised.
+- [CureCheck Report Explainer](curecheck-report-explainer.md) — OCR flow, vision model, pdfjs-dist setup, and new API schemas.

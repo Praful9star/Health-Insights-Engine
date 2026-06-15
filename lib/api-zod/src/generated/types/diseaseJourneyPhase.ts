@@ -11,7 +11,6 @@ export interface DiseaseJourneyPhase {
   phase: DiseaseJourneyPhasePhase;
   title: string;
   description: string;
-  /** Typical duration of this phase */
   duration: string;
   commonExperiences: string[];
   warningSignsToWatch: string[];

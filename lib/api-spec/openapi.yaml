@@ -92,7 +92,7 @@ paths:
       operationId: explainMedicalReport
       tags: [report-explainer]
       summary: Explain a medical report
-      description: Convert complex medical terminology into simple language
+      description: Convert complex medical terminology into simple language with detailed per-parameter analysis
       requestBody:
         required: true
         content:
@@ -106,6 +106,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ReportResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /ocr-report:
+    post:
+      operationId: ocrReport
+      tags: [report-explainer]
+      summary: Extract text from a medical report image
+      description: Use AI vision to read and extract text from an uploaded medical report image
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OcrInput"
+      responses:
+        "200":
+          description: Extracted text
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OcrResult"
         "400":
           description: Bad request
           content:
@@ -213,7 +239,6 @@ components:
           type: integer
           minimum: 0
           maximum: 100
-          description: Credibility score from 0 to 100
         evidenceStrength:
           type: string
           enum: [strong, moderate, weak, insufficient]
@@ -222,23 +247,18 @@ components:
           enum: [likely_true, partially_true, misleading, likely_false, unverifiable]
         summary:
           type: string
-          description: Brief summary of the analysis
         redFlags:
           type: array
           items:
             type: string
-          description: List of red flags identified
         whyMisleading:
           type: string
-          description: Explanation of why the claim may be misleading
         saferInterpretation:
           type: string
-          description: A more accurate, safer interpretation of the claim
         doctorQuestions:
           type: array
           items:
             type: string
-          description: Recommended questions to ask a doctor
         disclaimer:
           type: string
 
@@ -251,15 +271,12 @@ components:
         disease:
           type: string
           minLength: 2
-          description: Disease or condition name
         ageGroup:
           type: string
           enum: [child, teen, adult, senior]
-          description: Patient age group
         language:
           type: string
           enum: [en, hi]
-          description: Response language
 
     DiseaseJourneyPhase:
       type: object
@@ -280,7 +297,6 @@ components:
           type: string
         duration:
           type: string
-          description: Typical duration of this phase
         commonExperiences:
           type: array
           items:
@@ -322,6 +338,30 @@ components:
         disclaimer:
           type: string
 
+    OcrInput:
+      type: object
+      required:
+        - imageData
+        - mimeType
+      properties:
+        imageData:
+          type: string
+          description: Base64-encoded image data (no data URI prefix)
+        mimeType:
+          type: string
+          description: MIME type of the image (image/jpeg, image/png, etc.)
+
+    OcrResult:
+      type: object
+      required:
+        - extractedText
+      properties:
+        extractedText:
+          type: string
+        confidence:
+          type: string
+          enum: [high, medium, low]
+
     ReportInput:
       type: object
       required:
@@ -330,11 +370,45 @@ components:
         reportText:
           type: string
           minLength: 20
-          description: The medical report text to explain
         language:
           type: string
           enum: [en, hi]
-          description: Response language
+
+    ReportParameter:
+      type: object
+      required:
+        - name
+        - status
+        - whatItMeans
+        - whyItMatters
+      properties:
+        name:
+          type: string
+        userValue:
+          type: string
+        normalRange:
+          type: string
+        status:
+          type: string
+          enum: [low, normal, high, critical]
+        whatItMeans:
+          type: string
+        whyItMatters:
+          type: string
+        causes:
+          type: array
+          items:
+            type: string
+        symptoms:
+          type: array
+          items:
+            type: string
+        lifestyle:
+          type: array
+          items:
+            type: string
+        urgency:
+          type: string
 
     ReportTerm:
       type: object
@@ -374,7 +448,15 @@ components:
       properties:
         simpleSummary:
           type: string
-          description: Plain-language summary of the report
+        severity:
+          type: string
+          enum: [low_concern, moderate_concern, high_concern]
+        severityReason:
+          type: string
+        parameters:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportParameter"
         keyTerms:
           type: array
           items:
@@ -383,6 +465,16 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ReportFinding"
+        healthInsights:
+          type: string
+        positiveFindings:
+          type: array
+          items:
+            type: string
+        areasOfAttention:
+          type: array
+          items:
+            type: string
         doctorQuestions:
           type: array
           items:
@@ -401,21 +493,16 @@ components:
         symptoms:
           type: string
           minLength: 5
-          description: Description of symptoms
         age:
           type: string
-          description: Patient age (optional)
         gender:
           type: string
           enum: [male, female, other]
-          description: Patient gender (optional)
         duration:
           type: string
-          description: How long symptoms have been present
         language:
           type: string
           enum: [en, hi]
-          description: Response language
 
     SymptomCause:
       type: object
@@ -476,11 +563,9 @@ components:
         medicine:
           type: string
           minLength: 2
-          description: Medicine name or prescription text
         language:
           type: string
           enum: [en, hi]
-          description: Response language
 
     MedicineSideEffect:
       type: object

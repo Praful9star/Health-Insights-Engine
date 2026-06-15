@@ -10,22 +10,16 @@ import type { ClaimResultVerdict } from './claimResultVerdict';
 
 export interface ClaimResult {
   /**
-     * Credibility score from 0 to 100
      * @minimum 0
      * @maximum 100
      */
   credibilityScore: number;
   evidenceStrength: ClaimResultEvidenceStrength;
   verdict: ClaimResultVerdict;
-  /** Brief summary of the analysis */
   summary?: string;
-  /** List of red flags identified */
   redFlags: string[];
-  /** Explanation of why the claim may be misleading */
   whyMisleading: string;
-  /** A more accurate, safer interpretation of the claim */
   saferInterpretation: string;
-  /** Recommended questions to ask a doctor */
   doctorQuestions: string[];
   disclaimer: string;
 }

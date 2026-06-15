@@ -6,9 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-/**
- * Patient gender (optional)
- */
 export type SymptomInputGender = typeof SymptomInputGender[keyof typeof SymptomInputGender];
 
 

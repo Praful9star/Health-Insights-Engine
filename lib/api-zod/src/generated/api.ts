@@ -36,14 +36,14 @@ export const checkHealthClaimResponseCredibilityScoreMax = 100;
 
 
 export const CheckHealthClaimResponse = zod.object({
-  "credibilityScore": zod.number().min(checkHealthClaimResponseCredibilityScoreMin).max(checkHealthClaimResponseCredibilityScoreMax).describe('Credibility score from 0 to 100'),
+  "credibilityScore": zod.number().min(checkHealthClaimResponseCredibilityScoreMin).max(checkHealthClaimResponseCredibilityScoreMax),
   "evidenceStrength": zod.enum(['strong', 'moderate', 'weak', 'insufficient']),
   "verdict": zod.enum(['likely_true', 'partially_true', 'misleading', 'likely_false', 'unverifiable']),
-  "summary": zod.string().optional().describe('Brief summary of the analysis'),
-  "redFlags": zod.array(zod.string()).describe('List of red flags identified'),
-  "whyMisleading": zod.string().describe('Explanation of why the claim may be misleading'),
-  "saferInterpretation": zod.string().describe('A more accurate, safer interpretation of the claim'),
-  "doctorQuestions": zod.array(zod.string()).describe('Recommended questions to ask a doctor'),
+  "summary": zod.string().optional(),
+  "redFlags": zod.array(zod.string()),
+  "whyMisleading": zod.string(),
+  "saferInterpretation": zod.string(),
+  "doctorQuestions": zod.array(zod.string()),
   "disclaimer": zod.string()
 })
 
@@ -57,9 +57,9 @@ export const getDiseaseJourneyBodyDiseaseMin = 2;
 
 
 export const GetDiseaseJourneyBody = zod.object({
-  "disease": zod.string().min(getDiseaseJourneyBodyDiseaseMin).describe('Disease or condition name'),
-  "ageGroup": zod.enum(['child', 'teen', 'adult', 'senior']).describe('Patient age group'),
-  "language": zod.enum(['en', 'hi']).optional().describe('Response language')
+  "disease": zod.string().min(getDiseaseJourneyBodyDiseaseMin),
+  "ageGroup": zod.enum(['child', 'teen', 'adult', 'senior']),
+  "language": zod.enum(['en', 'hi']).optional()
 })
 
 export const GetDiseaseJourneyResponse = zod.object({
@@ -70,7 +70,7 @@ export const GetDiseaseJourneyResponse = zod.object({
   "phase": zod.enum(['initial', 'monitoring', 'treatment', 'recovery', 'ongoing_management']),
   "title": zod.string(),
   "description": zod.string(),
-  "duration": zod.string().describe('Typical duration of this phase'),
+  "duration": zod.string(),
   "commonExperiences": zod.array(zod.string()),
   "warningSignsToWatch": zod.array(zod.string())
 })),
@@ -81,7 +81,7 @@ export const GetDiseaseJourneyResponse = zod.object({
 
 
 /**
- * Convert complex medical terminology into simple language
+ * Convert complex medical terminology into simple language with detailed per-parameter analysis
  * @summary Explain a medical report
  */
 export const explainMedicalReportBodyReportTextMin = 20;
@@ -89,12 +89,26 @@ export const explainMedicalReportBodyReportTextMin = 20;
 
 
 export const ExplainMedicalReportBody = zod.object({
-  "reportText": zod.string().min(explainMedicalReportBodyReportTextMin).describe('The medical report text to explain'),
-  "language": zod.enum(['en', 'hi']).optional().describe('Response language')
+  "reportText": zod.string().min(explainMedicalReportBodyReportTextMin),
+  "language": zod.enum(['en', 'hi']).optional()
 })
 
 export const ExplainMedicalReportResponse = zod.object({
-  "simpleSummary": zod.string().describe('Plain-language summary of the report'),
+  "simpleSummary": zod.string(),
+  "severity": zod.enum(['low_concern', 'moderate_concern', 'high_concern']).optional(),
+  "severityReason": zod.string().optional(),
+  "parameters": zod.array(zod.object({
+  "name": zod.string(),
+  "userValue": zod.string().optional(),
+  "normalRange": zod.string().optional(),
+  "status": zod.enum(['low', 'normal', 'high', 'critical']),
+  "whatItMeans": zod.string(),
+  "whyItMatters": zod.string(),
+  "causes": zod.array(zod.string()).optional(),
+  "symptoms": zod.array(zod.string()).optional(),
+  "lifestyle": zod.array(zod.string()).optional(),
+  "urgency": zod.string().optional()
+})).optional(),
   "keyTerms": zod.array(zod.object({
   "term": zod.string(),
   "simplifiedExplanation": zod.string()
@@ -104,9 +118,27 @@ export const ExplainMedicalReportResponse = zod.object({
   "importance": zod.enum(['critical', 'important', 'normal', 'informational']),
   "explanation": zod.string()
 })),
+  "healthInsights": zod.string().optional(),
+  "positiveFindings": zod.array(zod.string()).optional(),
+  "areasOfAttention": zod.array(zod.string()).optional(),
   "doctorQuestions": zod.array(zod.string()),
   "overallAssessment": zod.enum(['requires_urgent_attention', 'needs_follow_up', 'routine_monitoring', 'all_clear']),
   "disclaimer": zod.string()
+})
+
+
+/**
+ * Use AI vision to read and extract text from an uploaded medical report image
+ * @summary Extract text from a medical report image
+ */
+export const OcrReportBody = zod.object({
+  "imageData": zod.string().describe('Base64-encoded image data (no data URI prefix)'),
+  "mimeType": zod.string().describe('MIME type of the image (image\/jpeg, image\/png, etc.)')
+})
+
+export const OcrReportResponse = zod.object({
+  "extractedText": zod.string(),
+  "confidence": zod.enum(['high', 'medium', 'low']).optional()
 })
 
 
@@ -119,11 +151,11 @@ export const checkSymptomsBodySymptomsMin = 5;
 
 
 export const CheckSymptomsBody = zod.object({
-  "symptoms": zod.string().min(checkSymptomsBodySymptomsMin).describe('Description of symptoms'),
-  "age": zod.string().optional().describe('Patient age (optional)'),
-  "gender": zod.enum(['male', 'female', 'other']).optional().describe('Patient gender (optional)'),
-  "duration": zod.string().optional().describe('How long symptoms have been present'),
-  "language": zod.enum(['en', 'hi']).optional().describe('Response language')
+  "symptoms": zod.string().min(checkSymptomsBodySymptomsMin),
+  "age": zod.string().optional(),
+  "gender": zod.enum(['male', 'female', 'other']).optional(),
+  "duration": zod.string().optional(),
+  "language": zod.enum(['en', 'hi']).optional()
 })
 
 export const CheckSymptomsResponse = zod.object({
@@ -151,8 +183,8 @@ export const explainMedicineBodyMedicineMin = 2;
 
 
 export const ExplainMedicineBody = zod.object({
-  "medicine": zod.string().min(explainMedicineBodyMedicineMin).describe('Medicine name or prescription text'),
-  "language": zod.enum(['en', 'hi']).optional().describe('Response language')
+  "medicine": zod.string().min(explainMedicineBodyMedicineMin),
+  "language": zod.enum(['en', 'hi']).optional()
 })
 
 export const ExplainMedicineResponse = zod.object({

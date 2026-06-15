@@ -8,11 +8,7 @@
 import type { MedicineInputLanguage } from './medicineInputLanguage';
 
 export interface MedicineInput {
-  /**
-     * Medicine name or prescription text
-     * @minLength 2
-     */
+  /** @minLength 2 */
   medicine: string;
-  /** Response language */
   language?: MedicineInputLanguage;
 }

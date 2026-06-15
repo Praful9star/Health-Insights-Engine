@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { RefreshCw, ChevronLeft, ChevronRight, FlaskConical, CheckCircle2, Heart, Share2, Flame } from "lucide-react";
+import { RefreshCw, ChevronLeft, ChevronRight, FlaskConical, CheckCircle2, Shield } from "lucide-react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/language-context";
 import { DAILY_MYTHS } from "@/data/myths";
-import { useToast } from "@/hooks/use-toast";
+import { WhatsAppShare } from "@/components/whatsapp-share";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -39,7 +40,6 @@ function CredibilityBar({ score }: { score: number }) {
 
 export default function MythBuster() {
   const { language, t } = useLanguage();
-  const { toast } = useToast();
   const [idx, setIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [direction, setDirection] = useState(1);
@@ -60,23 +60,14 @@ export default function MythBuster() {
     setIdx(next);
   };
 
-  const share = () => {
-    const text = `🧪 Health Myth Check:\n\n"${language === "hi" ? myth.myth.hi : myth.myth.en}"\n\n✅ The Truth:\n${language === "hi" ? myth.truth.hi : myth.truth.en}\n\nvia CureCheck – curecheck.in`;
-    if (navigator.share) {
-      navigator.share({ text }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(text).then(() => {
-        toast({ title: t("Copied to clipboard!", "Clipboard पर copy हो गया!") });
-      });
-    }
-  };
+  const shareText = `🧪 ${t("Health Myth Check", "Health Myth Check")}:\n\n"${language === "hi" ? myth.myth.hi : myth.myth.en}"\n\n✅ ${t("The Truth", "सच्चाई")}:\n${language === "hi" ? myth.truth.hi : myth.truth.en}\n\n${t("via CureCheck – curecheck.in", "CureCheck – curecheck.in के ज़रिए")}`;
 
   return (
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12">
       {/* Header */}
       <motion.div variants={fadeUp} initial="hidden" animate="visible" className="text-center mb-10">
-        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel mono-label text-primary mb-5">
-          <Flame className="w-3.5 h-3.5" /> {t("Myth vs Science", "मिथक बनाम विज्ञान")}
+        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel mono-label text-amber-400 mb-5">
+          <FlaskConical className="w-3.5 h-3.5" /> {t("Myth vs Science", "मिथक बनाम विज्ञान")}
         </span>
         <h1 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">
           {t("Bust a Health Myth", "एक मिथक तोड़ें")}
@@ -92,7 +83,7 @@ export default function MythBuster() {
           <button
             key={i}
             onClick={() => { setFlipped(false); setIdx(i); }}
-            className={`w-2 h-2 rounded-full transition-all ${i === idx ? "bg-primary w-4" : "bg-muted/60 hover:bg-muted"}`}
+            className={`w-2 h-2 rounded-full transition-all ${i === idx ? "bg-amber-400 w-4" : "bg-muted/60 hover:bg-muted"}`}
             aria-label={`Go to myth ${i + 1}`}
           />
         ))}
@@ -107,7 +98,7 @@ export default function MythBuster() {
           exit={{ opacity: 0, x: -direction * 40 }}
           transition={{ duration: 0.35 }}
         >
-          <div className="flip-3d" style={{ minHeight: "360px" }}>
+          <div className="flip-3d" style={{ minHeight: "380px" }}>
             <motion.div
               className="flip-inner w-full h-full"
               animate={flipped ? "back" : "front"}
@@ -115,7 +106,7 @@ export default function MythBuster() {
               style={{ transformStyle: "preserve-3d" }}
             >
               {/* FRONT — the myth */}
-              <div className="flip-face flip-front glass-panel rounded-[1.75rem] p-8 sm:p-10 flex flex-col min-h-[360px]">
+              <div className="flip-face flip-front glass-panel border border-amber-500/20 rounded-[1.75rem] p-8 sm:p-10 flex flex-col min-h-[380px]">
                 <div className="flex items-center justify-between mb-4">
                   <span className="mono-label text-rose-400 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" /> {t("The Myth", "मिथक")}
@@ -136,7 +127,7 @@ export default function MythBuster() {
               </div>
 
               {/* BACK — the science */}
-              <div className="flip-face flip-back glass-panel rounded-[1.75rem] p-8 sm:p-10 flex flex-col min-h-[360px]" style={{ transform: "rotateY(180deg)" }}>
+              <div className="flip-face flip-back glass-panel border border-amber-500/30 rounded-[1.75rem] p-8 sm:p-10 flex flex-col min-h-[380px]" style={{ transform: "rotateY(180deg)" }}>
                 <span className="mono-label text-emerald-400 flex items-center gap-2 mb-4">
                   <CheckCircle2 className="w-4 h-4" /> {t("The Science", "विज्ञान")}
                 </span>
@@ -146,19 +137,33 @@ export default function MythBuster() {
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2.5 pt-4 border-t border-border/50">
-                  <Button onClick={() => setFlipped(false)} variant="outline" size="sm" className="rounded-full gap-1.5" data-testid="button-flip-back">
+                  <Button
+                    onClick={() => setFlipped(false)}
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full gap-1.5"
+                    data-testid="button-flip-back"
+                  >
                     <RefreshCw className="w-3.5 h-3.5" /> {t("See myth", "मिथक देखें")}
                   </Button>
-                  <Button onClick={() => go(1)} variant="outline" size="sm" className="rounded-full gap-1.5" data-testid="button-next-myth">
+                  <Button
+                    onClick={() => go(1)}
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full gap-1.5"
+                    data-testid="button-next-myth"
+                  >
                     {t("Next", "अगला")} <ChevronRight className="w-3.5 h-3.5" />
                   </Button>
-                  <button
-                    onClick={share}
-                    className="inline-flex items-center gap-1.5 text-sm px-3.5 py-1.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 hover:bg-emerald-500/25 transition-colors font-600"
-                    data-testid="button-share-myth"
-                  >
-                    <Heart className="w-3.5 h-3.5 fill-current" /> {t("Share", "शेयर")}
-                  </button>
+                  <Link href="/claim-checker">
+                    <button
+                      className="inline-flex items-center gap-1.5 text-sm px-3.5 py-1.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/25 transition-colors font-600"
+                      data-testid="button-check-similar-claims"
+                    >
+                      <Shield className="w-3.5 h-3.5" /> {t("Check similar claims", "Similar claims check करें")}
+                    </button>
+                  </Link>
+                  <WhatsAppShare text={shareText} label={t("Share on WhatsApp", "WhatsApp पर share करें")} />
                 </div>
               </div>
             </motion.div>
@@ -171,7 +176,7 @@ export default function MythBuster() {
         <Button variant="outline" size="icon" onClick={() => go(-1)} className="rounded-full w-10 h-10" aria-label="Previous myth">
           <ChevronLeft className="w-5 h-5" />
         </Button>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <button
             onClick={shuffle}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mono-label"
@@ -179,19 +184,12 @@ export default function MythBuster() {
           >
             <RefreshCw className="w-3.5 h-3.5" /> {t("Shuffle", "Shuffle")}
           </button>
-          <button
-            onClick={share}
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mono-label"
-          >
-            <Share2 className="w-3.5 h-3.5" /> {t("Share", "शेयर")}
-          </button>
         </div>
         <Button variant="outline" size="icon" onClick={() => go(1)} className="rounded-full w-10 h-10" aria-label="Next myth">
           <ChevronRight className="w-5 h-5" />
         </Button>
       </div>
 
-      {/* All myths count */}
       <p className="text-center text-xs text-muted-foreground mt-6 mono-label">
         {t(`${total} health myths · Science-backed explanations`, `${total} health myths · Science-backed explanations`)}
       </p>

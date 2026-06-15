@@ -28,6 +28,8 @@ import type {
   HealthStatus,
   MedicineInput,
   MedicineResult,
+  OcrInput,
+  OcrResult,
   ReportInput,
   ReportResult,
   SymptomInput,
@@ -277,7 +279,7 @@ export const getExplainMedicalReportUrl = () => {
 }
 
 /**
- * Convert complex medical terminology into simple language
+ * Convert complex medical terminology into simple language with detailed per-parameter analysis
  * @summary Explain a medical report
  */
 export const explainMedicalReport = async (reportInput: ReportInput, options?: RequestInit): Promise<ReportResult> => {
@@ -338,6 +340,78 @@ export const useExplainMedicalReport = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getExplainMedicalReportMutationOptions(options));
+    }
+
+export const getOcrReportUrl = () => {
+
+
+
+
+  return `/api/ocr-report`
+}
+
+/**
+ * Use AI vision to read and extract text from an uploaded medical report image
+ * @summary Extract text from a medical report image
+ */
+export const ocrReport = async (ocrInput: OcrInput, options?: RequestInit): Promise<OcrResult> => {
+
+  return customFetch<OcrResult>(getOcrReportUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      ocrInput,)
+  }
+);}
+
+
+
+
+export const getOcrReportMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ocrReport>>, TError,{data: BodyType<OcrInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof ocrReport>>, TError,{data: BodyType<OcrInput>}, TContext> => {
+
+const mutationKey = ['ocrReport'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ocrReport>>, {data: BodyType<OcrInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  ocrReport(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OcrReportMutationResult = NonNullable<Awaited<ReturnType<typeof ocrReport>>>
+    export type OcrReportMutationBody = BodyType<OcrInput>
+    export type OcrReportMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Extract text from a medical report image
+ */
+export const useOcrReport = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ocrReport>>, TError,{data: BodyType<OcrInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof ocrReport>>,
+        TError,
+        {data: BodyType<OcrInput>},
+        TContext
+      > => {
+      return useMutation(getOcrReportMutationOptions(options));
     }
 
 export const getCheckSymptomsUrl = () => {

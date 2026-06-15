@@ -57,29 +57,20 @@ export const ClaimResultVerdict = {
 
 export interface ClaimResult {
   /**
-     * Credibility score from 0 to 100
      * @minimum 0
      * @maximum 100
      */
   credibilityScore: number;
   evidenceStrength: ClaimResultEvidenceStrength;
   verdict: ClaimResultVerdict;
-  /** Brief summary of the analysis */
   summary?: string;
-  /** List of red flags identified */
   redFlags: string[];
-  /** Explanation of why the claim may be misleading */
   whyMisleading: string;
-  /** A more accurate, safer interpretation of the claim */
   saferInterpretation: string;
-  /** Recommended questions to ask a doctor */
   doctorQuestions: string[];
   disclaimer: string;
 }
 
-/**
- * Patient age group
- */
 export type DiseaseJourneyInputAgeGroup = typeof DiseaseJourneyInputAgeGroup[keyof typeof DiseaseJourneyInputAgeGroup];
 
 
@@ -90,9 +81,6 @@ export const DiseaseJourneyInputAgeGroup = {
   senior: 'senior',
 } as const;
 
-/**
- * Response language
- */
 export type DiseaseJourneyInputLanguage = typeof DiseaseJourneyInputLanguage[keyof typeof DiseaseJourneyInputLanguage];
 
 
@@ -102,14 +90,9 @@ export const DiseaseJourneyInputLanguage = {
 } as const;
 
 export interface DiseaseJourneyInput {
-  /**
-     * Disease or condition name
-     * @minLength 2
-     */
+  /** @minLength 2 */
   disease: string;
-  /** Patient age group */
   ageGroup: DiseaseJourneyInputAgeGroup;
-  /** Response language */
   language?: DiseaseJourneyInputLanguage;
 }
 
@@ -128,7 +111,6 @@ export interface DiseaseJourneyPhase {
   phase: DiseaseJourneyPhasePhase;
   title: string;
   description: string;
-  /** Typical duration of this phase */
   duration: string;
   commonExperiences: string[];
   warningSignsToWatch: string[];
@@ -144,9 +126,27 @@ export interface DiseaseJourneyResult {
   disclaimer: string;
 }
 
-/**
- * Response language
- */
+export interface OcrInput {
+  /** Base64-encoded image data (no data URI prefix) */
+  imageData: string;
+  /** MIME type of the image (image/jpeg, image/png, etc.) */
+  mimeType: string;
+}
+
+export type OcrResultConfidence = typeof OcrResultConfidence[keyof typeof OcrResultConfidence];
+
+
+export const OcrResultConfidence = {
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+} as const;
+
+export interface OcrResult {
+  extractedText: string;
+  confidence?: OcrResultConfidence;
+}
+
 export type ReportInputLanguage = typeof ReportInputLanguage[keyof typeof ReportInputLanguage];
 
 
@@ -156,13 +156,32 @@ export const ReportInputLanguage = {
 } as const;
 
 export interface ReportInput {
-  /**
-     * The medical report text to explain
-     * @minLength 20
-     */
+  /** @minLength 20 */
   reportText: string;
-  /** Response language */
   language?: ReportInputLanguage;
+}
+
+export type ReportParameterStatus = typeof ReportParameterStatus[keyof typeof ReportParameterStatus];
+
+
+export const ReportParameterStatus = {
+  low: 'low',
+  normal: 'normal',
+  high: 'high',
+  critical: 'critical',
+} as const;
+
+export interface ReportParameter {
+  name: string;
+  userValue?: string;
+  normalRange?: string;
+  status: ReportParameterStatus;
+  whatItMeans: string;
+  whyItMatters: string;
+  causes?: string[];
+  symptoms?: string[];
+  lifestyle?: string[];
+  urgency?: string;
 }
 
 export interface ReportTerm {
@@ -186,6 +205,15 @@ export interface ReportFinding {
   explanation: string;
 }
 
+export type ReportResultSeverity = typeof ReportResultSeverity[keyof typeof ReportResultSeverity];
+
+
+export const ReportResultSeverity = {
+  low_concern: 'low_concern',
+  moderate_concern: 'moderate_concern',
+  high_concern: 'high_concern',
+} as const;
+
 export type ReportResultOverallAssessment = typeof ReportResultOverallAssessment[keyof typeof ReportResultOverallAssessment];
 
 
@@ -197,18 +225,20 @@ export const ReportResultOverallAssessment = {
 } as const;
 
 export interface ReportResult {
-  /** Plain-language summary of the report */
   simpleSummary: string;
+  severity?: ReportResultSeverity;
+  severityReason?: string;
+  parameters?: ReportParameter[];
   keyTerms: ReportTerm[];
   importantFindings: ReportFinding[];
+  healthInsights?: string;
+  positiveFindings?: string[];
+  areasOfAttention?: string[];
   doctorQuestions: string[];
   overallAssessment: ReportResultOverallAssessment;
   disclaimer: string;
 }
 
-/**
- * Patient gender (optional)
- */
 export type SymptomInputGender = typeof SymptomInputGender[keyof typeof SymptomInputGender];
 
 
@@ -218,9 +248,6 @@ export const SymptomInputGender = {
   other: 'other',
 } as const;
 
-/**
- * Response language
- */
 export type SymptomInputLanguage = typeof SymptomInputLanguage[keyof typeof SymptomInputLanguage];
 
 
@@ -230,18 +257,11 @@ export const SymptomInputLanguage = {
 } as const;
 
 export interface SymptomInput {
-  /**
-     * Description of symptoms
-     * @minLength 5
-     */
+  /** @minLength 5 */
   symptoms: string;
-  /** Patient age (optional) */
   age?: string;
-  /** Patient gender (optional) */
   gender?: SymptomInputGender;
-  /** How long symptoms have been present */
   duration?: string;
-  /** Response language */
   language?: SymptomInputLanguage;
 }
 
@@ -282,9 +302,6 @@ export interface SymptomResult {
   disclaimer: string;
 }
 
-/**
- * Response language
- */
 export type MedicineInputLanguage = typeof MedicineInputLanguage[keyof typeof MedicineInputLanguage];
 
 
@@ -294,12 +311,8 @@ export const MedicineInputLanguage = {
 } as const;
 
 export interface MedicineInput {
-  /**
-     * Medicine name or prescription text
-     * @minLength 2
-     */
+  /** @minLength 2 */
   medicine: string;
-  /** Response language */
   language?: MedicineInputLanguage;
 }
 

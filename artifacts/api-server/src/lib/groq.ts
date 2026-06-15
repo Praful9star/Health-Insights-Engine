@@ -10,7 +10,7 @@ export function getGroqClient(): Groq | null {
   return _client;
 }
 
-export async function groqChat(systemPrompt: string, userMessage: string): Promise<string> {
+export async function groqChat(systemPrompt: string, userMessage: string, maxTokens = 2048): Promise<string> {
   const client = getGroqClient();
   if (!client) throw new Error("GROQ_API_KEY not configured");
 
@@ -21,7 +21,7 @@ export async function groqChat(systemPrompt: string, userMessage: string): Promi
       { role: "user", content: userMessage },
     ],
     temperature: 0.3,
-    max_tokens: 2048,
+    max_tokens: maxTokens,
     response_format: { type: "json_object" },
   });
 

@@ -8,11 +8,7 @@
 import type { ReportInputLanguage } from './reportInputLanguage';
 
 export interface ReportInput {
-  /**
-     * The medical report text to explain
-     * @minLength 20
-     */
+  /** @minLength 20 */
   reportText: string;
-  /** Response language */
   language?: ReportInputLanguage;
 }

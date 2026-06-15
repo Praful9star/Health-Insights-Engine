@@ -6,14 +6,21 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ReportFinding } from './reportFinding';
+import type { ReportParameter } from './reportParameter';
 import type { ReportResultOverallAssessment } from './reportResultOverallAssessment';
+import type { ReportResultSeverity } from './reportResultSeverity';
 import type { ReportTerm } from './reportTerm';
 
 export interface ReportResult {
-  /** Plain-language summary of the report */
   simpleSummary: string;
+  severity?: ReportResultSeverity;
+  severityReason?: string;
+  parameters?: ReportParameter[];
   keyTerms: ReportTerm[];
   importantFindings: ReportFinding[];
+  healthInsights?: string;
+  positiveFindings?: string[];
+  areasOfAttention?: string[];
   doctorQuestions: string[];
   overallAssessment: ReportResultOverallAssessment;
   disclaimer: string;

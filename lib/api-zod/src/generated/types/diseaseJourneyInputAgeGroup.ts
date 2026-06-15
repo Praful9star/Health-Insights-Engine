@@ -6,9 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-/**
- * Patient age group
- */
 export type DiseaseJourneyInputAgeGroup = typeof DiseaseJourneyInputAgeGroup[keyof typeof DiseaseJourneyInputAgeGroup];
 
 
