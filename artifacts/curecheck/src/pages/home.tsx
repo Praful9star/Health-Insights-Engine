@@ -89,8 +89,13 @@ export default function Home() {
       {/* ===== HERO ===== */}
       <section className="relative hero-gradient overflow-hidden pt-20 pb-24 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0} className="flex justify-center mb-6">
-            <CureCheckMark size={52} id="hero-logo" />
+          <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0} className="flex justify-center mb-7">
+            <div className="flex items-center gap-3">
+              <CureCheckMark size={52} id="hero-logo" />
+              <span className="font-serif font-800 text-foreground text-[2.4rem] sm:text-5xl tracking-tight leading-none">
+                Cure<span className="text-primary">Check</span>
+              </span>
+            </div>
           </motion.div>
           <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0.5}>
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel mono-label text-primary">

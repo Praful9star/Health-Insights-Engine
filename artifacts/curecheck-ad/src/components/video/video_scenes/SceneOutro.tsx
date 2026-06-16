@@ -1,26 +1,5 @@
 import { motion } from 'framer-motion';
-
-function LogoMark() {
-  return (
-    <svg
-      width="clamp(64px, 10vw, 96px)"
-      height="clamp(64px, 10vw, 96px)"
-      viewBox="0 0 32 32"
-      fill="none"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="outro-logo-grad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#00c6ff" />
-          <stop offset="1" stopColor="#7c3aed" />
-        </linearGradient>
-      </defs>
-      <rect width="32" height="32" rx="9" fill="url(#outro-logo-grad)" />
-      <rect x="14.5" y="7" width="3" height="18" rx="1.5" fill="white" />
-      <rect x="7" y="14.5" width="18" height="3" rx="1.5" fill="white" />
-    </svg>
-  );
-}
+import { CureCheckMark } from '@/components/logo';
 
 export default function SceneOutro() {
   return (
@@ -67,7 +46,7 @@ export default function SceneOutro() {
           margin: '0 auto',
           filter: 'drop-shadow(0 0 24px rgba(0,212,255,0.35)) drop-shadow(0 0 60px rgba(124,58,237,0.2))',
         }}>
-          <LogoMark />
+          <CureCheckMark size={96} id="scene-outro-logo" />
         </div>
       </motion.div>
 

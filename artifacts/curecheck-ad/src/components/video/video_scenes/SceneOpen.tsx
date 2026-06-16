@@ -1,20 +1,5 @@
 import { motion } from 'framer-motion';
-
-function LogoMark() {
-  return (
-    <svg width="56" height="56" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <defs>
-        <linearGradient id="open-logo-grad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#00c6ff" />
-          <stop offset="1" stopColor="#7c3aed" />
-        </linearGradient>
-      </defs>
-      <rect width="32" height="32" rx="9" fill="url(#open-logo-grad)" />
-      <rect x="14.5" y="7" width="3" height="18" rx="1.5" fill="white" />
-      <rect x="7" y="14.5" width="18" height="3" rx="1.5" fill="white" />
-    </svg>
-  );
-}
+import { CureCheckMark } from '@/components/logo';
 
 export default function SceneOpen() {
   return (
@@ -48,9 +33,14 @@ export default function SceneOpen() {
           initial={{ opacity: 0, scale: 0.7 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.15, duration: 0.7, type: 'spring', stiffness: 260, damping: 22 }}
-          style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginBottom: '2rem',
+            filter: 'drop-shadow(0 0 20px rgba(0,212,255,0.4))',
+          }}
         >
-          <LogoMark />
+          <CureCheckMark size={56} id="scene-open-logo" />
         </motion.div>
 
         {/* First line */}
