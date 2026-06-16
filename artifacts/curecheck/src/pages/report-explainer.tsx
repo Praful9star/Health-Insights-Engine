@@ -1,5 +1,6 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "wouter";
 import { useExplainMedicalReport, useOcrReport } from "@workspace/api-client-react";
 import type { ReportParameter, ReportResult } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
@@ -10,12 +11,14 @@ import {
   Stethoscope, BookOpen, Save, CheckCircle2, Camera,
   Upload, FileText, ChevronDown, ChevronUp, Sparkles,
   TrendingUp, TrendingDown, Minus, AlertCircle, Heart,
-  Clipboard, X, RotateCcw,
+  Clipboard, X, RotateCcw, ChevronLeft, History,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/language-context";
 import { WhatsAppShare } from "@/components/whatsapp-share";
 import { useHealthStorage, extractBiomarkers, type TimelineEntry } from "@/hooks/use-health-storage";
+
+const LS_KEY = "cc_last_report_result_v1";
 
 // ─── Types & Config ───────────────────────────────────────────────────────────
 
@@ -237,9 +240,26 @@ export default function ReportExplainer() {
   const [isDragging, setIsDragging] = useState(false);
   const [ocrError, setOcrError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [storedResult, setStoredResult] = useState<ReportResult | null>(() => {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      return raw ? (JSON.parse(raw) as ReportResult) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const explainReport = useExplainMedicalReport();
   const ocrMutation = useOcrReport();
+
+  useEffect(() => {
+    if (explainReport.data) {
+      try {
+        localStorage.setItem(LS_KEY, JSON.stringify(explainReport.data));
+        setStoredResult(explainReport.data);
+      } catch {}
+    }
+  }, [explainReport.data]);
 
   // ── File handling ────────────────────────────────────────────────────────
 
@@ -341,7 +361,7 @@ export default function ReportExplainer() {
     explainReport.reset?.();
   };
 
-  const result = explainReport.data;
+  const result = explainReport.data ?? (step === "result" ? storedResult : null);
   const shareText = result ? buildWhatsAppText(result, language as "en" | "hi") : "";
   const params = result?.parameters ?? [];
   const abnormalParams = params.filter((p) => p.status !== "normal");
@@ -350,6 +370,13 @@ export default function ReportExplainer() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+
+        {/* Breadcrumb */}
+        <Link href="/">
+          <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 cursor-pointer">
+            <ChevronLeft className="w-4 h-4" /> {t("Home", "होम")}
+          </span>
+        </Link>
 
         {/* Header */}
         <div className="flex items-start gap-4 mb-8">
@@ -377,6 +404,21 @@ export default function ReportExplainer() {
           {/* ── STEP: INPUT ─────────────────────────────────────────────────── */}
           {step === "input" && (
             <motion.div key="input" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.2 }} className="space-y-4">
+
+              {/* Restore last result */}
+              {storedResult && (
+                <div className="flex items-center gap-3 px-4 py-3 glass-panel rounded-2xl border border-primary/15">
+                  <History className="w-4 h-4 text-primary flex-shrink-0" />
+                  <p className="text-sm text-muted-foreground flex-1">{t("You have a previous analysis.", "आपके पास पिछला analysis है।")}</p>
+                  <button
+                    onClick={() => setStep("result")}
+                    className="text-sm font-600 text-primary hover:text-primary/80 transition-colors flex-shrink-0"
+                    data-testid="button-restore-result"
+                  >
+                    {t("View →", "देखें →")}
+                  </button>
+                </div>
+              )}
 
               {/* Mode tabs */}
               <div className="flex gap-1 glass-panel rounded-2xl p-1">

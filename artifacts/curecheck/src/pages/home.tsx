@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import {
   FileSearch, Pill, Clock, Dumbbell, ArrowRight, Sparkles,
   CheckCircle2, Zap, ShieldCheck, BookOpen, TrendingUp, Flame,
-  BadgeCheck, DatabaseZap, Globe2, HeartPulse,
+  BadgeCheck, DatabaseZap, Globe2, HeartPulse, Quote,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CureCheckMark } from "@/components/logo";
@@ -11,6 +11,7 @@ import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useLanguage } from "@/contexts/language-context";
+import { getQuoteOfDay } from "@/data/quotes";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -83,6 +84,7 @@ const FAQS = [
 
 export default function Home() {
   const { language, t } = useLanguage();
+  const quote = getQuoteOfDay();
 
   return (
     <div className="relative z-10">
@@ -146,6 +148,25 @@ export default function Home() {
           <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={4} className="mt-5 mono-label text-muted-foreground/70">
             {t("Free · No signup · Not medical advice", "मुफ्त · कोई signup नहीं · चिकित्सा सलाह नहीं")}
           </motion.p>
+        </div>
+      </section>
+
+      {/* ===== QUOTE OF THE DAY ===== */}
+      <section className="px-4 pb-6">
+        <div className="max-w-2xl mx-auto">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+            <div className="glass-panel rounded-2xl px-6 py-5 border border-primary/10 flex gap-4 items-start">
+              <Quote className="w-5 h-5 text-primary/40 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm sm:text-base text-foreground/80 leading-relaxed italic">
+                  "{language === "hi" ? quote.text.hi : quote.text.en}"
+                </p>
+                <p className="text-xs text-muted-foreground mt-2 mono-label">
+                  — {language === "hi" ? quote.author.hi : quote.author.en}
+                </p>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 

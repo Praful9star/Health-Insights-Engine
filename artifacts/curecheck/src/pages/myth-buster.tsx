@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, ChevronLeft, ChevronRight, FlaskConical, CheckCircle2, Shield } from "lucide-react";
 import { Link } from "wouter";
@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/language-context";
 import { DAILY_MYTHS } from "@/data/myths";
 import { WhatsAppShare } from "@/components/whatsapp-share";
+
+const AUTO_ADVANCE_MS = 9000;
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -43,6 +45,10 @@ export default function MythBuster() {
   const [idx, setIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [direction, setDirection] = useState(1);
+  const [paused, setPaused] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const startRef = useRef<number>(Date.now());
+  const rafRef = useRef<number>(0);
 
   const myth = DAILY_MYTHS[idx];
   const total = DAILY_MYTHS.length;
@@ -51,6 +57,8 @@ export default function MythBuster() {
     setDirection(delta);
     setFlipped(false);
     setIdx((i) => (i + delta + total) % total);
+    setProgress(0);
+    startRef.current = Date.now();
   };
 
   const shuffle = () => {
@@ -58,7 +66,32 @@ export default function MythBuster() {
     setDirection(1);
     setFlipped(false);
     setIdx(next);
+    setProgress(0);
+    startRef.current = Date.now();
   };
+
+  useEffect(() => {
+    startRef.current = Date.now();
+    setProgress(0);
+
+    const tick = () => {
+      if (!paused && !flipped) {
+        const elapsed = Date.now() - startRef.current;
+        const pct = Math.min(elapsed / AUTO_ADVANCE_MS, 1);
+        setProgress(pct);
+        if (pct >= 1) {
+          setDirection(1);
+          setIdx((i) => (i + 1) % total);
+          startRef.current = Date.now();
+          setProgress(0);
+        }
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [idx, paused, flipped, total]);
 
   const shareText = `🧪 ${t("Health Myth Check", "Health Myth Check")}:\n\n"${language === "hi" ? myth.myth.hi : myth.myth.en}"\n\n✅ ${t("The Truth", "सच्चाई")}:\n${language === "hi" ? myth.truth.hi : myth.truth.en}\n\n${t("via CureCheck – curecheck.in", "CureCheck – curecheck.in के ज़रिए")}`;
 
@@ -66,9 +99,16 @@ export default function MythBuster() {
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12">
       {/* Header */}
       <motion.div variants={fadeUp} initial="hidden" animate="visible" className="text-center mb-10">
-        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel mono-label text-amber-400 mb-5">
-          <FlaskConical className="w-3.5 h-3.5" /> {t("Myth vs Science", "मिथक बनाम विज्ञान")}
-        </span>
+        <Link href="/">
+          <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer">
+            <ChevronLeft className="w-4 h-4" /> {t("Home", "होम")}
+          </span>
+        </Link>
+        <div className="flex justify-center mb-5">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel mono-label text-amber-400">
+            <FlaskConical className="w-3.5 h-3.5" /> {t("Myth vs Science", "मिथक बनाम विज्ञान")}
+          </span>
+        </div>
         <h1 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">
           {t("Bust a Health Myth", "एक मिथक तोड़ें")}
         </h1>
@@ -77,12 +117,22 @@ export default function MythBuster() {
         </p>
       </motion.div>
 
+      {/* Auto-advance progress bar */}
+      {!flipped && (
+        <div className="h-0.5 w-full bg-muted/40 rounded-full mb-6 overflow-hidden">
+          <div
+            className="h-full bg-amber-400/70 rounded-full transition-none"
+            style={{ width: `${progress * 100}%` }}
+          />
+        </div>
+      )}
+
       {/* Progress dots */}
       <div className="flex justify-center gap-1 mb-8 flex-wrap">
         {DAILY_MYTHS.slice(0, Math.min(total, 31)).map((_, i) => (
           <button
             key={i}
-            onClick={() => { setFlipped(false); setIdx(i); }}
+            onClick={() => { setFlipped(false); setIdx(i); setProgress(0); startRef.current = Date.now(); }}
             className={`w-2 h-2 rounded-full transition-all ${i === idx ? "bg-amber-400 w-4" : "bg-muted/60 hover:bg-muted"}`}
             aria-label={`Go to myth ${i + 1}`}
           />
@@ -97,6 +147,8 @@ export default function MythBuster() {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -direction * 40 }}
           transition={{ duration: 0.35 }}
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
         >
           <div className="flip-3d" style={{ minHeight: "380px" }}>
             <motion.div

@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "wouter";
 import { useCheckHealthClaim } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle, XCircle, HelpCircle, Shield, ArrowRight, Lightbulb, Stethoscope } from "lucide-react";
+import { AlertTriangle, CheckCircle, XCircle, HelpCircle, Shield, ArrowRight, Lightbulb, Stethoscope, ChevronLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/language-context";
 import { WhatsAppShare } from "@/components/whatsapp-share";
@@ -115,6 +116,11 @@ export default function ClaimChecker() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+        <Link href="/">
+          <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer">
+            <ChevronLeft className="w-4 h-4" /> {t("Home", "होम")}
+          </span>
+        </Link>
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center">
             <Shield className="w-5 h-5 text-blue-500" />

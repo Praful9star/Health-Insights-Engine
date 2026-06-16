@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/contexts/language-context";
 import Navbar from "@/components/navbar";
 import DisclaimerBanner from "@/components/disclaimer-banner";
+import ScrollToTop from "@/components/scroll-to-top";
 import PremiumBackground from "@/components/premium-background";
 import Footer from "@/components/footer";
 import Home from "@/pages/home";
@@ -51,6 +52,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
             <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <ScrollToTop />
               <div className="grain relative min-h-screen flex flex-col">
                 <PremiumBackground />
                 <DisclaimerBanner />
