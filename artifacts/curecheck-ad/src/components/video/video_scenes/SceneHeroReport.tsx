@@ -107,7 +107,7 @@ export default function SceneHeroReport() {
                   fontFamily: 'Inter, sans-serif',
                   fontSize: 'clamp(0.75rem, 1.5vw, 1rem)',
                   fontWeight: 600,
-                  color: 'rgba(255,255,255,0.55)',
+                  color: 'rgba(255,255,255,0.82)',
                   letterSpacing: '0.05em',
                 }}>
                   {row.label}
@@ -175,7 +175,7 @@ export default function SceneHeroReport() {
             <div style={{
               fontFamily: 'Inter, sans-serif',
               fontSize: 'clamp(0.7rem, 1.3vw, 0.9rem)',
-              color: 'rgba(255,255,255,0.6)',
+              color: 'rgba(255,255,255,0.78)',
               lineHeight: 1.5,
             }}>
               <span style={{ color: '#00d4ff', fontWeight: 600 }}>AI Insight: </span>

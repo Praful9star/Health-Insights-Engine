@@ -175,7 +175,7 @@ export default function SceneClaimChecker() {
               style={{
                 fontFamily: 'Inter, sans-serif',
                 fontSize: 'clamp(0.75rem, 1.4vw, 0.95rem)',
-                color: 'rgba(255,255,255,0.55)',
+                color: 'rgba(255,255,255,0.78)',
                 lineHeight: 1.5,
               }}
             >

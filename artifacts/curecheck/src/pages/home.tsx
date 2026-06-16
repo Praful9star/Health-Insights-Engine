@@ -6,6 +6,7 @@ import {
   BadgeCheck, DatabaseZap, Globe2, HeartPulse,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CureCheckMark } from "@/components/logo";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
@@ -88,7 +89,10 @@ export default function Home() {
       {/* ===== HERO ===== */}
       <section className="relative hero-gradient overflow-hidden pt-20 pb-24 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0}>
+          <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0} className="flex justify-center mb-6">
+            <CureCheckMark size={52} id="hero-logo" />
+          </motion.div>
+          <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0.5}>
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel mono-label text-primary">
               <Sparkles className="w-3.5 h-3.5" />
               {t("AI Health Platform · Built for India", "AI स्वास्थ्य Platform · भारत के लिए")}

@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Activity, Menu, X, Languages, ChevronDown } from "lucide-react";
+import { Menu, X, Languages, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/language-context";
+import { CureCheckMark } from "@/components/logo";
 
 const PRIMARY_LINKS = [
   { href: "/report-explainer", label: { en: "Reports", hi: "रिपोर्ट" } },
@@ -45,13 +46,11 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/">
           <motion.div
-            className="flex items-center gap-2 flex-shrink-0 cursor-pointer"
+            className="flex items-center gap-2.5 flex-shrink-0 cursor-pointer"
             whileHover={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 400 }}
           >
-            <div className="w-8 h-8 rounded-xl bg-primary/15 flex items-center justify-center">
-              <Activity className="w-4.5 h-4.5 text-primary" />
-            </div>
+            <CureCheckMark size={32} id="navbar-logo" />
             <span className="font-serif font-800 text-foreground text-[1.05rem]">
               Cure<span className="text-primary">Check</span>
             </span>

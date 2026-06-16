@@ -1,5 +1,27 @@
 import { motion } from 'framer-motion';
 
+function LogoMark() {
+  return (
+    <svg
+      width="clamp(64px, 10vw, 96px)"
+      height="clamp(64px, 10vw, 96px)"
+      viewBox="0 0 32 32"
+      fill="none"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="outro-logo-grad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#00c6ff" />
+          <stop offset="1" stopColor="#7c3aed" />
+        </linearGradient>
+      </defs>
+      <rect width="32" height="32" rx="9" fill="url(#outro-logo-grad)" />
+      <rect x="14.5" y="7" width="3" height="18" rx="1.5" fill="white" />
+      <rect x="7" y="14.5" width="18" height="3" rx="1.5" fill="white" />
+    </svg>
+  );
+}
+
 export default function SceneOutro() {
   return (
     <motion.div
@@ -39,18 +61,13 @@ export default function SceneOutro() {
         }}
       >
         <div style={{
-          width: 'clamp(64px, 10vw, 96px)',
-          height: 'clamp(64px, 10vw, 96px)',
-          borderRadius: '24px',
-          background: 'linear-gradient(135deg, rgba(0,212,255,0.2) 0%, rgba(124,58,237,0.2) 100%)',
-          border: '1.5px solid rgba(0,212,255,0.4)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           margin: '0 auto',
-          boxShadow: '0 0 40px rgba(0,212,255,0.2), 0 0 80px rgba(124,58,237,0.12)',
+          filter: 'drop-shadow(0 0 24px rgba(0,212,255,0.35)) drop-shadow(0 0 60px rgba(124,58,237,0.2))',
         }}>
-          <span style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)' }}>✦</span>
+          <LogoMark />
         </div>
       </motion.div>
 
@@ -86,7 +103,7 @@ export default function SceneOutro() {
           fontFamily: 'Inter, sans-serif',
           fontSize: 'clamp(0.85rem, 1.8vw, 1.2rem)',
           fontWeight: 400,
-          color: 'rgba(255,255,255,0.55)',
+          color: 'rgba(255,255,255,0.78)',
           marginTop: '0.75rem',
           letterSpacing: '0.01em',
         }}
@@ -136,7 +153,7 @@ export default function SceneOutro() {
               borderRadius: '999px',
               background: 'rgba(0,212,255,0.08)',
               border: '1px solid rgba(0,212,255,0.2)',
-              color: 'rgba(255,255,255,0.65)',
+              color: 'rgba(255,255,255,0.85)',
               fontFamily: 'Inter, sans-serif',
               fontSize: 'clamp(0.6rem, 1.1vw, 0.8rem)',
               fontWeight: 500,

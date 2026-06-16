@@ -128,7 +128,7 @@ export default function SceneFeatures() {
             <div style={{
               fontFamily: 'Inter, sans-serif',
               fontSize: 'clamp(0.65rem, 1.2vw, 0.85rem)',
-              color: 'rgba(255,255,255,0.45)',
+              color: 'rgba(255,255,255,0.72)',
               lineHeight: 1.5,
             }}>
               {f.desc}

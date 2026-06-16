@@ -67,7 +67,7 @@ export default function SceneProblem() {
               <div style={{
                 fontFamily: 'Inter, sans-serif',
                 fontSize: 'clamp(0.75rem, 1.4vw, 1rem)',
-                color: 'rgba(255,255,255,0.45)',
+                color: 'rgba(255,255,255,0.72)',
                 marginTop: '0.25rem',
               }}>
                 {p.sub}

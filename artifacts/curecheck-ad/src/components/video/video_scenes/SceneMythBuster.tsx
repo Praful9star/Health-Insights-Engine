@@ -150,7 +150,7 @@ export default function SceneMythBuster() {
             marginTop: '1.2rem',
             fontFamily: 'Inter, sans-serif',
             fontSize: 'clamp(0.6rem, 1vw, 0.75rem)',
-            color: 'rgba(255,255,255,0.3)',
+            color: 'rgba(255,255,255,0.58)',
           }}
         >
           Sources reviewed by AI · Always consult a healthcare professional
