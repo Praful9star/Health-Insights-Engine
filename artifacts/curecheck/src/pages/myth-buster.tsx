@@ -7,7 +7,7 @@ import { useLanguage } from "@/contexts/language-context";
 import { DAILY_MYTHS } from "@/data/myths";
 import { WhatsAppShare } from "@/components/whatsapp-share";
 
-const AUTO_ADVANCE_MS = 9000;
+const AUTO_ADVANCE_MS = 8000;
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },

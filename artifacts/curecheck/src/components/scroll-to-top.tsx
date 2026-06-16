@@ -4,7 +4,7 @@ import { useLocation } from "wouter";
 export default function ScrollToTop() {
   const [location] = useLocation();
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+    window.scrollTo(0, 0);
   }, [location]);
   return null;
 }

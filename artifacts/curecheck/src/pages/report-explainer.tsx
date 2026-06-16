@@ -233,33 +233,41 @@ export default function ReportExplainer() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  const [step, setStep] = useState<AppStep>("input");
+  const [storedResult, setStoredResult] = useState<{ result: ReportResult; savedAt: string } | null>(() => {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      return raw ? (JSON.parse(raw) as { result: ReportResult; savedAt: string }) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [step, setStep] = useState<AppStep>(() => (storedResult ? "result" : "input"));
   const [uploadMode, setUploadMode] = useState<UploadMode>("upload");
   const [reportText, setReportText] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [ocrError, setOcrError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
-  const [storedResult, setStoredResult] = useState<ReportResult | null>(() => {
-    try {
-      const raw = localStorage.getItem(LS_KEY);
-      return raw ? (JSON.parse(raw) as ReportResult) : null;
-    } catch {
-      return null;
-    }
-  });
 
   const explainReport = useExplainMedicalReport();
   const ocrMutation = useOcrReport();
 
   useEffect(() => {
     if (explainReport.data) {
+      const entry = { result: explainReport.data, savedAt: new Date().toISOString() };
       try {
-        localStorage.setItem(LS_KEY, JSON.stringify(explainReport.data));
-        setStoredResult(explainReport.data);
+        localStorage.setItem(LS_KEY, JSON.stringify(entry));
+        setStoredResult(entry);
       } catch {}
     }
   }, [explainReport.data]);
+
+  const clearStoredResult = () => {
+    try { localStorage.removeItem(LS_KEY); } catch {}
+    setStoredResult(null);
+    reset();
+  };
 
   // ── File handling ────────────────────────────────────────────────────────
 
@@ -361,7 +369,7 @@ export default function ReportExplainer() {
     explainReport.reset?.();
   };
 
-  const result = explainReport.data ?? (step === "result" ? storedResult : null);
+  const result = explainReport.data ?? (step === "result" ? (storedResult?.result ?? null) : null);
   const shareText = result ? buildWhatsAppText(result, language as "en" | "hi") : "";
   const params = result?.parameters ?? [];
   const abnormalParams = params.filter((p) => p.status !== "normal");
@@ -404,21 +412,6 @@ export default function ReportExplainer() {
           {/* ── STEP: INPUT ─────────────────────────────────────────────────── */}
           {step === "input" && (
             <motion.div key="input" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.2 }} className="space-y-4">
-
-              {/* Restore last result */}
-              {storedResult && (
-                <div className="flex items-center gap-3 px-4 py-3 glass-panel rounded-2xl border border-primary/15">
-                  <History className="w-4 h-4 text-primary flex-shrink-0" />
-                  <p className="text-sm text-muted-foreground flex-1">{t("You have a previous analysis.", "आपके पास पिछला analysis है।")}</p>
-                  <button
-                    onClick={() => setStep("result")}
-                    className="text-sm font-600 text-primary hover:text-primary/80 transition-colors flex-shrink-0"
-                    data-testid="button-restore-result"
-                  >
-                    {t("View →", "देखें →")}
-                  </button>
-                </div>
-              )}
 
               {/* Mode tabs */}
               <div className="flex gap-1 glass-panel rounded-2xl p-1">
@@ -609,6 +602,24 @@ export default function ReportExplainer() {
           {/* ── STEP: RESULT ─────────────────────────────────────────────────── */}
           {step === "result" && result && !explainReport.isPending && (
             <motion.div key="result" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-4">
+
+              {/* Saved result banner */}
+              {storedResult && !explainReport.data && (
+                <div className="flex items-center gap-3 px-4 py-3 glass-panel rounded-2xl border border-primary/10">
+                  <History className="w-4 h-4 text-primary/60 flex-shrink-0" />
+                  <p className="text-xs text-muted-foreground flex-1">
+                    {t("Saved result from", "Saved result from")}{" "}
+                    {new Date(storedResult.savedAt).toLocaleDateString(language === "hi" ? "hi-IN" : "en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                  </p>
+                  <button
+                    onClick={clearStoredResult}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors font-600 flex-shrink-0"
+                    data-testid="button-clear-saved-result"
+                  >
+                    {t("Clear", "हटाएं")} ×
+                  </button>
+                </div>
+              )}
 
               {/* Severity + Assessment */}
               {(() => {

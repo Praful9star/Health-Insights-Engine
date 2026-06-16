@@ -11,7 +11,7 @@ import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useLanguage } from "@/contexts/language-context";
-import { getQuoteOfDay } from "@/data/quotes";
+import { useQuoteOfDay } from "@/hooks/use-quote-of-day";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -84,7 +84,7 @@ const FAQS = [
 
 export default function Home() {
   const { language, t } = useLanguage();
-  const quote = getQuoteOfDay();
+  const quote = useQuoteOfDay();
 
   return (
     <div className="relative z-10">
