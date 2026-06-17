@@ -387,6 +387,20 @@ export default function SymptomChecker() {
               <p className="text-xs text-muted-foreground text-center px-4 py-3 rounded-lg bg-muted/50 border border-border">
                 {result.disclaimer}
               </p>
+
+              {/* Was this helpful? */}
+              <div className="glass-panel rounded-2xl overflow-hidden p-1 mt-2">
+                <iframe
+                  data-tally-src="https://tally.so/embed/LZoLQO?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
+                  loading="lazy"
+                  width="100%"
+                  height="340"
+                  frameBorder="0"
+                  marginHeight={0}
+                  marginWidth={0}
+                  title="Was this useful?"
+                />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

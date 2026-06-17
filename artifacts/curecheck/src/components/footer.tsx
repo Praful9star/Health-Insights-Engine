@@ -158,6 +158,40 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Tally forms row — Feedback + Bug Report */}
+        <div className="mt-14 pt-10 border-t border-border/40 grid md:grid-cols-2 gap-8">
+          <div>
+            <h4 className="mono-label text-primary/80 mb-4">{t("Share Your Feedback", "अपनी राय दें")}</h4>
+            <div className="glass-panel rounded-2xl overflow-hidden p-1">
+              <iframe
+                data-tally-src="https://tally.so/embed/ZjQBjv?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
+                loading="lazy"
+                width="100%"
+                height="436"
+                frameBorder="0"
+                marginHeight={0}
+                marginWidth={0}
+                title="Health Assessment"
+              />
+            </div>
+          </div>
+          <div>
+            <h4 className="mono-label text-primary/80 mb-4">{t("Report a Bug", "बग रिपोर्ट करें")}</h4>
+            <div className="glass-panel rounded-2xl overflow-hidden p-1">
+              <iframe
+                data-tally-src="https://tally.so/embed/LZoLQO?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
+                loading="lazy"
+                width="100%"
+                height="200"
+                frameBorder="0"
+                marginHeight={0}
+                marginWidth={0}
+                title="Report a Bug!"
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="mt-12 pt-6 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} CureCheck. {t("All rights reserved.", "सर्वाधिकार सुरक्षित।")}
