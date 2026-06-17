@@ -104,7 +104,7 @@ export default function Navbar() {
           </button>
 
           <Link href="/premium">
-            <button className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/30 hover:bg-primary/20 text-xs font-700 text-primary transition-all">
+            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/30 hover:bg-primary/20 text-xs font-700 text-primary transition-all">
               <Star className="w-3 h-3" /> Premium
             </button>
           </Link>
@@ -126,7 +126,7 @@ export default function Navbar() {
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }}
             className="lg:hidden border-t border-border/40 bg-background/95 backdrop-blur-xl overflow-hidden">
             <nav className="px-4 py-3 flex flex-col gap-1 max-h-[80vh] overflow-y-auto">
-              {[...PRIMARY_LINKS, ...MORE_LINKS, { href: "/login", label: { en: user ? "My Account" : "Login / Sign up", hi: user ? "मेरा खाता" : "लॉगिन / साइनअप" } }].map(link => (
+              {[{ href: "/premium", label: { en: "⭐ Premium", hi: "⭐ प्रीमियम" } }, ...PRIMARY_LINKS, ...MORE_LINKS, { href: "/login", label: { en: user ? "My Account" : "Login / Sign up", hi: user ? "मेरा खाता" : "लॉगिन / साइनअप" } }].map(link => (
                 <Link key={link.href} href={link.href}>
                   <span onClick={() => setOpen(false)}
                     className={`block px-4 py-2.5 rounded-xl text-sm font-600 cursor-pointer transition-colors ${isActive(link.href) ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"}`}>
