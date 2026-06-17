@@ -1,4 +1,6 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { useEffect } from "react";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
+import { motion, AnimatePresence } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +13,9 @@ import DisclaimerBanner from "@/components/disclaimer-banner";
 import ScrollToTop from "@/components/scroll-to-top";
 import PremiumBackground from "@/components/premium-background";
 import Footer from "@/components/footer";
+import FloatingAIButton from "@/components/floating-ai-button";
+import PWAInstall from "@/components/pwa-install";
+import MobileBottomNav from "@/components/mobile-bottom-nav";
 import Home from "@/pages/home";
 import ClaimChecker from "@/pages/claim-checker";
 import DiseaseJourney from "@/pages/disease-journey";
@@ -37,14 +42,13 @@ import Premium from "@/pages/premium";
 import Weather from "@/pages/weather";
 import AdminPanel from "@/pages/admin";
 import Feedback from "@/pages/feedback";
-import MobileBottomNav from "@/components/mobile-bottom-nav";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
 });
 
-function Router() {
+function Routes() {
   return (
     <Switch>
       <Route path="/" component={Home} />
@@ -78,6 +82,32 @@ function Router() {
   );
 }
 
+function AnimatedRouter() {
+  const [location] = useLocation();
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={location}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -6 }}
+        transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
+      >
+        <Routes />
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+function ServiceWorkerRegistrar() {
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
+  }, []);
+  return null;
+}
+
 export default function App() {
   return (
     <ThemeProvider defaultTheme="dark" forcedTheme="dark" storageKey="curecheck-theme">
@@ -86,6 +116,7 @@ export default function App() {
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>
               <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+                <ServiceWorkerRegistrar />
                 <Analytics />
                 <ScrollToTop />
                 <div className="grain relative min-h-screen flex flex-col">
@@ -93,10 +124,12 @@ export default function App() {
                   <DisclaimerBanner />
                   <Navbar />
                   <main className="flex-1 pb-20 lg:pb-0">
-                    <Router />
+                    <AnimatedRouter />
                   </main>
                   <Footer />
                   <MobileBottomNav />
+                  <FloatingAIButton />
+                  <PWAInstall />
                 </div>
                 <Toaster />
               </WouterRouter>

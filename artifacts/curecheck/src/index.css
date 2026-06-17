@@ -638,4 +638,100 @@
   .glow-whatsapp:hover {
     box-shadow: 0 0 0 1px hsl(142 76% 36% / 0.5), 0 0 40px hsl(142 76% 36% / 0.25);
   }
+
+  /* ── Glass panel — light mode ──────────────────────────────────── */
+  :root .glass-panel {
+    background: rgba(255,255,255,0.68);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+
+  /* ── Skeleton pulse ─────────────────────────────────────────────── */
+  @keyframes skeleton {
+    0%   { opacity: 0.6; }
+    50%  { opacity: 1; }
+    100% { opacity: 0.6; }
+  }
+  .skeleton { animation: skeleton 1.6s ease-in-out infinite; }
+
+  /* ── Floating ring for fab button ──────────────────────────────── */
+  @keyframes fab-ring {
+    0%   { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(2); opacity: 0; }
+  }
+
+  /* ── Page entry animation ───────────────────────────────────────── */
+  @keyframes page-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .page-enter { animation: page-in 0.25s cubic-bezier(0.22,1,0.36,1) both; }
+
+  /* ── Card hover — stronger lift ─────────────────────────────────── */
+  .hover-lift {
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px -8px hsl(183 100% 50% / 0.12), 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  /* ── Pulse ring for live indicators ────────────────────────────── */
+  @keyframes live-ring {
+    0%   { transform: scale(1); opacity: 0.7; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+  .live-ring::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: currentColor;
+    animation: live-ring 1.8s ease-out infinite;
+    opacity: 0;
+  }
+
+  /* ── Scrollbar hide ─────────────────────────────────────────────── */
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+  /* ── Micro button press ─────────────────────────────────────────── */
+  .btn-press { transition: transform 0.12s ease, box-shadow 0.12s ease; }
+  .btn-press:active { transform: scale(0.96); }
+
+  /* ── Focus ring (accessible) ────────────────────────────────────── */
+  .focus-ring:focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+
+  /* ── Teal badge (live data indicator) ──────────────────────────── */
+  .badge-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+    background: hsl(183 100% 50% / 0.12);
+    border: 1px solid hsl(183 100% 50% / 0.25);
+    color: hsl(183 100% 50%);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-family: var(--app-font-mono);
+  }
+
+  /* ── Blinking cursor ────────────────────────────────────────────── */
+  .cursor-blink::after {
+    content: '|';
+    animation: blink 1s step-end infinite;
+    color: hsl(var(--primary));
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
 }

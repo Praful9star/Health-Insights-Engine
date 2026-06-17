@@ -5,3 +5,4 @@
 - [CureCheck API route paths](curecheck-route-paths.md) — routes must NOT include /api/ prefix; app.use("/api", router) strips it. lib/brand needs @types/react + "types":["react"] in tsconfig for codegen to pass.
 - [CureCheck integrations](curecheck-integrations.md) — Razorpay payment links, Sanity project ID, Sentry setup, Claude migration details.
 - [CureCheck news-ticker source shape](curecheck-news-ticker.md) — API returns `source: {name: string}` not a string; ticker must extract `.name` or crash with "Objects are not valid as React child {name}".
+- [CureCheck global UX additions](curecheck-ux.md) — FloatingAIButton, AnimatePresence page transitions, PWA service worker, PWAInstall banner, and improved 404 already added; do not duplicate.
