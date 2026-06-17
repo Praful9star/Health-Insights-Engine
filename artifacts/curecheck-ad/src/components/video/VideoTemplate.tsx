@@ -1,45 +1,30 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useVideoPlayer } from '@/lib/video';
 import { useEffect, useRef } from 'react';
-import SceneOpen from './video_scenes/SceneOpen';
-import SceneProblem from './video_scenes/SceneProblem';
-import SceneHeroReport from './video_scenes/SceneHeroReport';
-import SceneClaimChecker from './video_scenes/SceneClaimChecker';
-import SceneFeatures from './video_scenes/SceneFeatures';
-import SceneMythBuster from './video_scenes/SceneMythBuster';
-import SceneOutro from './video_scenes/SceneOutro';
+import Scene1Hook from './video_scenes/Scene1Hook';
+import Scene2Agitation from './video_scenes/Scene2Agitation';
+import Scene3Reveal from './video_scenes/Scene3Reveal';
+import Scene4Features from './video_scenes/Scene4Features';
+import Scene5Trust from './video_scenes/Scene5Trust';
+import Scene6CTA from './video_scenes/Scene6CTA';
 
 export const SCENE_DURATIONS: Record<string, number> = {
-  open: 3500,
-  problem: 4500,
-  hero_report: 7000,
-  claim_checker: 4000,
-  features: 4500,
-  myth_buster: 3500,
-  outro: 5000,
+  hook:      3000,
+  agitation: 5000,
+  reveal:    7000,
+  features:  20000,
+  trust:     10000,
+  cta:       10000,
 };
 
 const SCENE_COMPONENTS: Record<string, React.ComponentType> = {
-  open: SceneOpen,
-  problem: SceneProblem,
-  hero_report: SceneHeroReport,
-  claim_checker: SceneClaimChecker,
-  features: SceneFeatures,
-  myth_buster: SceneMythBuster,
-  outro: SceneOutro,
+  hook:      Scene1Hook,
+  agitation: Scene2Agitation,
+  reveal:    Scene3Reveal,
+  features:  Scene4Features,
+  trust:     Scene5Trust,
+  cta:       Scene6CTA,
 };
-
-const SCENE_START_SEC: Record<string, number> = (() => {
-  const out: Record<string, number> = {};
-  let cumulativeMs = 0;
-  for (const [key, ms] of Object.entries(SCENE_DURATIONS)) {
-    out[key] = cumulativeMs / 1000;
-    cumulativeMs += ms;
-  }
-  return out;
-})();
-
-const AUDIO_SEEK_EPSILON_SEC = 0.18;
 
 export default function VideoTemplate({
   durations = SCENE_DURATIONS,
@@ -59,89 +44,56 @@ export default function VideoTemplate({
     onSceneChange?.(currentSceneKey);
   }, [currentSceneKey, onSceneChange]);
 
-  const baseSceneKey = currentSceneKey.replace(/_r[12]$/, '');
-
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.volume = 0.45;
-    const targetTime = SCENE_START_SEC[baseSceneKey] ?? 0;
-    if (Math.abs(audio.currentTime - targetTime) > AUDIO_SEEK_EPSILON_SEC) {
-      audio.currentTime = targetTime;
-    }
+    audio.volume = 0.35;
     audio.play().catch(() => {});
-  }, [currentSceneKey, baseSceneKey, muted]);
+  }, [currentSceneKey, muted]);
 
-  const SceneComponent = SCENE_COMPONENTS[baseSceneKey];
+  const SceneComponent = SCENE_COMPONENTS[currentSceneKey];
 
   return (
-    <>
-      <div
-        className="relative w-full h-screen overflow-hidden"
-        style={{ backgroundColor: '#0a0f1e' }}
-      >
-        {/* Persistent background layers */}
-        <div className="absolute inset-0" style={{ pointerEvents: 'none' }}>
-          {/* Radial gradients */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0,212,255,0.10) 0%, transparent 60%), radial-gradient(ellipse 60% 80% at 80% 110%, rgba(124,58,237,0.07) 0%, transparent 60%)',
-            }}
-          />
-          {/* Floating ambient orb 1 */}
-          <motion.div
-            className="absolute rounded-full"
-            style={{
-              width: '45vw',
-              height: '45vw',
-              top: '-15%',
-              left: '-8%',
-              background: 'radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%)',
-              filter: 'blur(50px)',
-            }}
-            animate={{ x: [0, 25, 0], y: [0, -18, 0] }}
-            transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          {/* Floating ambient orb 2 */}
-          <motion.div
-            className="absolute rounded-full"
-            style={{
-              width: '55vw',
-              height: '55vw',
-              bottom: '-25%',
-              right: '-12%',
-              background: 'radial-gradient(circle, rgba(124,58,237,0.05) 0%, transparent 70%)',
-              filter: 'blur(70px)',
-            }}
-            animate={{ x: [0, -18, 0], y: [0, 22, 0] }}
-            transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
-          />
-          {/* Subtle grid overlay */}
-          <div
-            className="absolute inset-0 opacity-[0.022]"
-            style={{
-              backgroundImage:
-                'linear-gradient(rgba(0,212,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.6) 1px, transparent 1px)',
-              backgroundSize: '60px 60px',
-            }}
-          />
-        </div>
-
-        {/* Scene layer */}
-        <AnimatePresence mode="popLayout">
-          {SceneComponent && <SceneComponent key={currentSceneKey} />}
-        </AnimatePresence>
+    <div
+      className="relative w-full h-full overflow-hidden"
+      style={{ backgroundColor: '#060d1f' }}
+    >
+      {/* Persistent background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0" style={{
+          background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,212,255,0.08) 0%, transparent 60%), radial-gradient(ellipse 60% 70% at 80% 110%, rgba(124,58,237,0.06) 0%, transparent 60%)',
+        }} />
+        {/* Grid */}
+        <div className="absolute inset-0" style={{
+          opacity: 0.018,
+          backgroundImage: 'linear-gradient(rgba(0,212,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,1) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+        }} />
+        {/* Ambient orbs */}
+        <motion.div className="absolute rounded-full" style={{
+          width: '70%', height: '70%', top: '-20%', left: '-15%',
+          background: 'radial-gradient(circle, rgba(0,212,255,0.05) 0%, transparent 70%)',
+          filter: 'blur(40px)',
+        }}
+          animate={{ x: [0, 20, 0], y: [0, -15, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div className="absolute rounded-full" style={{
+          width: '80%', height: '80%', bottom: '-25%', right: '-20%',
+          background: 'radial-gradient(circle, rgba(124,58,237,0.04) 0%, transparent 70%)',
+          filter: 'blur(50px)',
+        }}
+          animate={{ x: [0, -15, 0], y: [0, 20, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
+        />
       </div>
 
-      <audio
-        ref={audioRef}
-        src={`${import.meta.env.BASE_URL}audio/bg_music.mp3`}
-        preload="auto"
-        autoPlay
-        muted={muted}
-      />
-    </>
+      {/* Scene layer */}
+      <AnimatePresence mode="popLayout">
+        {SceneComponent && <SceneComponent key={currentSceneKey} />}
+      </AnimatePresence>
+
+      <audio ref={audioRef} src={`${import.meta.env.BASE_URL}audio/bg_music.mp3`} preload="auto" autoPlay muted={muted} />
+    </div>
   );
 }
