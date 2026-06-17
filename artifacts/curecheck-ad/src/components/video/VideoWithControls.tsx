@@ -55,7 +55,7 @@ function ProgressSegments({
   );
 }
 
-export default function VideoWithControls() {
+export default function VideoWithControls({ hideControls = false }: { hideControls?: boolean }) {
   const {
     sceneKeys,
     activeIndex,
@@ -107,6 +107,14 @@ export default function VideoWithControls() {
   }, [collapsed, tapPinned]);
 
   const barVisible = !collapsed || hovering || tapPinned;
+
+  if (hideControls) {
+    return (
+      <div className="relative w-full h-full">
+        <VideoTemplate key={mountKey} durations={durations} loop muted={muted} onSceneChange={onSceneChange} />
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full h-full">
