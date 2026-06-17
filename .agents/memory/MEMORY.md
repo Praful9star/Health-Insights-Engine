@@ -2,3 +2,5 @@
 - [framer-motion ease typing](framer-motion-ease-typing.md) — inline cubic-bezier `ease: [...]` needs `as [number, number, number, number]` cast or tsc fails (vite build hides it).
 - [CureCheck localStorage features](curecheck-localstorage.md) — fitness/timeline data persisted client-side; hook, keys, and types summarised.
 - [CureCheck Report Explainer](curecheck-report-explainer.md) — OCR flow, vision model, pdfjs-dist setup, and new API schemas.
+- [CureCheck API route paths](curecheck-route-paths.md) — routes must NOT include /api/ prefix; app.use("/api", router) strips it. lib/brand needs @types/react + "types":["react"] in tsconfig for codegen to pass.
+- [CureCheck integrations](curecheck-integrations.md) — Razorpay payment links, Sanity project ID, Sentry setup, Claude migration details.

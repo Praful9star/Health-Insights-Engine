@@ -6,9 +6,7 @@
     "emitDeclarationOnly": true,
     "outDir": "dist",
     "rootDir": "src",
-    "jsx": "react-jsx",
-    "lib": ["dom", "es2022"],
-    "types": ["react"]
+    "types": ["node"]
   },
   "include": ["src"]
 }

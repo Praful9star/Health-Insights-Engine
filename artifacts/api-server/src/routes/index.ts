@@ -8,6 +8,7 @@ import symptomCheckerRouter from "./symptom-checker";
 import medicineExplainerRouter from "./medicine-explainer";
 import healthNewsRouter from "./health-news";
 import drugInteractionRouter from "./drug-interaction";
+import doctorPrepRouter from "./doctor-prep";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(symptomCheckerRouter);
 router.use(medicineExplainerRouter);
 router.use(healthNewsRouter);
 router.use(drugInteractionRouter);
+router.use(doctorPrepRouter);
 
 export default router;

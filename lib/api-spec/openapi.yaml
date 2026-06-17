@@ -191,6 +191,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /api/doctor-prep:
+    post:
+      tags: [Health]
+      operationId: doctorPrep
+      summary: Generate doctor visit preparation checklist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DoctorPrepInput"
+      responses:
+        "200":
+          description: Doctor visit prep checklist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DoctorPrepResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /api/drug-interaction:
     post:
       tags: [Health]
@@ -579,6 +604,54 @@ components:
           type: string
         disclaimer:
           type: string
+
+    DoctorPrepInput:
+      type: object
+      required:
+        - concern
+      properties:
+        concern:
+          type: string
+          minLength: 5
+        symptoms:
+          type: array
+          items:
+            type: string
+        medicalHistory:
+          type: string
+        currentMedications:
+          type: string
+        visitType:
+          type: string
+          enum: [general, specialist, followup, emergency]
+
+    DoctorPrepResult:
+      type: object
+      required:
+        - summary
+        - questionsToAsk
+        - symptomsToDescribe
+        - documentsToCarry
+        - redFlags
+      properties:
+        summary:
+          type: string
+        questionsToAsk:
+          type: array
+          items:
+            type: string
+        symptomsToDescribe:
+          type: array
+          items:
+            type: string
+        documentsToCarry:
+          type: array
+          items:
+            type: string
+        redFlags:
+          type: array
+          items:
+            type: string
 
     DrugInteractionInput:
       type: object

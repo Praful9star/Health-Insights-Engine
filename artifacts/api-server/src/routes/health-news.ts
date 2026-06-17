@@ -31,7 +31,7 @@ const FALLBACK: NewsArticle[] = [
 
 const router = Router();
 
-router.get("/api/health-news", async (req, res) => {
+router.get("/health-news", async (req, res) => {
   const q = typeof req.query.q === "string" && req.query.q.trim() ? req.query.q.trim() : "India health";
   const cacheKey = q.toLowerCase().slice(0, 80);
 

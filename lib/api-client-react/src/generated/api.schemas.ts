@@ -302,6 +302,78 @@ export interface SymptomResult {
   disclaimer: string;
 }
 
+export type DoctorPrepInputVisitType = typeof DoctorPrepInputVisitType[keyof typeof DoctorPrepInputVisitType];
+
+
+export const DoctorPrepInputVisitType = {
+  general: 'general',
+  specialist: 'specialist',
+  followup: 'followup',
+  emergency: 'emergency',
+} as const;
+
+export interface DoctorPrepInput {
+  /** @minLength 5 */
+  concern: string;
+  symptoms?: string[];
+  medicalHistory?: string;
+  currentMedications?: string;
+  visitType?: DoctorPrepInputVisitType;
+}
+
+export interface DoctorPrepResult {
+  summary: string;
+  questionsToAsk: string[];
+  symptomsToDescribe: string[];
+  documentsToCarry: string[];
+  redFlags: string[];
+}
+
+export interface DrugInteractionInput {
+  /**
+     * @minItems 2
+     * @maxItems 5
+     */
+  medicines: string[];
+}
+
+export type DrugInteractionEntrySeverity = typeof DrugInteractionEntrySeverity[keyof typeof DrugInteractionEntrySeverity];
+
+
+export const DrugInteractionEntrySeverity = {
+  major: 'major',
+  moderate: 'moderate',
+  minor: 'minor',
+  none: 'none',
+} as const;
+
+export interface DrugInteractionEntry {
+  medicine1: string;
+  medicine2: string;
+  severity: DrugInteractionEntrySeverity;
+  effect: string;
+  mechanism: string;
+  recommendation: string;
+}
+
+export type DrugInteractionResultOverallRisk = typeof DrugInteractionResultOverallRisk[keyof typeof DrugInteractionResultOverallRisk];
+
+
+export const DrugInteractionResultOverallRisk = {
+  high: 'high',
+  moderate: 'moderate',
+  low: 'low',
+  safe: 'safe',
+} as const;
+
+export interface DrugInteractionResult {
+  interactions: DrugInteractionEntry[];
+  overallRisk: DrugInteractionResultOverallRisk;
+  overallSummary: string;
+  generalAdvice: string[];
+  disclaimer: string;
+}
+
 export type MedicineInputLanguage = typeof MedicineInputLanguage[keyof typeof MedicineInputLanguage];
 
 

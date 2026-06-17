@@ -14,6 +14,7 @@ runButton = "Project"
 [agent]
 stack = "PNPM_WORKSPACE"
 expertMode = true
+integrations = ["resend:1.0.0"]
 
 [postMerge]
 path = "scripts/post-merge.sh"
@@ -38,3 +39,14 @@ externalPort = 3003
 [[ports]]
 localPort = 25201
 externalPort = 3000
+
+[nix]
+channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+SANITY_PROJECT_ID = "tqmjf1jn"
+SANITY_DATASET = "production"
+RAZORPAY_PREMIUM_MONTHLY_LINK = "https://rzp.io/rzp/jywNeGo"
+RAZORPAY_PREMIUM_ANNUAL_LINK = "https://rzp.io/rzp/y4J1B3a"

@@ -32,6 +32,8 @@ import Insurance from "@/pages/insurance";
 import Pregnancy from "@/pages/pregnancy";
 import News from "@/pages/news";
 import DrugInteraction from "@/pages/drug-interaction";
+import DoctorPrep from "@/pages/doctor-prep";
+import Premium from "@/pages/premium";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -62,6 +64,8 @@ function Router() {
       <Route path="/pregnancy" component={Pregnancy} />
       <Route path="/news" component={News} />
       <Route path="/drug-interaction" component={DrugInteraction} />
+      <Route path="/doctor-prep" component={DoctorPrep} />
+      <Route path="/premium" component={Premium} />
       <Route component={NotFound} />
     </Switch>
   );

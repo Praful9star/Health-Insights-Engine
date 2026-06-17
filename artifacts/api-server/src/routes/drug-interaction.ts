@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { groqChat } from "../lib/groq";
+import { claudeChat } from "../lib/claude";
 
 const router: IRouter = Router();
 
@@ -24,7 +24,7 @@ const MOCK: Record<string, unknown> = {
   disclaimer: "This analysis is for educational purposes only and does not replace professional medical advice. Always consult your doctor or pharmacist before combining medicines.",
 };
 
-router.post("/api/drug-interaction", async (req, res) => {
+router.post("/drug-interaction", async (req, res) => {
   const { medicines } = req.body ?? {};
 
   if (!Array.isArray(medicines) || medicines.length < 2) {
@@ -61,7 +61,7 @@ Respond ONLY with a JSON object:
 }`;
 
   try {
-    const content = await groqChat(systemPrompt, userMessage);
+    const content = await claudeChat(systemPrompt, userMessage);
 
     let parsed: Record<string, unknown>;
     try {

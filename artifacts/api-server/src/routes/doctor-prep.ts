@@ -1,14 +1,10 @@
 import { Router, type IRouter } from "express";
-import { groqChat } from "../lib/groq";
+import { claudeChat } from "../lib/claude";
 
 const router: IRouter = Router();
 
 const MOCK = {
-  topConcerns: [
-    "Persistent fatigue lasting more than 2 weeks",
-    "Unexplained weight changes",
-    "Sleep disturbances affecting daily function",
-  ],
+  summary: "You are preparing for a general checkup with concerns about fatigue and chest discomfort. Organise your symptoms clearly before the visit.",
   questionsToAsk: [
     "What could be causing my symptoms? Are there multiple possible causes?",
     "What tests do you recommend and what will they tell us?",
@@ -18,82 +14,76 @@ const MOCK = {
     "Are my current medicines contributing to any of these symptoms?",
     "What happens if we don't treat this now?",
   ],
-  whatToBring: [
+  symptomsToDescribe: [
+    "When exactly did it start — give a specific date or period",
+    "How often does it happen — constant, or comes and goes?",
+    "What makes it better or worse (food, activity, stress, time of day)?",
+    "Rate severity from 1–10 and describe how it affects your daily routine",
+    "Any associated symptoms you noticed around the same time?",
+  ],
+  documentsToCarry: [
     "List of all medicines (include OTC, supplements, herbal)",
-    "Previous test reports and prescriptions",
-    "Aadhaar / insurance card (CGHS/ESI/PM-JAY)",
-    "Written symptom diary if you have one",
+    "Previous test reports and prescriptions (last 6–12 months)",
+    "Aadhaar / insurance card (CGHS/ESI/PM-JAY if applicable)",
+    "Written symptom diary if available",
     "A trusted family member if you feel you may forget things",
   ],
-  preparationTips: [
-    "Write down your 3 most important questions before entering the room — doctors are busy and you want to cover the essentials.",
-    "Describe your symptoms in timeline order: when did it start, what makes it better or worse?",
-    "Be honest about lifestyle factors — diet, sleep, stress, alcohol, tobacco. Doctors cannot help with information they don't have.",
-    "If you don't understand something, say: 'Please explain that in simpler terms.'",
-    "Ask for written instructions or a summary before leaving.",
+  redFlags: [
+    "Severe chest pain radiating to the arm, jaw, or back — go to ER immediately",
+    "Sudden shortness of breath at rest",
+    "Coughing or vomiting blood",
+    "High fever above 103°F (39.4°C) with stiff neck or confusion",
+    "Sudden severe headache unlike any before",
   ],
-  whenToGoToER: [
-    "Chest pain or pressure",
-    "Difficulty breathing or shortness of breath at rest",
-    "Sudden severe headache",
-    "Weakness or numbness on one side of body (stroke signs)",
-    "High fever with stiff neck or confusion",
-  ],
-  disclaimer: "This preparation guide is for educational purposes only. It does not replace medical advice. Always follow your doctor's guidance.",
 };
 
-router.post("/api/doctor-prep", async (req, res) => {
-  const { symptoms, duration, age_group, gender, existing_conditions } = req.body ?? {};
+router.post("/doctor-prep", async (req, res): Promise<void> => {
+  const { concern, symptoms, medicalHistory, currentMedications, visitType } = req.body ?? {};
 
-  if (!symptoms || (Array.isArray(symptoms) && symptoms.length === 0)) {
-    return res.status(400).json({ message: "Please provide at least one symptom." });
+  if (!concern || typeof concern !== "string" || concern.trim().length < 5) {
+    res.status(400).json({ error: "Please describe your main concern (at least 5 characters)." });
+    return;
   }
 
-  const symptomList = Array.isArray(symptoms)
+  const symptomList: string[] = Array.isArray(symptoms)
     ? symptoms.filter((s: unknown) => typeof s === "string" && s.trim()).slice(0, 10)
-    : [String(symptoms).trim()];
-
-  if (symptomList.length === 0) {
-    return res.status(400).json({ message: "Please provide valid symptom descriptions." });
-  }
+    : [];
 
   const systemPrompt = `You are CureCheck's Doctor Visit Prep assistant — helping Indian patients prepare for medical consultations.
-You do NOT diagnose. You help patients organize their thoughts and communicate clearly with their doctor.
-Respond ONLY with valid JSON. Be practical and specific for the Indian healthcare context.`;
-
-  const userMessage = `Help this Indian patient prepare for their doctor's appointment.
-
-Symptoms: ${symptomList.join("; ")}
-Duration: ${duration || "not specified"}
-Age group: ${age_group || "adult"}
-Gender: ${gender || "not specified"}
-Existing conditions / medicines: ${existing_conditions || "none mentioned"}
-
-Generate a practical doctor visit prep guide. Respond ONLY with JSON:
+You do NOT diagnose. You help patients organise their thoughts and communicate clearly with their doctor.
+Respond ONLY with valid JSON matching this exact structure:
 {
-  "topConcerns": [string array — 3 key things to raise with the doctor],
-  "questionsToAsk": [string array — 6-8 specific, useful questions for this patient's situation],
-  "whatToBring": [string array — 4-5 items to bring to the appointment],
-  "preparationTips": [string array — 4-5 practical communication tips],
-  "whenToGoToER": [string array — 4-5 symptoms that require immediate ER visit, specific to these complaints],
-  "disclaimer": "This preparation guide is for educational purposes only. It does not replace medical advice. Always follow your doctor's guidance."
+  "summary": "2-3 sentence overview of the patient's situation and visit purpose",
+  "questionsToAsk": ["6-8 specific, useful questions tailored to their concern"],
+  "symptomsToDescribe": ["4-5 specific tips on how to describe their symptoms clearly to the doctor"],
+  "documentsToCarry": ["4-5 relevant documents/items to bring"],
+  "redFlags": ["4-5 warning signs that would require immediate ER visit, specific to their complaint"]
 }
+Be practical and specific for the Indian healthcare context. Tailor everything to the patient's actual concern.`;
 
-Make the questions specific to the symptoms provided, not generic. Tailor for Indian healthcare context.`;
+  const userMessage = `Help this Indian patient prepare for their ${visitType ?? "general"} doctor's appointment.
+
+Main concern: ${concern.trim()}
+${symptomList.length > 0 ? `Symptoms: ${symptomList.join(", ")}` : ""}
+${medicalHistory ? `Medical history: ${medicalHistory}` : ""}
+${currentMedications ? `Current medications: ${currentMedications}` : ""}
+
+Generate a personalised doctor visit prep guide as JSON.`;
 
   try {
-    const content = await groqChat(systemPrompt, userMessage);
+    const content = await claudeChat(systemPrompt, userMessage);
     let parsed: Record<string, unknown>;
     try {
       parsed = JSON.parse(content);
     } catch {
       req.log.warn("Doctor prep JSON parse failed — returning mock");
-      return res.json(MOCK);
+      res.json(MOCK);
+      return;
     }
-    return res.json(parsed);
+    res.json(parsed);
   } catch (err) {
-    req.log.warn({ err }, "Groq doctor-prep error — returning mock");
-    return res.json(MOCK);
+    req.log.warn({ err }, "Doctor prep AI error — returning mock");
+    res.json(MOCK);
   }
 });
 

@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { CheckHealthClaimBody, CheckHealthClaimResponse } from "@workspace/api-zod";
-import { groqChat, getGroqClient } from "../lib/groq";
+import { claudeChat, isAiAvailable } from "../lib/claude";
 import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
@@ -157,14 +157,14 @@ router.post("/claim-checker", async (req, res): Promise<void> => {
   }
 
   const { claim } = parsed.data;
-  const hasGroq = !!getGroqClient();
+  const hasAi = isAiAvailable();
 
   try {
     let result;
 
-    if (hasGroq) {
+    if (hasAi) {
       req.log.info({ claimLength: claim.length }, "Analyzing claim with Groq");
-      const raw = await groqChat(SYSTEM_PROMPT, `Please analyze this health claim: "${claim}"`);
+      const raw = await claudeChat(SYSTEM_PROMPT, `Please analyze this health claim: "${claim}"`);
       result = JSON.parse(raw);
     } else {
       req.log.info("GROQ_API_KEY not set, using mock response");

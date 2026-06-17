@@ -209,3 +209,55 @@ export const ExplainMedicineResponse = zod.object({
 })
 
 
+/**
+ * @summary Generate doctor visit preparation checklist
+ */
+export const doctorPrepBodyConcernMin = 5;
+
+
+
+export const DoctorPrepBody = zod.object({
+  "concern": zod.string().min(doctorPrepBodyConcernMin),
+  "symptoms": zod.array(zod.string()).optional(),
+  "medicalHistory": zod.string().optional(),
+  "currentMedications": zod.string().optional(),
+  "visitType": zod.enum(['general', 'specialist', 'followup', 'emergency']).optional()
+})
+
+export const DoctorPrepResponse = zod.object({
+  "summary": zod.string(),
+  "questionsToAsk": zod.array(zod.string()),
+  "symptomsToDescribe": zod.array(zod.string()),
+  "documentsToCarry": zod.array(zod.string()),
+  "redFlags": zod.array(zod.string())
+})
+
+
+/**
+ * @summary Check drug-drug interactions
+ */
+export const checkDrugInteractionBodyMedicinesMin = 2;
+export const checkDrugInteractionBodyMedicinesMax = 5;
+
+
+
+export const CheckDrugInteractionBody = zod.object({
+  "medicines": zod.array(zod.string()).min(checkDrugInteractionBodyMedicinesMin).max(checkDrugInteractionBodyMedicinesMax)
+})
+
+export const CheckDrugInteractionResponse = zod.object({
+  "interactions": zod.array(zod.object({
+  "medicine1": zod.string(),
+  "medicine2": zod.string(),
+  "severity": zod.enum(['major', 'moderate', 'minor', 'none']),
+  "effect": zod.string(),
+  "mechanism": zod.string(),
+  "recommendation": zod.string()
+})),
+  "overallRisk": zod.enum(['high', 'moderate', 'low', 'safe']),
+  "overallSummary": zod.string(),
+  "generalAdvice": zod.array(zod.string()),
+  "disclaimer": zod.string()
+})
+
+

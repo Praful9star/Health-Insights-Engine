@@ -24,6 +24,10 @@ import type {
   ClaimResult,
   DiseaseJourneyInput,
   DiseaseJourneyResult,
+  DoctorPrepInput,
+  DoctorPrepResult,
+  DrugInteractionInput,
+  DrugInteractionResult,
   ErrorResponse,
   HealthStatus,
   MedicineInput,
@@ -556,5 +560,147 @@ export const useExplainMedicine = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getExplainMedicineMutationOptions(options));
+    }
+
+export const getDoctorPrepUrl = () => {
+
+
+
+
+  return `/api/api/doctor-prep`
+}
+
+/**
+ * @summary Generate doctor visit preparation checklist
+ */
+export const doctorPrep = async (doctorPrepInput: DoctorPrepInput, options?: RequestInit): Promise<DoctorPrepResult> => {
+
+  return customFetch<DoctorPrepResult>(getDoctorPrepUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      doctorPrepInput,)
+  }
+);}
+
+
+
+
+export const getDoctorPrepMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof doctorPrep>>, TError,{data: BodyType<DoctorPrepInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof doctorPrep>>, TError,{data: BodyType<DoctorPrepInput>}, TContext> => {
+
+const mutationKey = ['doctorPrep'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof doctorPrep>>, {data: BodyType<DoctorPrepInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  doctorPrep(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DoctorPrepMutationResult = NonNullable<Awaited<ReturnType<typeof doctorPrep>>>
+    export type DoctorPrepMutationBody = BodyType<DoctorPrepInput>
+    export type DoctorPrepMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Generate doctor visit preparation checklist
+ */
+export const useDoctorPrep = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof doctorPrep>>, TError,{data: BodyType<DoctorPrepInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof doctorPrep>>,
+        TError,
+        {data: BodyType<DoctorPrepInput>},
+        TContext
+      > => {
+      return useMutation(getDoctorPrepMutationOptions(options));
+    }
+
+export const getCheckDrugInteractionUrl = () => {
+
+
+
+
+  return `/api/api/drug-interaction`
+}
+
+/**
+ * @summary Check drug-drug interactions
+ */
+export const checkDrugInteraction = async (drugInteractionInput: DrugInteractionInput, options?: RequestInit): Promise<DrugInteractionResult> => {
+
+  return customFetch<DrugInteractionResult>(getCheckDrugInteractionUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      drugInteractionInput,)
+  }
+);}
+
+
+
+
+export const getCheckDrugInteractionMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkDrugInteraction>>, TError,{data: BodyType<DrugInteractionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof checkDrugInteraction>>, TError,{data: BodyType<DrugInteractionInput>}, TContext> => {
+
+const mutationKey = ['checkDrugInteraction'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof checkDrugInteraction>>, {data: BodyType<DrugInteractionInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  checkDrugInteraction(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CheckDrugInteractionMutationResult = NonNullable<Awaited<ReturnType<typeof checkDrugInteraction>>>
+    export type CheckDrugInteractionMutationBody = BodyType<DrugInteractionInput>
+    export type CheckDrugInteractionMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Check drug-drug interactions
+ */
+export const useCheckDrugInteraction = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkDrugInteraction>>, TError,{data: BodyType<DrugInteractionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof checkDrugInteraction>>,
+        TError,
+        {data: BodyType<DrugInteractionInput>},
+        TContext
+      > => {
+      return useMutation(getCheckDrugInteractionMutationOptions(options));
     }
 

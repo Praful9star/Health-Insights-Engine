@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { GetDiseaseJourneyBody, GetDiseaseJourneyResponse } from "@workspace/api-zod";
-import { groqChat, getGroqClient } from "../lib/groq";
+import { claudeChat, isAiAvailable } from "../lib/claude";
 
 const router: IRouter = Router();
 
@@ -426,14 +426,14 @@ router.post("/disease-journey", async (req, res): Promise<void> => {
   }
 
   const { disease, ageGroup } = parsed.data;
-  const hasGroq = !!getGroqClient();
+  const hasAi = isAiAvailable();
 
   try {
     let result;
 
-    if (hasGroq) {
+    if (hasAi) {
       req.log.info({ disease, ageGroup }, "Generating disease journey with Groq");
-      const raw = await groqChat(
+      const raw = await claudeChat(
         SYSTEM_PROMPT,
         `Generate a disease journey map for: Disease: "${disease}", Age Group: "${ageGroup}"`,
       );

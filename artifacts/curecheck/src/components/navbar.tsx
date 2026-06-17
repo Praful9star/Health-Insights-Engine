@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Languages, ChevronDown, User, LogIn } from "lucide-react";
+import { Menu, X, Languages, ChevronDown, User, LogIn, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/language-context";
 import { useAuth } from "@/contexts/auth-context";
@@ -29,6 +29,7 @@ const MORE_LINKS = [
   { href: "/ayurveda",          label: { en: "Ayurveda Guide",         hi: "आयुर्वेद"         } },
   { href: "/insurance",         label: { en: "Insurance Guide",        hi: "बीमा गाइड"        } },
   { href: "/pregnancy",         label: { en: "Pregnancy Tracker",      hi: "गर्भावस्था"       } },
+  { href: "/doctor-prep",       label: { en: "Doctor Visit Prep",      hi: "डॉक्टर तैयारी"    } },
   { href: "/about",             label: { en: "About",                  hi: "परिचय"            } },
 ];
 
@@ -99,6 +100,12 @@ export default function Navbar() {
             <span className={`px-2.5 py-1 rounded-full transition-colors ${language === "en" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>EN</span>
             <span className={`px-2.5 py-1 rounded-full transition-colors ${language === "hi" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>हिंदी</span>
           </button>
+
+          <Link href="/premium">
+            <button className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/30 hover:bg-primary/20 text-xs font-700 text-primary transition-all">
+              <Star className="w-3 h-3" /> Premium
+            </button>
+          </Link>
 
           <Link href="/login">
             <button className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/70 bg-muted/30 hover:bg-muted/60 text-xs font-600 text-muted-foreground hover:text-foreground transition-all">

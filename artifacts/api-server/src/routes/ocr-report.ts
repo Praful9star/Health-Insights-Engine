@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { OcrReportBody } from "@workspace/api-zod";
-import { getGroqClient } from "../lib/groq";
+import { claudeVision, isAiAvailable } from "../lib/claude";
 
 const router: IRouter = Router();
 
@@ -27,34 +27,31 @@ router.post("/ocr-report", async (req, res): Promise<void> => {
   }
 
   const { imageData, mimeType } = parsed.data;
-  const client = getGroqClient();
 
-  if (!client) {
-    req.log.info("GROQ_API_KEY not set, returning mock OCR result");
+  if (!isAiAvailable()) {
+    req.log.info("AI not configured, returning mock OCR result");
     await new Promise((r) => setTimeout(r, 1200));
     res.json({ extractedText: MOCK_EXTRACTED_TEXT, confidence: "high" });
     return;
   }
 
   try {
-    req.log.info({ mimeType }, "Running vision OCR on medical report image");
+    req.log.info({ mimeType }, "Running Claude vision OCR on medical report image");
 
-    const completion = await client.chat.completions.create({
-      model: "llama-3.2-11b-vision-preview",
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "image_url",
-              image_url: {
-                url: `data:${mimeType};base64,${imageData}`,
-              },
-            },
-            {
-              type: "text",
-              text: `You are a medical OCR assistant. Extract ALL text from this medical report image EXACTLY as written.
-              
+    const validMimeType = (
+      mimeType === "image/jpeg" ||
+      mimeType === "image/png" ||
+      mimeType === "image/gif" ||
+      mimeType === "image/webp"
+    )
+      ? mimeType
+      : "image/jpeg" as const;
+
+    const extractedText = await claudeVision(
+      imageData,
+      validMimeType,
+      `You are a medical OCR assistant. Extract ALL text from this medical report image EXACTLY as written.
+
 Preserve:
 - All parameter names and values
 - All reference ranges (the numbers in brackets)
@@ -65,15 +62,7 @@ Preserve:
 
 Format the output as clean readable text. Do not add any commentary or interpretation.
 Return ONLY the extracted text from the report.`,
-            },
-          ],
-        },
-      ],
-      temperature: 0.1,
-      max_tokens: 2000,
-    });
-
-    const extractedText = completion.choices[0]?.message?.content ?? "";
+    );
 
     if (!extractedText || extractedText.length < 10) {
       res.json({ extractedText: MOCK_EXTRACTED_TEXT, confidence: "low" });
