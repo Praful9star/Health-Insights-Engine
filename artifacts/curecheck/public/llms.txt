@@ -1,0 +1,36 @@
+# CureCheck
+
+> AI-powered healthcare information platform for Indian users. CureCheck helps people verify health claims from WhatsApp forwards, understand symptoms, decode lab reports, learn about medicines, and navigate disease journeys — in plain language, in Hindi and English. Educational only; never diagnoses or prescribes.
+
+## Primary tools
+
+- [Health Claim Checker](https://curecheck.in/claim-checker): Paste a WhatsApp forward or health claim and get a credibility score, verdict, red flags, and safer interpretation.
+- [Symptom Checker](https://curecheck.in/symptom-checker): Describe symptoms and get a plain-language overview of possible causes and when to see a doctor.
+- [Report Explainer](https://curecheck.in/report-explainer): Upload or paste a CBC, thyroid, or other lab report and get plain-language findings with key term explanations.
+- [Medicine Explainer](https://curecheck.in/medicine-explainer): Look up any medicine to understand what it does, common side effects, and important precautions.
+- [Disease Journey Map](https://curecheck.in/disease-journey): Enter a disease and age group to see a phase-by-phase journey with typical experiences and warning signs.
+- [Drug Interaction Checker](https://curecheck.in/drug-interaction): Check whether two or more medicines interact and understand the risk level.
+
+## Additional health resources
+
+- [Myth Buster](https://curecheck.in/myth-buster): Debunks common Indian health myths with evidence-based explanations.
+- [Mental Health](https://curecheck.in/mental-health): Mental wellness resources and self-assessment tools.
+- [Ayurveda](https://curecheck.in/ayurveda): Evidence-based information on Ayurvedic practices and herbs.
+- [Pregnancy](https://curecheck.in/pregnancy): Week-by-week pregnancy guidance and symptom information.
+- [Vaccines](https://curecheck.in/vaccines): India's childhood and adult vaccination schedule with FAQs.
+- [Emergency](https://curecheck.in/emergency): First-aid guidance and emergency contact numbers for India.
+- [Hospital Finder](https://curecheck.in/hospitals): Find nearby hospitals and clinics.
+- [Health Calculators](https://curecheck.in/calculators): BMI, calorie, and other health calculators.
+- [Doctor Prep](https://curecheck.in/doctor-prep): Prepare questions and notes before a doctor visit.
+- [Fitness Hub](https://curecheck.in/fitness-hub): Workout and nutrition guidance tailored for Indian lifestyles.
+- [Health Insurance](https://curecheck.in/insurance): Plain-language guide to understanding health insurance in India.
+- [Health Timeline](https://curecheck.in/health-timeline): Track personal health events and build a medical history.
+- [About CureCheck](https://curecheck.in/about): Mission, team, and editorial standards.
+
+## Sitemap
+
+https://curecheck.in/sitemap.xml
+
+## Robots
+
+https://curecheck.in/robots.txt

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Home, ArrowLeft, Stethoscope, Search } from "lucide-react";
@@ -10,6 +11,29 @@ const QUICK_LINKS = [
 ];
 
 export default function NotFound() {
+  useEffect(() => {
+    const existing = document.querySelector('meta[name="robots"]');
+    const prev = existing?.getAttribute("content") ?? null;
+    if (existing) {
+      existing.setAttribute("content", "noindex, nofollow");
+    } else {
+      const meta = document.createElement("meta");
+      meta.name = "robots";
+      meta.content = "noindex, nofollow";
+      document.head.appendChild(meta);
+    }
+    return () => {
+      const tag = document.querySelector('meta[name="robots"]');
+      if (tag) {
+        if (prev !== null) {
+          tag.setAttribute("content", prev);
+        } else {
+          tag.remove();
+        }
+      }
+    };
+  }, []);
+
   return (
     <div className="relative z-10 min-h-[80vh] flex flex-col items-center justify-center px-4 py-16 text-center">
       <motion.div

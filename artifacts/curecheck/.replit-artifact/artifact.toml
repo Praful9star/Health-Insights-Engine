@@ -23,7 +23,119 @@ publicDir = "artifacts/curecheck/dist/public"
 serve = "static"
 
 [[services.production.rewrites]]
-from = "/*"
+from = "/"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/claim-checker"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/symptom-checker"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/report-explainer"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/medicine-explainer"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/disease-journey"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/myth-buster"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/myth-buster/*"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/health-timeline"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/fitness-hub"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/mental-health"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/hospitals"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/calculators"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/emergency"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/vaccines"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/ayurveda"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/insurance"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/pregnancy"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/news"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/drug-interaction"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/doctor-prep"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/premium"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/weather"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/about"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/login"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/dashboard"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/profile"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/admin-curecheck-secure"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/feedback"
 to = "/index.html"
 
 [services.env]
