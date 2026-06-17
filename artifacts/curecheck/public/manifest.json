@@ -1,15 +1,63 @@
 {
   "name": "CureCheck — AI Health Platform",
   "short_name": "CureCheck",
-  "description": "AI-powered health for Indians — reports, medicines, fitness & more",
+  "description": "AI-powered health for Indians — reports, medicines, fitness & more. Free, no signup.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#070d0d",
   "theme_color": "#0d9488",
   "orientation": "portrait-primary",
-  "categories": ["health", "medical"],
+  "categories": ["health", "medical", "fitness"],
   "lang": "en-IN",
+  "dir": "ltr",
+  "id": "curecheck-app",
   "icons": [
-    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
-  ]
+    { "src": "/icon-192.png",    "sizes": "192x192", "type": "image/png",     "purpose": "any" },
+    { "src": "/icon-512.png",    "sizes": "512x512", "type": "image/png",     "purpose": "any" },
+    { "src": "/icon-maskable.png","sizes": "512x512", "type": "image/png",    "purpose": "maskable" },
+    { "src": "/favicon.svg",     "sizes": "any",     "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Analyze Report",
+      "short_name": "Report",
+      "description": "Analyze your medical report with AI",
+      "url": "/report-explainer",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Symptom Checker",
+      "short_name": "Symptoms",
+      "description": "Check your symptoms",
+      "url": "/symptom-checker",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Hospital Finder",
+      "short_name": "Hospitals",
+      "description": "Find hospitals near you",
+      "url": "/hospitals",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Emergency",
+      "short_name": "Emergency",
+      "description": "Emergency numbers & first aid",
+      "url": "/emergency",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/opengraph.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "CureCheck — AI Health Platform for India"
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": []
 }
