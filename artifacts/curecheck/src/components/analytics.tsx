@@ -21,6 +21,12 @@ export default function Analytics() {
 
     if (tawkId) {
       (window as any).Tawk_API = (window as any).Tawk_API ?? {};
+      (window as any).Tawk_API.customStyle = {
+        visibility: {
+          desktop: { position: "bl", xOffset: 20, yOffset: 20 },
+          mobile:  { position: "bl", xOffset: 10, yOffset: 10 },
+        },
+      };
       (window as any).Tawk_LoadStart = new Date();
       const s = document.createElement("script");
       s.async = true;
