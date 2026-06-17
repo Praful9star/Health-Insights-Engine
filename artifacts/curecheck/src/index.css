@@ -205,7 +205,7 @@
   --secondary-foreground: 0 0% 100%;
 
   --muted: 185 20% 12%;
-  --muted-foreground: 184 11% 64%;
+  --muted-foreground: 184 16% 75%;
 
   --accent: 185 22% 13%;
   --accent-foreground: 183 95% 72%;
@@ -239,8 +239,9 @@
 
 @layer base {
   * { @apply border-border; }
-  body { @apply font-sans antialiased bg-background text-foreground; }
-  h1, h2, h3, h4 { font-family: var(--app-font-serif); letter-spacing: -0.025em; }
+  body { @apply font-sans antialiased bg-background text-foreground; font-weight: 500; font-size: 1rem; line-height: 1.65; }
+  p { font-weight: 500; color: hsl(var(--foreground) / 0.88); }
+  h1, h2, h3, h4 { font-family: var(--app-font-serif); letter-spacing: -0.025em; font-weight: 700; }
 
   ::selection { background: hsl(var(--primary) / 0.28); color: hsl(var(--foreground)); }
 
@@ -521,13 +522,13 @@
     .bento-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
   }
 
-  /* JetBrains mono label */
+  /* Section labels — readable caps */
   .mono-label {
-    font-family: var(--app-font-mono);
+    font-family: var(--app-font-sans);
     text-transform: uppercase;
-    letter-spacing: 0.18em;
-    font-size: 0.7rem;
-    font-weight: 500;
+    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+    font-weight: 700;
   }
 
   /* Shimmer / sweep button */
