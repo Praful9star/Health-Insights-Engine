@@ -30,6 +30,8 @@ const MORE_LINKS = [
   { href: "/insurance",         label: { en: "Insurance Guide",        hi: "बीमा गाइड"        } },
   { href: "/pregnancy",         label: { en: "Pregnancy Tracker",      hi: "गर्भावस्था"       } },
   { href: "/doctor-prep",       label: { en: "Doctor Visit Prep",      hi: "डॉक्टर तैयारी"    } },
+  { href: "/weather",           label: { en: "Weather & Health Tips",  hi: "मौसम + स्वास्थ्य"  } },
+  { href: "/feedback",          label: { en: "Feedback",               hi: "प्रतिक्रिया"       } },
   { href: "/about",             label: { en: "About",                  hi: "परिचय"            } },
 ];
 

@@ -18,6 +18,7 @@ import { useQuoteOfDay } from "@/hooks/use-quote-of-day";
 import { DAILY_MYTHS } from "@/data/myths";
 import { WhatsAppShare } from "@/components/whatsapp-share";
 import NewsTicker from "@/components/news-ticker";
+import WeatherWidget from "@/components/weather-widget";
 
 /* ─── Animation variants ───────────────────────────────────────────── */
 const fadeUp = {
@@ -227,7 +228,7 @@ export default function Home() {
           <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0.5}>
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel mono-label text-primary">
               <Sparkles className="w-3.5 h-3.5" />
-              {t("AI Health Platform · Built for India", "AI स्वास्थ्य Platform · भारत के लिए")}
+              {t("Cut through health misinformation with evidence-based guidance.", "AI-powered · भारत के लिए बना")}
             </span>
           </motion.div>
 
@@ -235,11 +236,11 @@ export default function Home() {
             variants={fadeUp} initial="hidden" animate="visible" custom={1}
             className="mt-7 text-[2.4rem] sm:text-6xl lg:text-7xl font-serif font-800 leading-[1.05] text-foreground"
           >
-            {t("Understand Your Health.", "अपनी सेहत समझें।")}
+            {t("Healthcare Information", "स्वास्थ्य जानकारी")}
             <br />
-            {t("Track Your Progress.", "Progress track करें।")}
+            {t("You Can Actually", "जो आप वाकई")}
             <br />
-            <span className="gradient-text">{t("Improve Every Day.", "हर दिन बेहतर बनें।")}</span>
+            <span className="gradient-text">{t("Understand.", "समझ सकते हैं।")}</span>
           </motion.h1>
 
           <motion.p
@@ -247,8 +248,8 @@ export default function Home() {
             className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
           >
             {t(
-              "AI-powered report explanations, medicine guidance and fitness tracking — all in one place.",
-              "AI-powered रिपोर्ट समझाव, दवा guidance और fitness tracking — एक ही जगह।",
+              "Verify health claims, understand your reports, and navigate your health journey — with AI-powered educational guidance built for India.",
+              "health claims verify करें, reports समझें, और अपनी health journey navigate करें — AI-powered educational guidance के साथ।",
             )}
           </motion.p>
 
@@ -305,8 +306,17 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ══ WEATHER + HEALTH TIPS ════════════════════════════════════ */}
+      <section className="px-4 pt-10 pb-0">
+        <div className="max-w-2xl mx-auto">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+            <WeatherWidget />
+          </motion.div>
+        </div>
+      </section>
+
       {/* ══ QUOTE OF THE DAY ═════════════════════════════════════════ */}
-      <section className="px-4 pt-10 pb-4">
+      <section className="px-4 pt-6 pb-4">
         <div className="max-w-2xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <div className="glass-panel rounded-2xl px-6 py-5 border border-primary/10 flex gap-4 items-start">

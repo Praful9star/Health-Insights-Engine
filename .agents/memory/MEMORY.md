@@ -4,3 +4,4 @@
 - [CureCheck Report Explainer](curecheck-report-explainer.md) — OCR flow, vision model, pdfjs-dist setup, and new API schemas.
 - [CureCheck API route paths](curecheck-route-paths.md) — routes must NOT include /api/ prefix; app.use("/api", router) strips it. lib/brand needs @types/react + "types":["react"] in tsconfig for codegen to pass.
 - [CureCheck integrations](curecheck-integrations.md) — Razorpay payment links, Sanity project ID, Sentry setup, Claude migration details.
+- [CureCheck news-ticker source shape](curecheck-news-ticker.md) — API returns `source: {name: string}` not a string; ticker must extract `.name` or crash with "Objects are not valid as React child {name}".

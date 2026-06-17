@@ -34,6 +34,10 @@ import News from "@/pages/news";
 import DrugInteraction from "@/pages/drug-interaction";
 import DoctorPrep from "@/pages/doctor-prep";
 import Premium from "@/pages/premium";
+import Weather from "@/pages/weather";
+import AdminPanel from "@/pages/admin";
+import Feedback from "@/pages/feedback";
+import MobileBottomNav from "@/components/mobile-bottom-nav";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -66,6 +70,9 @@ function Router() {
       <Route path="/drug-interaction" component={DrugInteraction} />
       <Route path="/doctor-prep" component={DoctorPrep} />
       <Route path="/premium" component={Premium} />
+      <Route path="/weather" component={Weather} />
+      <Route path="/admin-curecheck-secure" component={AdminPanel} />
+      <Route path="/feedback" component={Feedback} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -85,10 +92,11 @@ export default function App() {
                   <PremiumBackground />
                   <DisclaimerBanner />
                   <Navbar />
-                  <main className="flex-1">
+                  <main className="flex-1 pb-20 lg:pb-0">
                     <Router />
                   </main>
                   <Footer />
+                  <MobileBottomNav />
                 </div>
                 <Toaster />
               </WouterRouter>

@@ -3,7 +3,7 @@ import { Activity, Newspaper } from "lucide-react";
 
 interface NewsItem {
   title: string;
-  source: string;
+  source: string | { name: string };
   url: string;
 }
 
@@ -57,7 +57,7 @@ export default function NewsTicker() {
               ) : (
                 <span className="font-500 text-foreground/70">{item.title}</span>
               )}
-              <span className="text-primary/50 font-400">— {item.source}</span>
+              <span className="text-primary/50 font-400">— {typeof item.source === "object" ? item.source.name : item.source}</span>
             </span>
           ))}
         </div>
