@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { ChevronLeft, Check, Zap, Shield, Brain, FileText, Pill, Activity, Star } from "lucide-react";
+import PageMeta from "@/components/page-meta";
 
 const MONTHLY_LINK = "https://rzp.io/rzp/jywNeGo";
 const ANNUAL_LINK = "https://rzp.io/rzp/y4J1B3a";
@@ -50,6 +51,11 @@ const FAQS = [
 export default function Premium() {
   return (
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12">
+      <PageMeta
+        title="CureCheck Premium — Advanced AI Health Tools"
+        description="Unlock unlimited AI health analysis, priority report explanation, and ad-free experience with CureCheck Premium. Built for India."
+        path="/premium"
+      />
       <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
 
       <div className="text-center mb-10">

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, ChevronLeft, ChevronRight, FlaskConical, CheckCircle2, Shield } from "lucide-react";
+import PageMeta from "@/components/page-meta";
 import { Link, useParams, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/language-context";
@@ -104,6 +105,11 @@ export default function MythBuster() {
 
   return (
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Health Myth Buster — Fact-Check Indian Health Claims"
+        description="Science-backed verdicts on common Indian health myths — from turmeric to giloy, Ayurveda to modern medicine. Free fact-checking tool."
+        path="/myth-buster"
+      />
       {/* Header */}
       <motion.div variants={fadeUp} initial="hidden" animate="visible" className="text-center mb-10">
         <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer">

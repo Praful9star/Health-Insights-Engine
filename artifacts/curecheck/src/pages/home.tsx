@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import PageMeta from "@/components/page-meta";
 import {
   FileSearch, Pill, Clock, Dumbbell, ArrowRight, Sparkles,
   CheckCircle2, Zap, ShieldCheck, BookOpen, TrendingUp, Flame,
@@ -196,6 +197,11 @@ export default function Home() {
 
   return (
     <div className="relative z-10">
+      <PageMeta
+        title="CureCheck — Free AI Health Information for Indians"
+        description="Free AI-powered health platform for India. Check health claims from WhatsApp forwards, understand symptoms, decode medical reports, and learn about medicines — in Hindi &amp; English."
+        path="/"
+      />
 
       {/* ══ NEWS TICKER ══════════════════════════════════════════════ */}
       <NewsTicker />

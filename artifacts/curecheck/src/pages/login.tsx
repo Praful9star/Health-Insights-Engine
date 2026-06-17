@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
+import PageMeta from "@/components/page-meta";
 import { Mail, Lock, User, ChevronLeft, LogIn, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,6 +68,11 @@ export default function Login() {
 
   return (
     <div className="relative z-10 min-h-[80vh] flex items-center justify-center px-4 py-12">
+      <PageMeta
+        title="Sign In — CureCheck"
+        description="Sign in to CureCheck to save your health history, access premium tools, and personalise your experience."
+        path="/login"
+      />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }} className="w-full max-w-sm">
         <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
 

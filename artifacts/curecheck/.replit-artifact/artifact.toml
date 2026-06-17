@@ -22,106 +22,110 @@ build = [ "pnpm", "--filter", "@workspace/curecheck", "run", "build" ]
 publicDir = "artifacts/curecheck/dist/public"
 serve = "static"
 
+# Root — prerendered with home-page metadata
 [[services.production.rewrites]]
 from = "/"
 to = "/index.html"
 
+# Tool pages — each served from its own prerendered HTML file
 [[services.production.rewrites]]
 from = "/claim-checker"
-to = "/index.html"
+to = "/claim-checker/index.html"
 
 [[services.production.rewrites]]
 from = "/symptom-checker"
-to = "/index.html"
+to = "/symptom-checker/index.html"
 
 [[services.production.rewrites]]
 from = "/report-explainer"
-to = "/index.html"
+to = "/report-explainer/index.html"
 
 [[services.production.rewrites]]
 from = "/medicine-explainer"
-to = "/index.html"
+to = "/medicine-explainer/index.html"
 
 [[services.production.rewrites]]
 from = "/disease-journey"
-to = "/index.html"
+to = "/disease-journey/index.html"
 
 [[services.production.rewrites]]
 from = "/myth-buster"
-to = "/index.html"
+to = "/myth-buster/index.html"
 
+# Dynamic slug — falls back to shared shell (React handles client-side routing)
 [[services.production.rewrites]]
 from = "/myth-buster/*"
 to = "/index.html"
 
 [[services.production.rewrites]]
 from = "/health-timeline"
-to = "/index.html"
+to = "/health-timeline/index.html"
 
 [[services.production.rewrites]]
 from = "/fitness-hub"
-to = "/index.html"
+to = "/fitness-hub/index.html"
 
 [[services.production.rewrites]]
 from = "/mental-health"
-to = "/index.html"
+to = "/mental-health/index.html"
 
 [[services.production.rewrites]]
 from = "/hospitals"
-to = "/index.html"
+to = "/hospitals/index.html"
 
 [[services.production.rewrites]]
 from = "/calculators"
-to = "/index.html"
+to = "/calculators/index.html"
 
 [[services.production.rewrites]]
 from = "/emergency"
-to = "/index.html"
+to = "/emergency/index.html"
 
 [[services.production.rewrites]]
 from = "/vaccines"
-to = "/index.html"
+to = "/vaccines/index.html"
 
 [[services.production.rewrites]]
 from = "/ayurveda"
-to = "/index.html"
+to = "/ayurveda/index.html"
 
 [[services.production.rewrites]]
 from = "/insurance"
-to = "/index.html"
+to = "/insurance/index.html"
 
 [[services.production.rewrites]]
 from = "/pregnancy"
-to = "/index.html"
+to = "/pregnancy/index.html"
 
 [[services.production.rewrites]]
 from = "/news"
-to = "/index.html"
+to = "/news/index.html"
 
 [[services.production.rewrites]]
 from = "/drug-interaction"
-to = "/index.html"
+to = "/drug-interaction/index.html"
 
 [[services.production.rewrites]]
 from = "/doctor-prep"
-to = "/index.html"
+to = "/doctor-prep/index.html"
 
 [[services.production.rewrites]]
 from = "/premium"
-to = "/index.html"
+to = "/premium/index.html"
 
 [[services.production.rewrites]]
 from = "/weather"
-to = "/index.html"
+to = "/weather/index.html"
 
 [[services.production.rewrites]]
 from = "/about"
-to = "/index.html"
+to = "/about/index.html"
 
 [[services.production.rewrites]]
 from = "/login"
-to = "/index.html"
+to = "/login/index.html"
 
+# Auth-gated and admin pages — served from shared shell
 [[services.production.rewrites]]
 from = "/dashboard"
 to = "/index.html"

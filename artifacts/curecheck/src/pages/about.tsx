@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Shield, Heart, Lock, Users, AlertTriangle, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import PageMeta from "@/components/page-meta";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -11,6 +12,11 @@ const fadeUp = {
 export default function About() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-16">
+      <PageMeta
+        title="About CureCheck — Our Mission &amp; Values"
+        description="CureCheck fights health misinformation in India with free, AI-powered tools. Learn about our mission, values, and how we work."
+        path="/about"
+      />
       <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0} className="text-center mb-12">
         <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
           <Shield className="w-8 h-8 text-primary" />

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
+import PageMeta from "@/components/page-meta";
 import { ChevronLeft, Phone, Brain, Wind, Heart } from "lucide-react";
 
 const HELPLINES = [
@@ -55,6 +56,11 @@ export default function MentalHealth() {
 
   return (
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12 space-y-10">
+      <PageMeta
+        title="Mental Health Support — Resources &amp; Helplines for India"
+        description="Compassionate mental health tools and resources for India — stress assessment, grounding techniques, crisis helplines, and therapist directories."
+        path="/mental-health"
+      />
       <div>
         <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
         <div className="flex items-start gap-4">

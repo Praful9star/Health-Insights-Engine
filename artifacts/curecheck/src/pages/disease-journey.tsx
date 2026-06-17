@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGetDiseaseJourney } from "@workspace/api-client-react";
+import PageMeta from "@/components/page-meta";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -55,6 +56,11 @@ export default function DiseaseJourney() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Disease Journey Map — Understand Your Condition"
+        description="Enter any disease to get a clear phase-by-phase journey map with common experiences, warning signs, and care tips tailored for India."
+        path="/disease-journey"
+      />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/50 flex items-center justify-center">

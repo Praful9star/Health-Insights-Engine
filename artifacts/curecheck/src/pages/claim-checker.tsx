@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
 import { useCheckHealthClaim } from "@workspace/api-client-react";
+import PageMeta from "@/components/page-meta";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -115,6 +116,11 @@ export default function ClaimChecker() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Health Claim Checker — Verify WhatsApp Health Forwards"
+        description="Paste any WhatsApp health claim and get an AI-powered credibility score with red flags, safer interpretation, and doctor questions. Free for India."
+        path="/claim-checker"
+      />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <Link href="/">
           <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer">

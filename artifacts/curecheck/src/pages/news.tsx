@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import PageMeta from "@/components/page-meta";
 import { ChevronLeft, Newspaper, RefreshCw, ExternalLink, Clock, Bookmark, BookmarkCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -106,6 +107,11 @@ export default function News() {
 
   return (
     <div className="relative z-10 max-w-4xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Health News — Latest Medical Updates for India"
+        description="Latest health news, drug approvals, and medical research updates relevant to Indian patients and healthcare. Updated daily."
+        path="/news"
+      />
       <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
 
       <div className="flex items-start justify-between gap-4 mb-7">

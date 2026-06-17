@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
+import PageMeta from "@/components/page-meta";
 import { useExplainMedicalReport, useOcrReport } from "@workspace/api-client-react";
 import type { ReportParameter, ReportResult } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
@@ -377,6 +378,11 @@ export default function ReportExplainer() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
+      <PageMeta
+        title="Medical Report Explainer — Decode Your Lab Reports"
+        description="Upload your CBC, thyroid, or any lab report and get a plain-language explanation of your results in Hindi and English. Free AI health tool for India."
+        path="/report-explainer"
+      />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
 
         {/* Breadcrumb */}

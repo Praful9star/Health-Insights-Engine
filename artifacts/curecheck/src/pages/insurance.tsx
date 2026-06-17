@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { ChevronLeft, Shield, CheckCircle2, ExternalLink } from "lucide-react";
+import PageMeta from "@/components/page-meta";
 
 type Tab = "govt" | "tips" | "claims";
 
@@ -79,6 +80,11 @@ export default function Insurance() {
 
   return (
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Health Insurance Guide — Understand Your Policy in India"
+        description="Understand your Indian health insurance policy, claim process, and coverage limits in plain language. Includes free government schemes."
+        path="/insurance"
+      />
       <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
 
       <div className="flex items-start gap-4 mb-7">

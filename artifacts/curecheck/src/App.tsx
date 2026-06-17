@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -123,6 +124,7 @@ function ServiceWorkerRegistrar() {
 
 export default function App() {
   return (
+    <HelmetProvider>
     <ThemeProvider defaultTheme="dark" forcedTheme="dark" storageKey="curecheck-theme">
       <LanguageProvider>
         <AuthProvider>
@@ -152,5 +154,6 @@ export default function App() {
         </AuthProvider>
       </LanguageProvider>
     </ThemeProvider>
+    </HelmetProvider>
   );
 }

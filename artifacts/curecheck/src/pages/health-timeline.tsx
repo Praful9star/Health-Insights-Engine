@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
+import PageMeta from "@/components/page-meta";
 import {
   Clock, FileSearch, Trash2, ChevronDown, ChevronUp, TrendingUp, TrendingDown,
   Minus, AlertTriangle, CheckCircle2, Info, Plus, ArrowRight,
@@ -226,6 +227,11 @@ export default function HealthTimeline() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Health Timeline — Track Your Medical History"
+        description="Log and track your health reports, symptoms, and test results over time. Visualise trends and prepare better for doctor visits. Free tool for India."
+        path="/health-timeline"
+      />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         {/* Header */}
         <div className="flex items-start gap-4 mb-8">

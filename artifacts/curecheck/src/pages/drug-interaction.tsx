@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
+import PageMeta from "@/components/page-meta";
 import { ChevronLeft, Pill, Plus, X, AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,6 +67,11 @@ export default function DrugInteraction() {
 
   return (
     <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Drug Interaction Checker — Safe Medication Use in India"
+        description="Check if your medicines interact dangerously with each other. Free AI-powered drug interaction checker for India. Enter up to 5 medicines."
+        path="/drug-interaction"
+      />
       <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
 
       <div className="flex items-start gap-4 mb-7">

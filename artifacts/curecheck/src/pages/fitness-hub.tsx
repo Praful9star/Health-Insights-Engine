@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import PageMeta from "@/components/page-meta";
 import {
   Dumbbell, Flame, Beef, Wheat, Droplet, Footprints, Moon,
   GlassWater, Plus, Minus, X, Utensils, Target, ChevronRight, Sparkles,
@@ -634,6 +635,11 @@ export default function FitnessHub() {
 
   return (
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Fitness Hub — Personalised Workout &amp; Wellness Plans"
+        description="Get AI-tailored fitness and wellness recommendations built around Indian lifestyles, dietary habits, and health goals. Track daily progress free."
+        path="/fitness-hub"
+      />
       {/* Profile modal */}
       <AnimatePresence>
         {showProfileModal && (

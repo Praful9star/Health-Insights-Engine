@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import PageMeta from "@/components/page-meta";
 import { ChevronLeft, Calculator, Activity, Flame, Droplets } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -197,6 +198,11 @@ export default function Calculators() {
   const [tab, setTab] = useState<Tab>("bmi");
   return (
     <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Health Calculators — BMI, Calories &amp; More for India"
+        description="Free health calculators for BMI, daily calorie needs, ideal weight, water intake, and more — calibrated for Indian body types."
+        path="/calculators"
+      />
       <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
       <div className="flex items-start gap-4 mb-7">
         <div className="w-12 h-12 rounded-2xl bg-amber-500/15 flex items-center justify-center flex-shrink-0"><Calculator className="w-6 h-6 text-amber-400" /></div>

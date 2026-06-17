@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { ChevronLeft, Syringe, CheckCircle2 } from "lucide-react";
+import PageMeta from "@/components/page-meta";
 
 type Stage = "birth" | "infant" | "toddler" | "child" | "teen" | "adult" | "senior";
 
@@ -89,6 +90,11 @@ export default function Vaccines() {
 
   return (
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Vaccine Guide — India's Immunisation Schedule"
+        description="Complete vaccine schedules for children and adults in India per the National Immunization Schedule — with FAQs and where to get vaccinated."
+        path="/vaccines"
+      />
       <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
 
       <div className="flex items-start gap-4 mb-7">

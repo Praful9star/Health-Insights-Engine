@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { ChevronLeft, Stethoscope, Plus, Trash2, Loader2, ClipboardList, AlertTriangle } from "lucide-react";
+import PageMeta from "@/components/page-meta";
 import { useDoctorPrep, type DoctorPrepInput } from "@workspace/api-client-react";
 
 const VISIT_TYPES = [
@@ -44,6 +45,11 @@ export default function DoctorPrep() {
 
   return (
     <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Doctor Appointment Prep — Get More From Your Visit"
+        description="Prepare smarter questions and notes before your doctor visit. Never leave confused or forget your concerns again. Free AI tool for India."
+        path="/doctor-prep"
+      />
       <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
 
       <div className="flex items-start gap-4 mb-8">

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useExplainMedicine } from "@workspace/api-client-react";
+import PageMeta from "@/components/page-meta";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -57,6 +58,11 @@ export default function MedicineExplainer() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Medicine Explainer — Understand Your Medications"
+        description="Get plain-language explanations of any medicine prescribed in India — uses, dosage, side effects, and drug interactions. Free AI health tool."
+        path="/medicine-explainer"
+      />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         {/* Header */}
         <div className="flex items-center gap-3 mb-2">

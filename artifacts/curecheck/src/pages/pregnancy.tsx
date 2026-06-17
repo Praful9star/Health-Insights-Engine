@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { ChevronLeft, Baby } from "lucide-react";
+import PageMeta from "@/components/page-meta";
 
 type Trimester = 1 | 2 | 3;
 
@@ -54,6 +55,11 @@ export default function Pregnancy() {
 
   return (
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Pregnancy Guide — Week-by-Week Health Information India"
+        description="Week-by-week pregnancy guidance for Indian mothers — nutrition, ANC tests, warning signs, and questions to ask your doctor. Free tracker."
+        path="/pregnancy"
+      />
       <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
 
       <div className="flex items-start gap-4 mb-7">

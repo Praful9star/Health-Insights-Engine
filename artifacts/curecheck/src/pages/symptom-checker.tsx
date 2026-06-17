@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCheckSymptoms } from "@workspace/api-client-react";
+import PageMeta from "@/components/page-meta";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -115,6 +116,11 @@ export default function SymptomChecker() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Symptom Checker — AI-Powered Health Assessment for India"
+        description="Describe your symptoms and get an AI assessment of possible causes, urgency level, and questions to ask your doctor. Free tool, built for India."
+        path="/symptom-checker"
+      />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         {/* Header */}
         <div className="flex items-center gap-3 mb-2">

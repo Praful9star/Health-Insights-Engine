@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import PageMeta from "@/components/page-meta";
 import { ChevronLeft, Phone, AlertTriangle, Heart, Zap, Wind, Droplets } from "lucide-react";
 
 const NATIONAL = [
@@ -69,6 +70,11 @@ export default function Emergency() {
   const [open, setOpen] = useState<string | null>(null);
   return (
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Emergency Guide — First Aid &amp; Emergency Contacts India"
+        description="India-specific first aid guides and emergency contacts — 108, AIIMS, poison control, and local hospitals. Works offline. Free."
+        path="/emergency"
+      />
       <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
 
       <div className="flex items-start gap-4 mb-7">

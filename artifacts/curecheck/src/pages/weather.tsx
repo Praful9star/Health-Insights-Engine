@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Wind, Droplets, Thermometer, MapPin, RefreshCw, AlertTriangle, Eye, Gauge } from "lucide-react";
+import PageMeta from "@/components/page-meta";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/page-header";
 
@@ -151,6 +152,11 @@ export default function WeatherPage() {
 
   return (
     <div className="relative z-10 max-w-2xl mx-auto px-4 py-10 pb-24 lg:pb-10">
+      <PageMeta
+        title="Health Weather — Air Quality &amp; Allergy Alerts India"
+        description="Real-time air quality index, pollen counts, and personalised health advisories based on your local weather across India."
+        path="/weather"
+      />
       <PageHeader
         icon={<span className="text-2xl">{weather ? wmoIcon(weather.code) : "🌤️"}</span>}
         title="Weather & Health Tips"

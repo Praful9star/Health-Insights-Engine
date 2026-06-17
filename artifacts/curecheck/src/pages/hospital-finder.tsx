@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import PageMeta from "@/components/page-meta";
 import { Link } from "wouter";
 import {
   ChevronLeft, MapPin, Loader2, AlertCircle, Phone,
@@ -329,6 +330,11 @@ export default function HospitalFinder() {
 
   return (
     <div className="relative z-10 max-w-4xl mx-auto px-4 py-12">
+      <PageMeta
+        title="Hospital Finder — Find Hospitals Near You in India"
+        description="Find hospitals, clinics, and healthcare centres near you across India with ratings, specialties, and contact details. Uses your location."
+        path="/hospitals"
+      />
       {/* Back */}
       <Link href="/">
         <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 cursor-pointer">
