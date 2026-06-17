@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Languages, ChevronDown, User, LogIn, Star } from "lucide-react";
+import { Menu, X, Languages, ChevronDown, User, LogIn, Star, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/language-context";
 import { useAuth } from "@/contexts/auth-context";
@@ -40,7 +40,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const { language, setLanguage, t } = useLanguage();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const moreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -56,6 +56,20 @@ export default function Navbar() {
   }, []);
 
   const isActive = (href: string) => location === href || location.startsWith(href + "/");
+
+  const displayName = profile?.name || user?.email?.split("@")[0] || "";
+
+  const mobileLinks = [
+    { href: "/premium", label: { en: "⭐ Premium", hi: "⭐ प्रीमियम" } },
+    ...PRIMARY_LINKS,
+    ...MORE_LINKS,
+    ...(user
+      ? [
+          { href: "/dashboard", label: { en: "My Dashboard", hi: "मेरा डैशबोर्ड" } },
+          { href: "/profile",   label: { en: "Edit Profile",  hi: "प्रोफ़ाइल संपादित करें" } },
+        ]
+      : [{ href: "/login", label: { en: "Login / Sign up", hi: "लॉगिन / साइनअप" } }]),
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/60 backdrop-blur-xl">
@@ -115,11 +129,20 @@ export default function Navbar() {
             </button>
           </Link>
 
-          <Link href="/login">
-            <button className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/70 bg-muted/30 hover:bg-muted/60 text-xs font-600 text-muted-foreground hover:text-foreground transition-all">
-              {user ? <><User className="w-3.5 h-3.5" /> {user.email?.split("@")[0]}</> : <><LogIn className="w-3.5 h-3.5" /> {t("Login", "लॉगिन")}</>}
-            </button>
-          </Link>
+          {user ? (
+            <Link href="/dashboard">
+              <button className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/40 bg-primary/10 hover:bg-primary/20 text-xs font-600 text-primary transition-all">
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                {displayName || "Dashboard"}
+              </button>
+            </Link>
+          ) : (
+            <Link href="/login">
+              <button className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/70 bg-muted/30 hover:bg-muted/60 text-xs font-600 text-muted-foreground hover:text-foreground transition-all">
+                <LogIn className="w-3.5 h-3.5" /> {t("Login", "लॉगिन")}
+              </button>
+            </Link>
+          )}
 
           <Button variant="ghost" size="icon" className="lg:hidden rounded-full w-9 h-9" onClick={() => setOpen(v => !v)} aria-label="Menu">
             {open ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -132,7 +155,7 @@ export default function Navbar() {
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }}
             className="lg:hidden border-t border-border/40 bg-background/95 backdrop-blur-xl overflow-hidden">
             <nav className="px-4 py-3 flex flex-col gap-1 max-h-[80vh] overflow-y-auto">
-              {[{ href: "/premium", label: { en: "⭐ Premium", hi: "⭐ प्रीमियम" } }, ...PRIMARY_LINKS, ...MORE_LINKS, { href: "/login", label: { en: user ? "My Account" : "Login / Sign up", hi: user ? "मेरा खाता" : "लॉगिन / साइनअप" } }].map(link => (
+              {mobileLinks.map(link => (
                 <Link key={link.href} href={link.href}>
                   <span onClick={() => setOpen(false)}
                     className={`block px-4 py-2.5 rounded-xl text-sm font-600 cursor-pointer transition-colors ${isActive(link.href) ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"}`}>

@@ -1,8 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { ChevronLeft, Newspaper, RefreshCw, ExternalLink, Clock } from "lucide-react";
+import { ChevronLeft, Newspaper, RefreshCw, ExternalLink, Clock, Bookmark, BookmarkCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+export interface SavedArticle {
+  url: string;
+  title: string;
+  description: string;
+  source: string;
+  publishedAt: string;
+  savedAt: string;
+}
+
+const ARTICLES_KEY = "cc_saved_articles";
+
+function readSaved(): SavedArticle[] {
+  try { return JSON.parse(localStorage.getItem(ARTICLES_KEY) ?? "[]") as SavedArticle[]; } catch { return []; }
+}
+function writeSaved(articles: SavedArticle[]): void {
+  try { localStorage.setItem(ARTICLES_KEY, JSON.stringify(articles)); } catch {}
+}
 
 interface Article {
   title: string;
@@ -22,6 +40,43 @@ function timeAgo(date: string) {
   if (h < 1) return "Just now";
   if (h < 24) return `${h}h ago`;
   return `${Math.floor(h / 24)}d ago`;
+}
+
+function BookmarkButton({ article }: { article: Article }) {
+  const [saved, setSaved] = useState(() => readSaved().some((a) => a.url === article.url));
+
+  const toggle = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const current = readSaved();
+    if (saved) {
+      writeSaved(current.filter((a) => a.url !== article.url));
+      setSaved(false);
+    } else {
+      writeSaved([
+        {
+          url: article.url,
+          title: article.title,
+          description: article.description,
+          source: article.source.name,
+          publishedAt: article.publishedAt,
+          savedAt: new Date().toISOString(),
+        },
+        ...current,
+      ].slice(0, 50));
+      setSaved(true);
+    }
+  }, [saved, article]);
+
+  return (
+    <button
+      onClick={toggle}
+      className={`p-1.5 rounded-full transition-all hover:scale-110 ${saved ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
+      title={saved ? "Remove bookmark" : "Save article"}
+    >
+      {saved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+    </button>
+  );
 }
 
 export default function News() {
@@ -59,7 +114,7 @@ export default function News() {
           <div>
             <span className="mono-label text-primary/80 mb-1 block">Live Updates</span>
             <h1 className="text-2xl sm:text-3xl font-serif font-800 text-foreground">Health News India</h1>
-            <p className="text-sm text-muted-foreground mt-1">Latest health news for Indians — updated continuously.</p>
+            <p className="text-sm text-muted-foreground mt-1">Latest health news for Indians — bookmark articles to read later.</p>
           </div>
         </div>
         <Button variant="ghost" size="icon" className="rounded-full flex-shrink-0" onClick={() => load(category)} disabled={loading}>
@@ -67,7 +122,6 @@ export default function News() {
         </Button>
       </div>
 
-      {/* Category filters */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide">
         {CATEGORIES.map(c => (
           <button key={c} onClick={() => setCategory(c)}
@@ -101,7 +155,6 @@ export default function News() {
 
       {!loading && !error && articles.length > 0 && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
-          {/* Featured article */}
           {featured && (
             <a href={featured.url} target="_blank" rel="noopener noreferrer" className="block group">
               <div className="glass-panel rounded-2xl overflow-hidden border border-border/40 hover:border-primary/30 transition-colors">
@@ -111,9 +164,12 @@ export default function News() {
                   </div>
                 )}
                 <div className="p-5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="px-2.5 py-0.5 bg-primary/15 text-primary text-[10px] font-700 rounded-full">Featured</span>
-                    <span className="text-[11px] text-muted-foreground">{featured.source.name}</span>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 bg-primary/15 text-primary text-[10px] font-700 rounded-full">Featured</span>
+                      <span className="text-[11px] text-muted-foreground">{featured.source.name}</span>
+                    </div>
+                    <BookmarkButton article={featured} />
                   </div>
                   <h2 className="text-lg font-serif font-700 text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">{featured.title}</h2>
                   <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{featured.description}</p>
@@ -126,7 +182,6 @@ export default function News() {
             </a>
           )}
 
-          {/* Article grid */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {rest.map((a, i) => (
               <motion.a key={i} href={a.url} target="_blank" rel="noopener noreferrer"
@@ -140,7 +195,10 @@ export default function News() {
                 <div className="p-4 flex flex-col flex-1">
                   <p className="text-[10px] text-muted-foreground mb-1.5">{a.source.name} · {timeAgo(a.publishedAt)}</p>
                   <h3 className="text-sm font-700 text-foreground group-hover:text-primary transition-colors line-clamp-3 flex-1 mb-2">{a.title}</h3>
-                  <div className="flex items-center text-xs text-muted-foreground"><ExternalLink className="w-3 h-3 ml-auto" /></div>
+                  <div className="flex items-center text-xs text-muted-foreground">
+                    <ExternalLink className="w-3 h-3 ml-auto" />
+                    <BookmarkButton article={a} />
+                  </div>
                 </div>
               </motion.a>
             ))}

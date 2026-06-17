@@ -9,6 +9,7 @@ import medicineExplainerRouter from "./medicine-explainer";
 import healthNewsRouter from "./health-news";
 import drugInteractionRouter from "./drug-interaction";
 import doctorPrepRouter from "./doctor-prep";
+import profileRouter from "./profile";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(medicineExplainerRouter);
 router.use(healthNewsRouter);
 router.use(drugInteractionRouter);
 router.use(doctorPrepRouter);
+router.use(profileRouter);
 
 export default router;

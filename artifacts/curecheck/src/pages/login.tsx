@@ -24,7 +24,7 @@ export default function Login() {
     if (mode === "login") {
       const { error: err } = await signIn(email, password);
       if (err) { setError(err); setBusy(false); return; }
-      navigate("/");
+      navigate("/dashboard");
     } else {
       const { error: err } = await signUp(email, password, name);
       if (err) { setError(err); setBusy(false); return; }

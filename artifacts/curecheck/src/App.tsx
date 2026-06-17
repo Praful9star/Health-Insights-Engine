@@ -42,6 +42,9 @@ import Premium from "@/pages/premium";
 import Weather from "@/pages/weather";
 import AdminPanel from "@/pages/admin";
 import Feedback from "@/pages/feedback";
+import Dashboard from "@/pages/dashboard";
+import Profile from "@/pages/profile";
+import ProtectedRoute from "@/components/protected-route";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -75,6 +78,8 @@ function Routes() {
       <Route path="/doctor-prep" component={DoctorPrep} />
       <Route path="/premium" component={Premium} />
       <Route path="/weather" component={Weather} />
+      <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/profile" component={() => <ProtectedRoute component={Profile} />} />
       <Route path="/admin-curecheck-secure" component={AdminPanel} />
       <Route path="/feedback" component={Feedback} />
       <Route component={NotFound} />
