@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, ChevronLeft, ChevronRight, FlaskConical, CheckCircle2, Shield } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useParams, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/language-context";
 import { DAILY_MYTHS } from "@/data/myths";
@@ -38,6 +38,13 @@ function CredibilityBar({ score }: { score: number }) {
       </div>
     </div>
   );
+}
+
+function ScoreBadge({ score }: { score: number }) {
+  if (score <= 25) return <span className="text-xs font-600 text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full shrink-0">Mostly False</span>;
+  if (score <= 50) return <span className="text-xs font-600 text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full shrink-0">Partially True</span>;
+  if (score <= 75) return <span className="text-xs font-600 text-yellow-400 bg-yellow-500/10 px-2 py-0.5 rounded-full shrink-0">Mixed</span>;
+  return <span className="text-xs font-600 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full shrink-0">Mostly True</span>;
 }
 
 export default function MythBuster() {
@@ -99,10 +106,8 @@ export default function MythBuster() {
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12">
       {/* Header */}
       <motion.div variants={fadeUp} initial="hidden" animate="visible" className="text-center mb-10">
-        <Link href="/">
-          <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer">
-            <ChevronLeft className="w-4 h-4" /> {t("Home", "होम")}
-          </span>
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer">
+          <ChevronLeft className="w-4 h-4" /> {t("Home", "होम")}
         </Link>
         <div className="flex justify-center mb-5">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel mono-label text-amber-400">
@@ -198,22 +203,18 @@ export default function MythBuster() {
                   >
                     <RefreshCw className="w-3.5 h-3.5" /> {t("See myth", "मिथक देखें")}
                   </Button>
-                  <Button
-                    onClick={() => go(1)}
-                    variant="outline"
-                    size="sm"
-                    className="rounded-full gap-1.5"
-                    data-testid="button-next-myth"
+                  <Link
+                    href={`/myth-buster/${myth.slug}`}
+                    className="inline-flex items-center gap-1.5 text-sm px-3.5 py-1.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/25 transition-colors font-600"
                   >
-                    {t("Next", "अगला")} <ChevronRight className="w-3.5 h-3.5" />
-                  </Button>
-                  <Link href="/claim-checker">
-                    <button
-                      className="inline-flex items-center gap-1.5 text-sm px-3.5 py-1.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/25 transition-colors font-600"
-                      data-testid="button-check-similar-claims"
-                    >
-                      <Shield className="w-3.5 h-3.5" /> {t("Check similar claims", "Similar claims check करें")}
-                    </button>
+                    <FlaskConical className="w-3.5 h-3.5" /> {t("View full page", "Full page देखें")}
+                  </Link>
+                  <Link
+                    href="/claim-checker"
+                    className="inline-flex items-center gap-1.5 text-sm px-3.5 py-1.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/25 transition-colors font-600"
+                    data-testid="button-check-similar-claims"
+                  >
+                    <Shield className="w-3.5 h-3.5" /> {t("Check similar claims", "Similar claims check करें")}
                   </Link>
                   <WhatsAppShare text={shareText} label={t("Share on WhatsApp", "WhatsApp पर share करें")} />
                 </div>
@@ -245,6 +246,185 @@ export default function MythBuster() {
       <p className="text-center text-xs text-muted-foreground mt-6 mono-label">
         {t(`${total} health myths · Science-backed explanations`, `${total} health myths · Science-backed explanations`)}
       </p>
+
+      {/* All Myths Index — crawlable links for search engines */}
+      <section className="mt-16">
+        <h2 className="text-xl font-serif font-700 text-foreground mb-2">
+          {t("All Health Myths", "सभी Health Myths")}
+        </h2>
+        <p className="text-sm text-muted-foreground mb-6">
+          {t(
+            "Browse all science-backed myth explanations. Each myth has its own page with a full explanation.",
+            "सभी science-backed myth explanations देखें। हर myth का अपना page है।"
+          )}
+        </p>
+        <ul className="grid sm:grid-cols-2 gap-3">
+          {DAILY_MYTHS.map((m, i) => (
+            <li key={m.slug}>
+              <Link
+                href={`/myth-buster/${m.slug}`}
+                className="group flex items-start gap-3 p-3.5 rounded-xl glass-panel border border-border/40 hover:border-amber-500/40 transition-colors"
+              >
+                <span className="mono-label text-amber-400/70 shrink-0 mt-0.5">#{i + 1}</span>
+                <p className="flex-1 text-sm font-600 text-foreground/90 group-hover:text-foreground transition-colors leading-snug line-clamp-2 min-w-0">
+                  {language === "hi" ? m.myth.hi : m.myth.en}
+                </p>
+                <ScoreBadge score={m.score} />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  );
+}
+
+export function MythBusterDetail() {
+  const params = useParams<{ slug: string }>();
+  const slug = params.slug ?? "";
+  const [, navigate] = useLocation();
+  const { language, t } = useLanguage();
+  const [flipped, setFlipped] = useState(false);
+
+  const idx = DAILY_MYTHS.findIndex((m) => m.slug === slug);
+
+  useEffect(() => {
+    if (idx === -1 && slug) {
+      navigate("/myth-buster");
+    }
+  }, [idx, slug, navigate]);
+
+  if (idx === -1) return null;
+
+  const myth = DAILY_MYTHS[idx];
+  const total = DAILY_MYTHS.length;
+  const prevMyth = DAILY_MYTHS[(idx - 1 + total) % total];
+  const nextMyth = DAILY_MYTHS[(idx + 1) % total];
+
+  const shareText = `🧪 ${t("Health Myth Check", "Health Myth Check")}:\n\n"${language === "hi" ? myth.myth.hi : myth.myth.en}"\n\n✅ ${t("The Truth", "सच्चाई")}:\n${language === "hi" ? myth.truth.hi : myth.truth.en}\n\n${t("via CureCheck – curecheck.in", "CureCheck – curecheck.in के ज़रिए")}`;
+
+  return (
+    <div className="relative z-10 max-w-3xl mx-auto px-4 py-12">
+      {/* Breadcrumb */}
+      <motion.div variants={fadeUp} initial="hidden" animate="visible" className="mb-8">
+        <nav className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
+          <Link href="/" className="hover:text-foreground transition-colors">{t("Home", "होम")}</Link>
+          <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+          <Link href="/myth-buster" className="hover:text-foreground transition-colors">{t("Myth Buster", "Myth Buster")}</Link>
+          <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+          <span className="text-foreground/70 truncate max-w-[200px]">
+            {language === "hi" ? myth.myth.hi : myth.myth.en}
+          </span>
+        </nav>
+      </motion.div>
+
+      {/* Header */}
+      <motion.div variants={fadeUp} initial="hidden" animate="visible" className="text-center mb-10">
+        <div className="flex justify-center mb-5">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel mono-label text-amber-400">
+            <FlaskConical className="w-3.5 h-3.5" /> {t("Myth vs Science", "मिथक बनाम विज्ञान")} · #{idx + 1}/{total}
+          </span>
+        </div>
+        <h1 className="text-2xl sm:text-4xl font-serif font-800 text-foreground leading-snug">
+          "{language === "hi" ? myth.myth.hi : myth.myth.en}"
+        </h1>
+      </motion.div>
+
+      {/* Flip Card */}
+      <motion.div variants={fadeUp} initial="hidden" animate="visible">
+        <div className="flip-3d" style={{ minHeight: "380px" }}>
+          <motion.div
+            className="flip-inner w-full h-full"
+            animate={flipped ? "back" : "front"}
+            variants={flipVariants}
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            {/* FRONT — the myth */}
+            <div className="flip-face flip-front glass-panel border border-amber-500/20 rounded-[1.75rem] p-8 sm:p-10 flex flex-col min-h-[380px]">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="mono-label text-rose-400 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" /> {t("The Myth", "मिथक")}
+                </span>
+              </div>
+              <p className="text-xl sm:text-2xl font-serif font-700 text-foreground/90 leading-relaxed flex-1 mb-6">
+                "{language === "hi" ? myth.myth.hi : myth.myth.en}"
+              </p>
+              <CredibilityBar score={myth.score} />
+              <Button
+                onClick={() => setFlipped(true)}
+                className="shimmer-btn mt-6 gap-2 rounded-full"
+                data-testid="button-flip-to-truth"
+              >
+                <FlaskConical className="w-4 h-4" /> {t("Reveal the Science", "विज्ञान देखें")}
+              </Button>
+            </div>
+
+            {/* BACK — the science */}
+            <div className="flip-face flip-back glass-panel border border-amber-500/30 rounded-[1.75rem] p-8 sm:p-10 flex flex-col min-h-[380px]" style={{ transform: "rotateY(180deg)" }}>
+              <span className="mono-label text-emerald-400 flex items-center gap-2 mb-4">
+                <CheckCircle2 className="w-4 h-4" /> {t("The Science", "विज्ञान")}
+              </span>
+              <div className="flex-1 overflow-y-auto pr-1 mb-5">
+                <p className="text-base sm:text-lg text-foreground/90 leading-relaxed">
+                  {language === "hi" ? myth.truth.hi : myth.truth.en}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2.5 pt-4 border-t border-border/50">
+                <Button
+                  onClick={() => setFlipped(false)}
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full gap-1.5"
+                  data-testid="button-flip-back"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" /> {t("See myth", "मिथक देखें")}
+                </Button>
+                <Link
+                  href="/claim-checker"
+                  className="inline-flex items-center gap-1.5 text-sm px-3.5 py-1.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/25 transition-colors font-600"
+                  data-testid="button-check-similar-claims"
+                >
+                  <Shield className="w-3.5 h-3.5" /> {t("Check similar claims", "Similar claims check करें")}
+                </Link>
+                <WhatsAppShare text={shareText} label={t("Share on WhatsApp", "WhatsApp पर share करें")} />
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Prev / Next navigation — crawlable links */}
+      <nav aria-label="Myth navigation" className="flex items-center justify-between mt-8 gap-4">
+        <Link
+          href={`/myth-buster/${prevMyth.slug}`}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass-panel border border-border/40 hover:border-amber-500/40 transition-colors group max-w-[45%]"
+        >
+          <ChevronLeft className="w-4 h-4 text-muted-foreground shrink-0" />
+          <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors line-clamp-2 leading-snug">
+            {language === "hi" ? prevMyth.myth.hi : prevMyth.myth.en}
+          </span>
+        </Link>
+        <Link
+          href={`/myth-buster/${nextMyth.slug}`}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass-panel border border-border/40 hover:border-amber-500/40 transition-colors group max-w-[45%] text-right"
+        >
+          <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors line-clamp-2 leading-snug">
+            {language === "hi" ? nextMyth.myth.hi : nextMyth.myth.en}
+          </span>
+          <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+        </Link>
+      </nav>
+
+      {/* Link back to full index */}
+      <div className="text-center mt-8">
+        <Link
+          href="/myth-buster"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mono-label"
+        >
+          <FlaskConical className="w-3.5 h-3.5" />
+          {t(`Browse all ${total} health myths`, `सभी ${total} health myths देखें`)}
+        </Link>
+      </div>
     </div>
   );
 }

@@ -25,7 +25,7 @@ import SymptomChecker from "@/pages/symptom-checker";
 import MedicineExplainer from "@/pages/medicine-explainer";
 import FitnessHub from "@/pages/fitness-hub";
 import HealthTimeline from "@/pages/health-timeline";
-import MythBuster from "@/pages/myth-buster";
+import MythBuster, { MythBusterDetail } from "@/pages/myth-buster";
 import About from "@/pages/about";
 import Login from "@/pages/login";
 import HospitalFinder from "@/pages/hospital-finder";
@@ -60,6 +60,7 @@ function Routes() {
       <Route path="/medicine-explainer" component={MedicineExplainer} />
       <Route path="/health-timeline" component={HealthTimeline} />
       <Route path="/fitness-hub" component={FitnessHub} />
+      <Route path="/myth-buster/:slug" component={MythBusterDetail} />
       <Route path="/myth-buster" component={MythBuster} />
       <Route path="/symptom-checker" component={SymptomChecker} />
       <Route path="/disease-journey" component={DiseaseJourney} />
