@@ -19,7 +19,7 @@ export default function FloatingAIButton() {
   if (HIDE_ON.includes(location)) return null;
 
   return (
-    <div className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 z-50 flex flex-col items-end gap-2">
+    <div className="fixed bottom-24 right-4 lg:bottom-20 lg:right-6 z-50 flex flex-col items-end gap-2">
       <AnimatePresence>
         {open && (
           <motion.div

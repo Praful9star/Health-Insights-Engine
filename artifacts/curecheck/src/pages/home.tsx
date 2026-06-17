@@ -1,11 +1,11 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import {
   FileSearch, Pill, Clock, Dumbbell, ArrowRight, Sparkles,
   CheckCircle2, Zap, ShieldCheck, BookOpen, TrendingUp, Flame,
   BadgeCheck, DatabaseZap, Globe2, HeartPulse, Quote,
-  Activity, Users, FlaskConical, MapPin, Share2,
+  Activity, FlaskConical, MapPin, Share2,
   Brain, Leaf, Syringe, Baby, Newspaper, Calculator, PhoneCall, Shield, Stethoscope,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,38 +28,6 @@ const fadeUp = {
     transition: { delay: i * 0.08, duration: 0.6, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
   }),
 };
-
-/* ─── Count-up hook ────────────────────────────────────────────────── */
-function useCountUp(target: number, duration = 2200) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const started = useRef(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting || started.current) return;
-      started.current = true;
-      obs.disconnect();
-      const t0 = performance.now();
-      const tick = (now: number) => {
-        const pct = Math.min((now - t0) / duration, 1);
-        const eased = 1 - Math.pow(1 - pct, 3);
-        setCount(Math.round(eased * target));
-        if (pct < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    }, { threshold: 0.35 });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [target, duration]);
-  return { ref, count };
-}
-
-function StatNum({ value, suffix }: { value: number; suffix: string }) {
-  const { ref, count } = useCountUp(value);
-  return <span ref={ref} className="tabular-nums">{count.toLocaleString("en-IN")}{suffix}</span>;
-}
 
 /* ─── ECG animation — glowing ────────────────────────────────────────── */
 function EcgAnimation() {
@@ -116,14 +84,6 @@ function FloatingParticles() {
     </div>
   );
 }
-
-/* ─── Platform stats ─────────────────────────────────────────────────── */
-const STATS = [
-  { value: 240000, suffix: "+", label: { en: "Reports Analyzed",        hi: "Reports Analyzed"       }, color: "text-primary",     bg: "bg-primary/12",     glow: "hsl(183 100% 50%)", icon: FileSearch, border: "border-primary/25",   delay: 0   },
-  { value: 100000, suffix: "+", label: { en: "Medicines in Database",    hi: "Medicines Database में"  }, color: "text-violet-400", bg: "bg-violet-500/12",  glow: "hsl(270 80% 60%)",  icon: Pill,       border: "border-violet-500/25",  delay: 0.1 },
-  { value: 50,     suffix: "+", label: { en: "Diseases Tracked Live",    hi: "Diseases Live Track"    }, color: "text-emerald-400", bg: "bg-emerald-500/12", glow: "hsl(150 70% 50%)",  icon: Activity,   border: "border-emerald-500/25", delay: 0.2 },
-  { value: 140,    suffix: " Cr", label: { en: "Indians We're Built For", hi: "भारतीयों के लिए"       }, color: "text-amber-400",   bg: "bg-amber-500/12",   glow: "hsl(45 90% 55%)",   icon: Users,      border: "border-amber-500/25",   delay: 0.3 },
-];
 
 /* ─── India state badges ─────────────────────────────────────────────── */
 const INDIA_STATES = [
@@ -339,39 +299,6 @@ export default function Home() {
 
         {/* ECG line — glowing */}
         <EcgAnimation />
-      </section>
-
-      {/* ══ COUNT-UP STATS ═══════════════════════════════════════════ */}
-      <section className="py-12 px-4 relative overflow-hidden">
-        {/* subtle background radial */}
-        <div className="absolute inset-0 pointer-events-none" aria-hidden="true"
-          style={{ background: "radial-gradient(ellipse 80% 60% at 50% 50%, hsl(183 100% 50% / 0.04), transparent 70%)" }} />
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {STATS.map((s, i) => (
-              <motion.div
-                key={i} variants={fadeUp} initial="hidden" whileInView="visible"
-                viewport={{ once: true }} custom={s.delay}
-                className={`glass-panel rounded-2xl p-6 text-center border ${s.border} relative overflow-hidden group cursor-default`}
-                style={{ transition: "box-shadow 0.3s ease, transform 0.3s ease" }}
-                whileHover={{ y: -4, boxShadow: `0 16px 40px -8px ${s.glow}30, 0 0 0 1px ${s.glow}40` }}
-              >
-                {/* top accent bar */}
-                <div className={`absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r ${s.border.replace("border-", "from-").replace("/25", "/60")} to-transparent`} />
-                <div className={`w-11 h-11 rounded-2xl ${s.bg} ${s.color} flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
-                  <s.icon className="w-5 h-5" />
-                </div>
-                <p className={`text-3xl sm:text-4xl font-serif font-800 ${s.color} leading-none`}
-                  style={{ textShadow: `0 0 20px ${s.glow}60` }}>
-                  <StatNum value={s.value} suffix={s.suffix} />
-                </p>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-2 font-500 leading-tight">
-                  {language === "hi" ? s.label.hi : s.label.en}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
       </section>
 
       {/* ══ WEATHER + HEALTH TIPS ════════════════════════════════════ */}

@@ -47,7 +47,7 @@ export default function PWAInstall() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
           transition={{ type: "spring", stiffness: 320, damping: 30 }}
-          className="fixed bottom-24 left-4 right-4 lg:left-auto lg:right-24 lg:w-80 z-50"
+          className="fixed bottom-[9.5rem] left-4 right-4 lg:bottom-6 lg:left-auto lg:right-28 lg:w-80 z-50"
         >
           <div className="glass-panel rounded-2xl p-4 border border-primary/20 shadow-2xl shadow-black/40 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">

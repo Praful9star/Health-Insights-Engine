@@ -270,10 +270,14 @@
   }
   /* Stronger frosted panel for bento cards */
   .glass-panel {
-    background: rgba(13,21,21,0.5);
-    backdrop-filter: blur(24px) saturate(1.25);
-    -webkit-backdrop-filter: blur(24px) saturate(1.25);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(15,23,42,0.6);
+    backdrop-filter: blur(12px) saturate(1.2);
+    -webkit-backdrop-filter: blur(12px) saturate(1.2);
+    border: 1px solid rgba(0,229,255,0.15);
+    transition: box-shadow 0.25s ease;
+  }
+  .glass-panel:hover {
+    box-shadow: 0 0 20px rgba(0,229,255,0.08);
   }
 
   /* Gradient text */
@@ -361,7 +365,7 @@
   }
   .ticker-track {
     display: inline-flex;
-    animation: ticker 30s linear infinite;
+    animation: ticker 50s linear infinite;
   }
   .ticker-track:hover { animation-play-state: paused; }
   @keyframes ticker {

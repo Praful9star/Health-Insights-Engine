@@ -76,7 +76,7 @@ export default function Premium() {
           <div className="w-full py-2.5 rounded-xl text-center text-sm font-600 text-muted-foreground bg-muted/30 border border-border/40">Current Plan</div>
         </div>
 
-        <div className="rounded-2xl p-6 border border-primary/30 bg-primary/5 flex flex-col relative overflow-hidden">
+        <div className="glass-panel rounded-2xl p-6 flex flex-col relative overflow-hidden" style={{ borderColor: "rgba(0,229,255,0.35)" }}>
           <div className="absolute top-3 right-3 px-2.5 py-1 bg-primary text-primary-foreground rounded-full text-[10px] font-800 uppercase tracking-wide">Popular</div>
           <div className="mb-4">
             <p className="text-xs font-700 text-primary/80 uppercase tracking-wider mb-1">Premium</p>

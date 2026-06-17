@@ -497,7 +497,8 @@ function ProfileModal({
             <div className="flex gap-2">
               {(["male", "female", "other"] as Gender[]).map(g => (
                 <button key={g} onClick={() => setForm(f => ({ ...f, gender: g }))}
-                  className={`flex-1 py-2 rounded-xl text-sm font-600 transition-all border ${form.gender === g ? "bg-primary/15 text-primary border-primary/40" : "bg-muted/40 text-muted-foreground border-border/60 hover:border-primary/30"}`}>
+                  className={`flex-1 py-2 rounded-xl text-sm font-600 transition-all border ${form.gender === g ? "bg-primary/20 text-primary border-primary/60" : "bg-muted/40 text-muted-foreground border-border/60 hover:border-primary/30"}`}
+                  style={form.gender === g ? { boxShadow: "0 0 0 1px rgba(0,229,255,0.25), 0 0 14px rgba(0,229,255,0.12)" } : undefined}>
                   {g === "male" ? t("Male", "पुरुष") : g === "female" ? t("Female", "महिला") : t("Other", "अन्य")}
                 </button>
               ))}
@@ -531,7 +532,8 @@ function ProfileModal({
             <div className="grid grid-cols-2 gap-2">
               {ACTIVITY_OPTS.map(opt => (
                 <button key={opt.id} onClick={() => setForm(f => ({ ...f, activityLevel: opt.id }))}
-                  className={`py-2.5 px-3 rounded-xl text-left transition-all border ${form.activityLevel === opt.id ? "bg-primary/15 border-primary/40" : "bg-muted/40 border-border/60 hover:border-primary/30"}`}>
+                  className={`py-2.5 px-3 rounded-xl text-left transition-all border ${form.activityLevel === opt.id ? "bg-primary/20 border-primary/60" : "bg-muted/40 border-border/60 hover:border-primary/30"}`}
+                  style={form.activityLevel === opt.id ? { boxShadow: "0 0 0 1px rgba(0,229,255,0.25), 0 0 14px rgba(0,229,255,0.12)" } : undefined}>
                   <p className={`text-sm font-700 ${form.activityLevel === opt.id ? "text-primary" : "text-foreground"}`}>{language === "hi" ? opt.label.hi : opt.label.en}</p>
                   <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{language === "hi" ? opt.desc.hi : opt.desc.en}</p>
                 </button>
@@ -541,15 +543,15 @@ function ProfileModal({
 
           {/* BMR preview */}
           {valid && (
-            <div className="glass-panel rounded-xl px-4 py-3 border border-primary/15 flex items-center gap-3">
+            <div className="glass-panel rounded-xl px-4 py-3 flex items-center gap-3" style={{ borderColor: "rgba(0,229,255,0.25)", boxShadow: "0 0 16px rgba(0,229,255,0.06)" }}>
               <Flame className="w-4 h-4 text-primary flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-muted-foreground">{t("Your estimated TDEE", "आपकी estimated TDEE")}</p>
-                <p className="text-base font-700 text-foreground tabular-nums">{calcTDEE(form)} <span className="text-xs font-400 text-muted-foreground">kcal/day</span></p>
+                <p className="text-lg font-800 text-foreground tabular-nums leading-tight">{calcTDEE(form)} <span className="text-xs font-500 text-muted-foreground">kcal/day</span></p>
               </div>
-              <div className="text-right flex-shrink-0">
+              <div className="text-right flex-shrink-0 border-l border-border/30 pl-4">
                 <p className="text-xs text-muted-foreground">BMR</p>
-                <p className="text-sm font-700 text-muted-foreground tabular-nums">{Math.round(calcBMR(form))}</p>
+                <p className="text-base font-700 text-foreground/80 tabular-nums">{Math.round(calcBMR(form))}</p>
               </div>
             </div>
           )}
