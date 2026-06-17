@@ -10,6 +10,7 @@ import healthNewsRouter from "./health-news";
 import drugInteractionRouter from "./drug-interaction";
 import doctorPrepRouter from "./doctor-prep";
 import profileRouter from "./profile";
+import notificationsRouter from "./notifications";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(healthNewsRouter);
 router.use(drugInteractionRouter);
 router.use(doctorPrepRouter);
 router.use(profileRouter);
+router.use(notificationsRouter);
 
 export default router;

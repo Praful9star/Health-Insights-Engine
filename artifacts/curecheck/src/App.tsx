@@ -15,6 +15,7 @@ import PremiumBackground from "@/components/premium-background";
 import Footer from "@/components/footer";
 import FloatingAIButton from "@/components/floating-ai-button";
 import PWAInstall from "@/components/pwa-install";
+import NotificationPrefs from "@/components/notification-prefs";
 import MobileBottomNav from "@/components/mobile-bottom-nav";
 import Home from "@/pages/home";
 import ClaimChecker from "@/pages/claim-checker";
@@ -135,6 +136,7 @@ export default function App() {
                   <MobileBottomNav />
                   <FloatingAIButton />
                   <PWAInstall />
+                  <NotificationPrefs />
                 </div>
                 <Toaster />
               </WouterRouter>
