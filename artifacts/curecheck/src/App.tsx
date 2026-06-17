@@ -4,6 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/contexts/language-context";
+import { AuthProvider } from "@/contexts/auth-context";
+import Analytics from "@/components/analytics";
 import Navbar from "@/components/navbar";
 import DisclaimerBanner from "@/components/disclaimer-banner";
 import ScrollToTop from "@/components/scroll-to-top";
@@ -19,12 +21,12 @@ import FitnessHub from "@/pages/fitness-hub";
 import HealthTimeline from "@/pages/health-timeline";
 import MythBuster from "@/pages/myth-buster";
 import About from "@/pages/about";
+import Login from "@/pages/login";
+import HospitalFinder from "@/pages/hospital-finder";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { retry: 1, staleTime: 30_000 },
-  },
+  defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
 });
 
 function Router() {
@@ -40,35 +42,38 @@ function Router() {
       <Route path="/disease-journey" component={DiseaseJourney} />
       <Route path="/claim-checker" component={ClaimChecker} />
       <Route path="/about" component={About} />
+      <Route path="/login" component={Login} />
+      <Route path="/hospitals" component={HospitalFinder} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-function App() {
+export default function App() {
   return (
     <ThemeProvider defaultTheme="dark" forcedTheme="dark" storageKey="curecheck-theme">
       <LanguageProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-              <ScrollToTop />
-              <div className="grain relative min-h-screen flex flex-col">
-                <PremiumBackground />
-                <DisclaimerBanner />
-                <Navbar />
-                <main className="flex-1">
-                  <Router />
-                </main>
-                <Footer />
-              </div>
-              <Toaster />
-            </WouterRouter>
-          </TooltipProvider>
-        </QueryClientProvider>
+        <AuthProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+                <Analytics />
+                <ScrollToTop />
+                <div className="grain relative min-h-screen flex flex-col">
+                  <PremiumBackground />
+                  <DisclaimerBanner />
+                  <Navbar />
+                  <main className="flex-1">
+                    <Router />
+                  </main>
+                  <Footer />
+                </div>
+                <Toaster />
+              </WouterRouter>
+            </TooltipProvider>
+          </QueryClientProvider>
+        </AuthProvider>
       </LanguageProvider>
     </ThemeProvider>
   );
 }
-
-export default App;

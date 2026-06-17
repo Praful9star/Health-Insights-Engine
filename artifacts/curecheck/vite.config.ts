@@ -6,7 +6,6 @@ import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
 const rawPort = process.env.PORT;
 const port = rawPort ? Number(rawPort) : 3000;
-
 const basePath = process.env.BASE_PATH ?? "/";
 
 export default defineConfig({
@@ -35,6 +34,13 @@ export default defineConfig({
       "@assets": path.resolve(import.meta.dirname, "..", "..", "attached_assets"),
     },
     dedupe: ["react", "react-dom"],
+  },
+  define: {
+    __GA_ID__: JSON.stringify(process.env.GA_MEASUREMENT_ID ?? ""),
+    __TAWK_ID__: JSON.stringify(process.env.TAWK_PROPERTY_ID ?? ""),
+    __ONESIGNAL_ID__: JSON.stringify(process.env.ONESIGNAL_APP_ID ?? ""),
+    __SUPABASE_URL__: JSON.stringify(process.env.SUPABASE_URL ?? ""),
+    __SUPABASE_ANON_KEY__: JSON.stringify(process.env.SUPABASE_ANON_KEY ?? ""),
   },
   root: path.resolve(import.meta.dirname),
   build: {

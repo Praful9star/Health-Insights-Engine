@@ -78,15 +78,11 @@ function EcgAnimation() {
 
 /* ─── Floating particles ─────────────────────────────────────────────── */
 const PARTICLES = [
-  { top: "12%", left: "6%",  icon: "🧬", sz: 22, delay: 0   },
-  { top: "22%", left: "90%", icon: "❤️", sz: 18, delay: 1.2 },
-  { top: "55%", left: "4%",  icon: "💊", sz: 16, delay: 2.1 },
-  { top: "70%", left: "93%", icon: "🩺", sz: 20, delay: 0.6 },
-  { top: "8%",  left: "20%", icon: "⚕️", sz: 14, delay: 1.8 },
-  { top: "80%", left: "13%", icon: "🔬", sz: 17, delay: 3.0 },
-  { top: "38%", left: "97%", icon: "🫀", sz: 21, delay: 2.5 },
-  { top: "48%", left: "2%",  icon: "🩻", sz: 15, delay: 1.5 },
-  { top: "88%", left: "82%", icon: "💉", sz: 14, delay: 0.9 },
+  { top: "14%", left: "5%",  icon: "🧬", sz: 22, delay: 0   },
+  { top: "20%", left: "91%", icon: "❤️", sz: 18, delay: 1.2 },
+  { top: "68%", left: "94%", icon: "🩺", sz: 20, delay: 0.6 },
+  { top: "78%", left: "8%",  icon: "💊", sz: 16, delay: 2.1 },
+  { top: "40%", left: "97%", icon: "🫀", sz: 19, delay: 2.5 },
 ];
 
 function FloatingParticles() {
