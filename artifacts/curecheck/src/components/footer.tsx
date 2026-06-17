@@ -193,9 +193,18 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-6 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} CureCheck. {t("All rights reserved.", "सर्वाधिकार सुरक्षित।")}
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <p className="text-xs text-muted-foreground">
+              © {new Date().getFullYear()} CureCheck. {t("All rights reserved.", "सर्वाधिकार सुरक्षित।")}
+            </p>
+            <span className="hidden sm:inline text-muted-foreground/30">·</span>
+            <p className="text-xs text-muted-foreground">
+              Built by{" "}
+              <Link href="/about" className="text-primary hover:underline font-600">Praful Srivastava</Link>
+              {" "}·{" "}
+              <a href="mailto:prafulsrivastava2@gmail.com" className="hover:text-primary transition-colors">Contact</a>
+            </p>
+          </div>
           <div className="flex items-center gap-4">
             <Link href="/feedback" className="text-xs text-muted-foreground hover:text-primary transition-colors">Feedback</Link>
             <Link href="/about" className="text-xs text-muted-foreground hover:text-primary transition-colors">About</Link>

@@ -84,7 +84,26 @@ export default function About() {
           </p>
         </motion.section>
 
-        <motion.section variants={fadeUp} initial="hidden" animate="visible" custom={5} className="text-center pt-6">
+        <motion.section variants={fadeUp} initial="hidden" animate="visible" custom={5}>
+          <h2 className="text-2xl font-serif font-700 text-foreground mb-4">The Founder</h2>
+          <div className="glass-panel rounded-2xl p-6 border border-primary/20">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <Users className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-700 text-foreground text-lg">Praful Srivastava</h3>
+                <p className="text-xs text-primary font-600 mb-3">Lucknow, India · Age 18</p>
+                <p className="text-muted-foreground leading-relaxed">
+                  CureCheck was built by Praful Srivastava, an 18-year-old from Lucknow, India, with the goal of making reliable health information accessible to everyone in plain language. Reach him at{" "}
+                  <a href="mailto:prafulsrivastava2@gmail.com" className="text-primary hover:underline">prafulsrivastava2@gmail.com</a>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.section>
+
+        <motion.section variants={fadeUp} initial="hidden" animate="visible" custom={6} className="text-center pt-6">
           <h2 className="text-2xl font-serif font-700 text-foreground mb-4">Start using CureCheck</h2>
           <p className="text-muted-foreground mb-6">No signup needed. Completely free.</p>
           <div className="flex flex-wrap gap-3 justify-center">

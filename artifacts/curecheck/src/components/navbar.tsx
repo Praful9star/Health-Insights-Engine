@@ -49,6 +49,12 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", h);
   }, []);
 
+  useEffect(() => {
+    const h = () => setOpen(true);
+    window.addEventListener("cc-open-menu", h);
+    return () => window.removeEventListener("cc-open-menu", h);
+  }, []);
+
   const isActive = (href: string) => location === href || location.startsWith(href + "/");
 
   return (

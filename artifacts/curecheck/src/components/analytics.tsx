@@ -27,6 +27,9 @@ export default function Analytics() {
           mobile:  { position: "bl", xOffset: 10, yOffset: 90 },
         },
       };
+      (window as any).Tawk_API.onLoad = function () {
+        setTimeout(() => { (window as any).Tawk_API?.minimize?.(); }, 2000);
+      };
       (window as any).Tawk_LoadStart = new Date();
       const s = document.createElement("script");
       s.async = true;

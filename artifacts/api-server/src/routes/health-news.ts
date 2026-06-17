@@ -29,11 +29,27 @@ const FALLBACK: NewsArticle[] = [
   { title: "NIMHANS launches 24x7 free mental health helpline: 080-46110007", description: "Connects callers with trained counsellors for anxiety, depression and crisis support.", url: "#", urlToImage: null, publishedAt: new Date().toISOString(), source: { name: "NIMHANS" } },
 ];
 
+const HEALTH_KEYWORDS = [
+  "health", "medical", "medicine", "hospital", "doctor", "disease", "patient",
+  "fitness", "diet", "nutrition", "yoga", "diabetes", "cancer", "heart",
+  "vaccine", "virus", "treatment", "surgery", "drug", "therapy", "mental",
+  "pregnancy", "pharma", "aiims", "icmr", "who ", "covid", "dengue", "malaria",
+  "blood", "clinical", "wellness", "obesity", "hypertension", "infection",
+  "epidemic", "pandemic", "healthcare", "ayurveda", "immunity", "hospital",
+  "nutrition", "ortho", "neuro", "cardio", "oncol", "pediatric",
+];
+
+function isHealthRelated(title: string, description = ""): boolean {
+  const text = `${title} ${description}`.toLowerCase();
+  return HEALTH_KEYWORDS.some((kw) => text.includes(kw));
+}
+
 const router = Router();
 
 router.get("/health-news", async (req, res) => {
-  const q = typeof req.query.q === "string" && req.query.q.trim() ? req.query.q.trim() : "India health";
-  const cacheKey = q.toLowerCase().slice(0, 80);
+  const customQ = typeof req.query.q === "string" && req.query.q.trim() ? req.query.q.trim() : "";
+  const isDefaultTicker = !customQ;
+  const cacheKey = (customQ || "ticker-default").toLowerCase().slice(0, 80);
 
   const hit = cache.get(cacheKey);
   if (hit && Date.now() - hit.ts < CACHE_TTL) {
@@ -46,14 +62,24 @@ router.get("/health-news", async (req, res) => {
   }
 
   try {
-    const url = new URL("https://newsapi.org/v2/everything");
-    url.searchParams.set("q", q);
-    url.searchParams.set("language", "en");
-    url.searchParams.set("sortBy", "publishedAt");
-    url.searchParams.set("pageSize", "20");
-    url.searchParams.set("apiKey", apiKey);
+    let fetchUrl: URL;
 
-    const resp = await fetch(url.toString());
+    if (isDefaultTicker) {
+      fetchUrl = new URL("https://newsapi.org/v2/top-headlines");
+      fetchUrl.searchParams.set("country", "in");
+      fetchUrl.searchParams.set("category", "health");
+      fetchUrl.searchParams.set("pageSize", "20");
+      fetchUrl.searchParams.set("apiKey", apiKey);
+    } else {
+      fetchUrl = new URL("https://newsapi.org/v2/everything");
+      fetchUrl.searchParams.set("q", `${customQ} health medical`);
+      fetchUrl.searchParams.set("language", "en");
+      fetchUrl.searchParams.set("sortBy", "publishedAt");
+      fetchUrl.searchParams.set("pageSize", "30");
+      fetchUrl.searchParams.set("apiKey", apiKey);
+    }
+
+    const resp = await fetch(fetchUrl.toString());
     if (!resp.ok) throw new Error(`NewsAPI ${resp.status}`);
 
     const data = (await resp.json()) as {
@@ -69,7 +95,13 @@ router.get("/health-news", async (req, res) => {
     };
 
     const articles: NewsArticle[] = (data.articles ?? [])
-      .filter((a) => a.title && a.title !== "[Removed]" && a.url && a.url !== "https://removed.com")
+      .filter((a) =>
+        a.title &&
+        a.title !== "[Removed]" &&
+        a.url &&
+        a.url !== "https://removed.com" &&
+        isHealthRelated(a.title, a.description)
+      )
       .slice(0, 18)
       .map((a) => ({
         title: a.title,
