@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { ExplainMedicalReportBody, ExplainMedicalReportResponse } from "@workspace/api-zod";
-import { claudeChat, isAiAvailable } from "../lib/claude";
+import { groqChat, isAiAvailable } from "../lib/groq";
 
 const router: IRouter = Router();
 
@@ -323,7 +323,7 @@ router.post("/report-explainer", async (req, res): Promise<void> => {
 
     if (hasAi) {
       req.log.info({ reportLength: reportText.length }, "Explaining report with Groq");
-      const raw = await claudeChat(
+      const raw = await groqChat(
         SYSTEM_PROMPT,
         `Please analyze this medical report and return the JSON response:\n\n${reportText}`,
         4096,

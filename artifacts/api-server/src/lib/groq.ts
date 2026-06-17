@@ -2,6 +2,10 @@ import Groq from "groq-sdk";
 
 let _client: Groq | null = null;
 
+export function isAiAvailable(): boolean {
+  return !!process.env.GROQ_API_KEY;
+}
+
 export function getGroqClient(): Groq | null {
   if (!process.env.GROQ_API_KEY) return null;
   if (!_client) {

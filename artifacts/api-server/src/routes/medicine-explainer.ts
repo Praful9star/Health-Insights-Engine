@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { ExplainMedicineBody, ExplainMedicineResponse } from "@workspace/api-zod";
-import { claudeChat, isAiAvailable } from "../lib/claude";
+import { groqChat, isAiAvailable } from "../lib/groq";
 
 const router: IRouter = Router();
 
@@ -152,7 +152,7 @@ router.post("/medicine-explainer", async (req, res): Promise<void> => {
     let result;
     if (hasAi) {
       req.log.info({ medicine, language }, "Explaining medicine with Groq");
-      const raw = await claudeChat(buildSystemPrompt(language), `Explain this medicine: "${medicine}"`);
+      const raw = await groqChat(buildSystemPrompt(language), `Explain this medicine: "${medicine}"`);
       result = JSON.parse(raw);
     } else {
       req.log.info("GROQ_API_KEY not set, using mock response");

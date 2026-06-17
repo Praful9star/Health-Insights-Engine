@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { claudeChat } from "../lib/claude";
+import { groqChat } from "../lib/groq";
 
 const router: IRouter = Router();
 
@@ -61,7 +61,7 @@ Respond ONLY with a JSON object:
 }`;
 
   try {
-    const content = await claudeChat(systemPrompt, userMessage);
+    const content = await groqChat(systemPrompt, userMessage);
 
     let parsed: Record<string, unknown>;
     try {

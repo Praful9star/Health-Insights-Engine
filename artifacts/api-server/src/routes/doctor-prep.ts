@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { claudeChat } from "../lib/claude";
+import { groqChat } from "../lib/groq";
 
 const router: IRouter = Router();
 
@@ -71,7 +71,7 @@ ${currentMedications ? `Current medications: ${currentMedications}` : ""}
 Generate a personalised doctor visit prep guide as JSON.`;
 
   try {
-    const content = await claudeChat(systemPrompt, userMessage);
+    const content = await groqChat(systemPrompt, userMessage);
     let parsed: Record<string, unknown>;
     try {
       parsed = JSON.parse(content);
