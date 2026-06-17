@@ -23,6 +23,15 @@ import MythBuster from "@/pages/myth-buster";
 import About from "@/pages/about";
 import Login from "@/pages/login";
 import HospitalFinder from "@/pages/hospital-finder";
+import Calculators from "@/pages/calculators";
+import Emergency from "@/pages/emergency";
+import MentalHealth from "@/pages/mental-health";
+import Vaccines from "@/pages/vaccines";
+import Ayurveda from "@/pages/ayurveda";
+import Insurance from "@/pages/insurance";
+import Pregnancy from "@/pages/pregnancy";
+import News from "@/pages/news";
+import DrugInteraction from "@/pages/drug-interaction";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -44,6 +53,15 @@ function Router() {
       <Route path="/about" component={About} />
       <Route path="/login" component={Login} />
       <Route path="/hospitals" component={HospitalFinder} />
+      <Route path="/calculators" component={Calculators} />
+      <Route path="/emergency" component={Emergency} />
+      <Route path="/mental-health" component={MentalHealth} />
+      <Route path="/vaccines" component={Vaccines} />
+      <Route path="/ayurveda" component={Ayurveda} />
+      <Route path="/insurance" component={Insurance} />
+      <Route path="/pregnancy" component={Pregnancy} />
+      <Route path="/news" component={News} />
+      <Route path="/drug-interaction" component={DrugInteraction} />
       <Route component={NotFound} />
     </Switch>
   );

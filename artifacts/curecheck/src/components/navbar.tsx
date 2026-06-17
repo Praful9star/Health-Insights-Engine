@@ -8,19 +8,28 @@ import { useAuth } from "@/contexts/auth-context";
 import { CureCheckMark } from "@/components/logo";
 
 const PRIMARY_LINKS = [
-  { href: "/report-explainer",  label: { en: "Reports",  hi: "रिपोर्ट"    } },
-  { href: "/medicine-explainer",label: { en: "Medicine", hi: "दवा"         } },
-  { href: "/health-timeline",   label: { en: "Timeline", hi: "टाइमलाइन"   } },
-  { href: "/fitness-hub",       label: { en: "Fitness",  hi: "फिटनेस"     } },
-  { href: "/myth-buster",       label: { en: "Myths",    hi: "मिथक"       } },
+  { href: "/report-explainer",   label: { en: "Reports",   hi: "रिपोर्ट"  } },
+  { href: "/medicine-explainer", label: { en: "Medicine",  hi: "दवा"      } },
+  { href: "/fitness-hub",        label: { en: "Fitness",   hi: "फिटनेस"  } },
+  { href: "/myth-buster",        label: { en: "Myths",     hi: "मिथक"    } },
+  { href: "/news",               label: { en: "News",      hi: "समाचार"  } },
 ];
 
 const MORE_LINKS = [
-  { href: "/hospitals",       label: { en: "Hospital Finder", hi: "अस्पताल खोजें" } },
-  { href: "/symptom-checker", label: { en: "Symptom Checker", hi: "लक्षण जांच"    } },
-  { href: "/disease-journey", label: { en: "Disease Journey", hi: "रोग यात्रा"    } },
-  { href: "/claim-checker",   label: { en: "Claim Checker",   hi: "दावा जांच"     } },
-  { href: "/about",           label: { en: "About",           hi: "परिचय"         } },
+  { href: "/symptom-checker",   label: { en: "Symptom Checker",       hi: "लक्षण जांच"       } },
+  { href: "/disease-journey",   label: { en: "Disease Journey",        hi: "रोग यात्रा"       } },
+  { href: "/claim-checker",     label: { en: "Claim Checker",          hi: "दावा जांच"        } },
+  { href: "/drug-interaction",  label: { en: "Drug Interactions",      hi: "दवा इंटरेक्शन"   } },
+  { href: "/health-timeline",   label: { en: "Health Timeline",        hi: "स्वास्थ्य टाइमलाइन" } },
+  { href: "/calculators",       label: { en: "Health Calculators",     hi: "स्वास्थ्य कैलकुलेटर" } },
+  { href: "/hospitals",         label: { en: "Hospital Finder",        hi: "अस्पताल खोजें"    } },
+  { href: "/emergency",         label: { en: "Emergency & First Aid",  hi: "आपातकाल"          } },
+  { href: "/mental-health",     label: { en: "Mental Health",          hi: "मानसिक स्वास्थ्य" } },
+  { href: "/vaccines",          label: { en: "Vaccine Schedule",       hi: "टीकाकरण"          } },
+  { href: "/ayurveda",          label: { en: "Ayurveda Guide",         hi: "आयुर्वेद"         } },
+  { href: "/insurance",         label: { en: "Insurance Guide",        hi: "बीमा गाइड"        } },
+  { href: "/pregnancy",         label: { en: "Pregnancy Tracker",      hi: "गर्भावस्था"       } },
+  { href: "/about",             label: { en: "About",                  hi: "परिचय"            } },
 ];
 
 export default function Navbar() {
@@ -58,6 +67,7 @@ export default function Navbar() {
               </span>
             </Link>
           ))}
+
           <div className="relative" ref={moreRef}>
             <button onClick={() => setMoreOpen(v => !v)}
               className="flex items-center gap-1 px-3.5 py-1.5 rounded-full text-sm font-600 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all">
@@ -66,7 +76,7 @@ export default function Navbar() {
             <AnimatePresence>
               {moreOpen && (
                 <motion.div initial={{ opacity: 0, y: -8, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.95 }} transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-2 w-52 glass-panel rounded-2xl border border-border/60 py-2 shadow-xl">
+                  className="absolute right-0 top-full mt-2 w-60 glass-panel rounded-2xl border border-border/60 py-2 shadow-xl max-h-[80vh] overflow-y-auto">
                   {MORE_LINKS.map(link => (
                     <Link key={link.href} href={link.href}>
                       <span onClick={() => setMoreOpen(false)}
@@ -106,7 +116,7 @@ export default function Navbar() {
         {open && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }}
             className="lg:hidden border-t border-border/40 bg-background/95 backdrop-blur-xl overflow-hidden">
-            <nav className="px-4 py-3 flex flex-col gap-1">
+            <nav className="px-4 py-3 flex flex-col gap-1 max-h-[80vh] overflow-y-auto">
               {[...PRIMARY_LINKS, ...MORE_LINKS, { href: "/login", label: { en: user ? "My Account" : "Login / Sign up", hi: user ? "मेरा खाता" : "लॉगिन / साइनअप" } }].map(link => (
                 <Link key={link.href} href={link.href}>
                   <span onClick={() => setOpen(false)}

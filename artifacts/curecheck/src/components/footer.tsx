@@ -1,74 +1,110 @@
 import { Link } from "wouter";
-import { Activity, Heart } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
+import { CureCheckMark } from "@/components/logo";
 
-const TOOL_LINKS = [
-  { href: "/symptom-checker", en: "Symptom Checker", hi: "लक्षण जांच" },
-  { href: "/claim-checker", en: "Claim Checker", hi: "दावा जांच" },
-  { href: "/medicine-explainer", en: "Medicine Info", hi: "दवा जानकारी" },
-  { href: "/report-explainer", en: "Report Explainer", hi: "रिपोर्ट समझें" },
-  { href: "/disease-journey", en: "Disease Journey", hi: "रोग यात्रा" },
-  { href: "/fitness-hub", en: "Fitness Hub", hi: "फिटनेस हब" },
+const AI_TOOLS = [
+  { href: "/report-explainer",   en: "Report Explainer",    hi: "रिपोर्ट समझें"    },
+  { href: "/medicine-explainer", en: "Medicine Guide",      hi: "दवा गाइड"         },
+  { href: "/symptom-checker",    en: "Symptom Checker",     hi: "लक्षण जांच"       },
+  { href: "/claim-checker",      en: "Claim Checker",       hi: "दावा जांच"        },
+  { href: "/disease-journey",    en: "Disease Journey",     hi: "रोग यात्रा"       },
+  { href: "/drug-interaction",   en: "Drug Interactions",   hi: "दवा इंटरेक्शन"   },
+];
+
+const HEALTH_TOOLS = [
+  { href: "/fitness-hub",        en: "Fitness Hub",         hi: "फिटनेस हब"        },
+  { href: "/health-timeline",    en: "Health Timeline",     hi: "स्वास्थ्य टाइमलाइन" },
+  { href: "/calculators",        en: "Health Calculators",  hi: "कैलकुलेटर"        },
+  { href: "/myth-buster",        en: "Myth Buster",         hi: "मिथक बस्टर"       },
+  { href: "/vaccines",           en: "Vaccine Schedule",    hi: "टीकाकरण"          },
+  { href: "/hospitals",          en: "Hospital Finder",     hi: "अस्पताल खोजें"    },
+];
+
+const INFO_LINKS = [
+  { href: "/emergency",          en: "Emergency & First Aid", hi: "आपातकाल"          },
+  { href: "/mental-health",      en: "Mental Health",         hi: "मानसिक स्वास्थ्य" },
+  { href: "/ayurveda",           en: "Ayurveda Guide",        hi: "आयुर्वेद"         },
+  { href: "/insurance",          en: "Insurance Guide",       hi: "बीमा गाइड"        },
+  { href: "/pregnancy",          en: "Pregnancy Tracker",     hi: "गर्भावस्था"       },
+  { href: "/news",               en: "Health News",           hi: "स्वास्थ्य समाचार" },
+  { href: "/about",              en: "About CureCheck",       hi: "परिचय"            },
 ];
 
 export default function Footer() {
   const { t, language } = useLanguage();
+  const lang = (l: { en: string; hi: string }) => language === "hi" ? l.hi : l.en;
 
   return (
     <footer className="relative z-10 mt-24 border-t border-border/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+        <div className="grid gap-10 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
+
           {/* Brand */}
           <div>
-            <Link href="/" className="flex items-center gap-2.5 group w-fit">
-              <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center glow-cyan">
-                <Activity className="w-5 h-5 text-primary-foreground" strokeWidth={2.5} />
+            <Link href="/">
+              <div className="flex items-center gap-2.5 cursor-pointer w-fit mb-4">
+                <CureCheckMark size={34} id="footer-logo" />
+                <span className="font-serif font-800 text-xl tracking-tight">
+                  Cure<span className="text-primary">Check</span>
+                </span>
               </div>
-              <span className="font-serif font-800 text-xl tracking-tight">
-                Cure<span className="text-primary">Check</span>
-              </span>
             </Link>
-            <p className="mt-4 text-sm text-muted-foreground max-w-xs leading-relaxed">
+            <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
               {t(
-                "AI-powered health clarity for India. Verify claims, decode reports, and train smarter — in plain language.",
-                "भारत के लिए AI-संचालित स्वास्थ्य स्पष्टता। दावों की जांच करें, रिपोर्ट समझें और स्मार्ट ट्रेनिंग करें — सरल भाषा में।",
+                "AI-powered health clarity for India. Verify claims, decode reports, find hospitals and more — in plain language.",
+                "भारत के लिए AI स्वास्थ्य प्लेटफॉर्म। दावों की जांच, रिपोर्ट समझें, अस्पताल खोजें — सरल भाषा में।",
               )}
             </p>
-            <p className="mt-5 mono-label text-muted-foreground/70">curecheck.in</p>
+            <p className="mt-4 mono-label text-muted-foreground/70">curecheck.in</p>
+            <p className="mt-5 text-sm text-muted-foreground leading-relaxed border-t border-border/40 pt-4 max-w-xs">
+              {t(
+                "Educational only. Never diagnoses or prescribes. Always consult a qualified doctor.",
+                "केवल शिक्षा के लिए। यह कभी निदान या दवा नहीं देता। हमेशा डॉक्टर से सलाह लें।",
+              )}
+            </p>
           </div>
 
-          {/* Tools */}
+          {/* AI Tools */}
           <div>
-            <h4 className="mono-label text-primary/80 mb-4">{t("Tools", "टूल्स")}</h4>
-            <ul className="space-y-2.5">
-              {TOOL_LINKS.map((l) => (
+            <h4 className="mono-label text-primary/80 mb-4">{t("AI Tools", "AI टूल्स")}</h4>
+            <ul className="space-y-2">
+              {AI_TOOLS.map(l => (
                 <li key={l.href}>
-                  <Link
-                    href={l.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {language === "hi" ? l.hi : l.en}
+                  <Link href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                    {lang(l)}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Trust */}
+          {/* Health Tools */}
           <div>
-            <h4 className="mono-label text-primary/80 mb-4">{t("Important", "महत्वपूर्ण")}</h4>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {t(
-                "CureCheck is for education only. It never diagnoses or prescribes. Always consult a qualified doctor.",
-                "CureCheck केवल शिक्षा के लिए है। यह कभी निदान या दवा नहीं देता। हमेशा योग्य डॉक्टर से सलाह लें।",
-              )}
-            </p>
-            <Link
-              href="/about"
-              className="inline-block mt-4 text-sm font-600 text-primary hover:underline underline-offset-4"
-            >
-              {t("About & Safety →", "परिचय और सुरक्षा →")}
-            </Link>
+            <h4 className="mono-label text-primary/80 mb-4">{t("Health Tools", "स्वास्थ्य टूल्स")}</h4>
+            <ul className="space-y-2">
+              {HEALTH_TOOLS.map(l => (
+                <li key={l.href}>
+                  <Link href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                    {lang(l)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Resources */}
+          <div>
+            <h4 className="mono-label text-primary/80 mb-4">{t("Resources", "संसाधन")}</h4>
+            <ul className="space-y-2">
+              {INFO_LINKS.map(l => (
+                <li key={l.href}>
+                  <Link href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                    {lang(l)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 

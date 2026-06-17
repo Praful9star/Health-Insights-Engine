@@ -191,6 +191,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /api/drug-interaction:
+    post:
+      tags: [Health]
+      operationId: checkDrugInteraction
+      summary: Check drug-drug interactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DrugInteractionInput"
+      responses:
+        "200":
+          description: Drug interaction analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DrugInteractionResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -552,6 +577,67 @@ components:
           type: string
         doctorSpeciality:
           type: string
+        disclaimer:
+          type: string
+
+    DrugInteractionInput:
+      type: object
+      required:
+        - medicines
+      properties:
+        medicines:
+          type: array
+          items:
+            type: string
+          minItems: 2
+          maxItems: 5
+
+    DrugInteractionEntry:
+      type: object
+      required:
+        - medicine1
+        - medicine2
+        - severity
+        - effect
+        - mechanism
+        - recommendation
+      properties:
+        medicine1:
+          type: string
+        medicine2:
+          type: string
+        severity:
+          type: string
+          enum: [major, moderate, minor, none]
+        effect:
+          type: string
+        mechanism:
+          type: string
+        recommendation:
+          type: string
+
+    DrugInteractionResult:
+      type: object
+      required:
+        - interactions
+        - overallRisk
+        - overallSummary
+        - generalAdvice
+        - disclaimer
+      properties:
+        interactions:
+          type: array
+          items:
+            $ref: "#/components/schemas/DrugInteractionEntry"
+        overallRisk:
+          type: string
+          enum: [high, moderate, low, safe]
+        overallSummary:
+          type: string
+        generalAdvice:
+          type: array
+          items:
+            type: string
         disclaimer:
           type: string
 
