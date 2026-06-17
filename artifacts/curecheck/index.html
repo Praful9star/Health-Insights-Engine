@@ -39,5 +39,15 @@
     })();
     </script>
     <!--End of Tawk.to Script-->
+    <!-- OneSignal Web Push Notifications -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "0b13d900-be77-4a40-aaf0-715333f56d3b"
+        });
+      });
+    </script>
   </body>
 </html>
