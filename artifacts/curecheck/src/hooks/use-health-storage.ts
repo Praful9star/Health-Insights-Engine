@@ -46,10 +46,18 @@ export interface TimelineEntry {
 
 export const todayStr = () => new Date().toISOString().split("T")[0];
 
+export function stepPoints(steps: number): number {
+  if (steps >= 19000) return 25;
+  if (steps >= 15000) return 21;
+  if (steps >= 10000) return 17;
+  if (steps >= 7000)  return 13;
+  return Math.round((steps / 7000) * 12);
+}
+
 export function computeScore(day: Omit<FitnessDay, "score">): number {
   const s = Math.min(25, (day.sleep / 8) * 25);
   const w = Math.min(25, (day.water / 8) * 25);
-  const st = Math.min(25, (day.steps / 10000) * 25);
+  const st = stepPoints(day.steps);
   const wo = day.workout ? 25 : 0;
   return Math.round(s + w + st + wo);
 }

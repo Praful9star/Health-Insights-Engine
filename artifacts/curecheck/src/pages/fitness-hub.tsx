@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/language-context";
 import {
-  useHealthStorage, computeScore, todayStr,
+  useHealthStorage, computeScore, todayStr, stepPoints,
   type FitnessDay, type Challenge,
 } from "@/hooks/use-health-storage";
 
@@ -111,6 +111,27 @@ const GOALS: {
   { id: "shred",    label: { en: "Shred",                hi: "श्रेड" },               tag: { en: "Lose fat",     hi: "फैट घटाएं" }, calAdj: -400, protein: 2.2, fat: 0.7 },
   { id: "maintain", label: { en: "Clean Maintenance",   hi: "क्लीन मेंटेनेंस" },   tag: { en: "Stay lean",    hi: "लीन रहें" },   calAdj: 0,    protein: 1.8, fat: 0.8 },
 ];
+
+const GOAL_AGE_SUMMARIES: Record<Goal, Record<"teen" | "young" | "adult" | "senior", { en: string; hi: string }>> = {
+  bulk: {
+    teen:   { en: "Focus on surplus from whole foods — your growing body handles carbs efficiently. Add compound lifts 3×/week.", hi: "Whole foods से surplus लें — growing body carbs efficiently use करती है। 3×/week compound lifts करें।" },
+    young:  { en: "Peak anabolic window. Hit a 300 kcal surplus and prioritise post-workout protein (30–40 g) within 30 min of training.", hi: "Peak anabolic window। 300 kcal surplus लें, workout के 30 min में 30–40g protein लें।" },
+    adult:  { en: "Keep the surplus tight (200–300 kcal) — excess converts to fat faster at 31+. Prioritise sleep; testosterone dips cut gains.", hi: "Surplus कम रखें (200–300 kcal) — 31+ पर excess fat बन जाता है। नींद पर ध्यान दें; testosterone gains घटाता है।" },
+    senior: { en: "Higher protein (2.0–2.2 g/kg) counters anabolic resistance. Space protein across 3 meals of 35–40 g each for best absorption.", hi: "Anabolic resistance के लिए ज़्यादा protein (2.0–2.2 g/kg)। 3 meals में 35–40g protein बाँटें।" },
+  },
+  shred: {
+    teen:   { en: "Aim for body recomposition, not aggressive cuts. A 200–250 kcal deficit is the maximum safe zone for a teen.", hi: "Aggressive cut की बजाय body recomp करें। Teen के लिए 200–250 kcal deficit maximum safe है।" },
+    young:  { en: "Your metabolism is still fast. A protein-sparing deficit (−400 kcal) with 2.2 g/kg protein will retain muscle while burning fat.", hi: "Metabolism तेज़ है। −400 kcal deficit में 2.2 g/kg protein लेकर muscle retain करें।" },
+    adult:  { en: "Higher cortisol at 31+ accelerates muscle loss on cuts. Keep 2 strength sessions per week and never drop below 1,600 kcal.", hi: "31+ पर cortisol से muscle loss होता है। 2 strength sessions रखें, 1,600 kcal से नीचे न जाएं।" },
+    senior: { en: "Fat loss above 0.5 kg/week will cost muscle at 46+. Eat protein first at every meal and add walking on rest days.", hi: "46+ पर 0.5 kg/week से ज़्यादा fat loss muscle घटाता है। हर meal में पहले protein खाएं।" },
+  },
+  maintain: {
+    teen:   { en: "Maintenance at your age means consistent energy for study and sport. Never skip meals — it tanks focus and performance.", hi: "Teen maintenance का मतलब study और sport के लिए energy। Meals skip न करें।" },
+    young:  { en: "Build habits that last a lifetime. Cycle higher carbs on training days and moderate carbs on rest days for body composition.", hi: "Lifetime habits बनाएं। Training days पर high-carb, rest days पर moderate-carb रखें।" },
+    adult:  { en: "Prioritise nutrient density over calorie counting. Add omega-3 rich foods (fish / flaxseed) 3× a week to manage inflammation.", hi: "Calories से ज़्यादा nutrient density पर focus करें। हफ्ते में 3× omega-3 foods (मछली/अलसी) लें।" },
+    senior: { en: "Maintenance at 46+ is active preservation. Include collagen-supporting foods (citrus, amla) and keep protein consistently high.", hi: "46+ पर maintenance active preservation है। Collagen foods (नींबू, आंवला) और high protein रखें।" },
+  },
+};
 
 const QUICK_FOODS = [
   { en: "2 Roti",          hi: "2 रोटी",          kcal: 220, p: 6,  c: 44, f: 2    },
@@ -693,10 +714,10 @@ export default function FitnessHub() {
                 <ScoreRing score={todayEntry.score} />
                 <div className="grid grid-cols-4 gap-2 mt-5">
                   {[
-                    { label: t("Sleep",   "नींद"),   pts: Math.min(25, Math.round((todayEntry.sleep / 8) * 25)),    color: "text-violet-400" },
-                    { label: t("Water",   "पानी"),   pts: Math.min(25, Math.round((todayEntry.water / 8) * 25)),    color: "text-sky-400"    },
-                    { label: t("Steps",   "कदम"),    pts: Math.min(25, Math.round((todayEntry.steps / 19000) * 25)), color: "text-emerald-400" },
-                    { label: t("Workout", "Workout"), pts: todayEntry.workout ? 25 : 0,                              color: "text-amber-400"  },
+                    { label: t("Sleep",   "नींद"),   pts: Math.min(25, Math.round((todayEntry.sleep / 8) * 25)), color: "text-violet-400" },
+                    { label: t("Water",   "पानी"),   pts: Math.min(25, Math.round((todayEntry.water / 8) * 25)), color: "text-sky-400"    },
+                    { label: t("Steps",   "कदम"),    pts: stepPoints(todayEntry.steps),                          color: "text-emerald-400" },
+                    { label: t("Workout", "Workout"), pts: todayEntry.workout ? 25 : 0,                          color: "text-amber-400"  },
                   ].map(item => (
                     <div key={item.label} className="text-center">
                       <p className={`text-lg font-serif font-800 tabular-nums ${item.color}`}>+{item.pts}</p>
@@ -805,6 +826,18 @@ export default function FitnessHub() {
                     </button>
                   ))}
                 </div>
+
+                {/* Goal × age-group personalised strategy */}
+                {profile && (() => {
+                  const ag = getAgeGroup(profile.age);
+                  const s = GOAL_AGE_SUMMARIES[goalId][ag];
+                  return (
+                    <div className="border-t border-border/40 pt-3 mb-1">
+                      <p className="text-[10px] mono-label text-primary/70 mb-1">{t("Your strategy", "आपकी strategy")} · {language === "hi" ? goal.label.hi : goal.label.en} + {profile.age}{t("yrs", "साल")}</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{language === "hi" ? s.hi : s.en}</p>
+                    </div>
+                  );
+                })()}
 
                 {/* Profile weight + TDEE row */}
                 <div className="flex items-center justify-between border-t border-border/40 pt-3 gap-2 flex-wrap">
