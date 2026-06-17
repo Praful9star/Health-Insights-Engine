@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -17,36 +17,40 @@ import FloatingAIButton from "@/components/floating-ai-button";
 import PWAInstall from "@/components/pwa-install";
 import NotificationPrefs from "@/components/notification-prefs";
 import MobileBottomNav from "@/components/mobile-bottom-nav";
-import Home from "@/pages/home";
-import ClaimChecker from "@/pages/claim-checker";
-import DiseaseJourney from "@/pages/disease-journey";
-import ReportExplainer from "@/pages/report-explainer";
-import SymptomChecker from "@/pages/symptom-checker";
-import MedicineExplainer from "@/pages/medicine-explainer";
-import FitnessHub from "@/pages/fitness-hub";
-import HealthTimeline from "@/pages/health-timeline";
-import MythBuster, { MythBusterDetail } from "@/pages/myth-buster";
-import About from "@/pages/about";
-import Login from "@/pages/login";
-import HospitalFinder from "@/pages/hospital-finder";
-import Calculators from "@/pages/calculators";
-import Emergency from "@/pages/emergency";
-import MentalHealth from "@/pages/mental-health";
-import Vaccines from "@/pages/vaccines";
-import Ayurveda from "@/pages/ayurveda";
-import Insurance from "@/pages/insurance";
-import Pregnancy from "@/pages/pregnancy";
-import News from "@/pages/news";
-import DrugInteraction from "@/pages/drug-interaction";
-import DoctorPrep from "@/pages/doctor-prep";
-import Premium from "@/pages/premium";
-import Weather from "@/pages/weather";
-import AdminPanel from "@/pages/admin";
-import Feedback from "@/pages/feedback";
-import Dashboard from "@/pages/dashboard";
-import Profile from "@/pages/profile";
 import ProtectedRoute from "@/components/protected-route";
-import NotFound from "@/pages/not-found";
+
+const Home = lazy(() => import("@/pages/home"));
+const ClaimChecker = lazy(() => import("@/pages/claim-checker"));
+const DiseaseJourney = lazy(() => import("@/pages/disease-journey"));
+const ReportExplainer = lazy(() => import("@/pages/report-explainer"));
+const SymptomChecker = lazy(() => import("@/pages/symptom-checker"));
+const MedicineExplainer = lazy(() => import("@/pages/medicine-explainer"));
+const FitnessHub = lazy(() => import("@/pages/fitness-hub"));
+const HealthTimeline = lazy(() => import("@/pages/health-timeline"));
+const MythBuster = lazy(() => import("@/pages/myth-buster"));
+const MythBusterDetail = lazy(() =>
+  import("@/pages/myth-buster").then((m) => ({ default: m.MythBusterDetail }))
+);
+const About = lazy(() => import("@/pages/about"));
+const Login = lazy(() => import("@/pages/login"));
+const HospitalFinder = lazy(() => import("@/pages/hospital-finder"));
+const Calculators = lazy(() => import("@/pages/calculators"));
+const Emergency = lazy(() => import("@/pages/emergency"));
+const MentalHealth = lazy(() => import("@/pages/mental-health"));
+const Vaccines = lazy(() => import("@/pages/vaccines"));
+const Ayurveda = lazy(() => import("@/pages/ayurveda"));
+const Insurance = lazy(() => import("@/pages/insurance"));
+const Pregnancy = lazy(() => import("@/pages/pregnancy"));
+const News = lazy(() => import("@/pages/news"));
+const DrugInteraction = lazy(() => import("@/pages/drug-interaction"));
+const DoctorPrep = lazy(() => import("@/pages/doctor-prep"));
+const Premium = lazy(() => import("@/pages/premium"));
+const Weather = lazy(() => import("@/pages/weather"));
+const AdminPanel = lazy(() => import("@/pages/admin"));
+const Feedback = lazy(() => import("@/pages/feedback"));
+const Dashboard = lazy(() => import("@/pages/dashboard"));
+const Profile = lazy(() => import("@/pages/profile"));
+const NotFound = lazy(() => import("@/pages/not-found"));
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
@@ -54,38 +58,40 @@ const queryClient = new QueryClient({
 
 function Routes() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/report-explainer" component={ReportExplainer} />
-      <Route path="/medicine-explainer" component={MedicineExplainer} />
-      <Route path="/health-timeline" component={HealthTimeline} />
-      <Route path="/fitness-hub" component={FitnessHub} />
-      <Route path="/myth-buster/:slug" component={MythBusterDetail} />
-      <Route path="/myth-buster" component={MythBuster} />
-      <Route path="/symptom-checker" component={SymptomChecker} />
-      <Route path="/disease-journey" component={DiseaseJourney} />
-      <Route path="/claim-checker" component={ClaimChecker} />
-      <Route path="/about" component={About} />
-      <Route path="/login" component={Login} />
-      <Route path="/hospitals" component={HospitalFinder} />
-      <Route path="/calculators" component={Calculators} />
-      <Route path="/emergency" component={Emergency} />
-      <Route path="/mental-health" component={MentalHealth} />
-      <Route path="/vaccines" component={Vaccines} />
-      <Route path="/ayurveda" component={Ayurveda} />
-      <Route path="/insurance" component={Insurance} />
-      <Route path="/pregnancy" component={Pregnancy} />
-      <Route path="/news" component={News} />
-      <Route path="/drug-interaction" component={DrugInteraction} />
-      <Route path="/doctor-prep" component={DoctorPrep} />
-      <Route path="/premium" component={Premium} />
-      <Route path="/weather" component={Weather} />
-      <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
-      <Route path="/profile" component={() => <ProtectedRoute component={Profile} />} />
-      <Route path="/admin-curecheck-secure" component={AdminPanel} />
-      <Route path="/feedback" component={Feedback} />
-      <Route component={NotFound} />
-    </Switch>
+    <Suspense fallback={null}>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/report-explainer" component={ReportExplainer} />
+        <Route path="/medicine-explainer" component={MedicineExplainer} />
+        <Route path="/health-timeline" component={HealthTimeline} />
+        <Route path="/fitness-hub" component={FitnessHub} />
+        <Route path="/myth-buster/:slug" component={MythBusterDetail} />
+        <Route path="/myth-buster" component={MythBuster} />
+        <Route path="/symptom-checker" component={SymptomChecker} />
+        <Route path="/disease-journey" component={DiseaseJourney} />
+        <Route path="/claim-checker" component={ClaimChecker} />
+        <Route path="/about" component={About} />
+        <Route path="/login" component={Login} />
+        <Route path="/hospitals" component={HospitalFinder} />
+        <Route path="/calculators" component={Calculators} />
+        <Route path="/emergency" component={Emergency} />
+        <Route path="/mental-health" component={MentalHealth} />
+        <Route path="/vaccines" component={Vaccines} />
+        <Route path="/ayurveda" component={Ayurveda} />
+        <Route path="/insurance" component={Insurance} />
+        <Route path="/pregnancy" component={Pregnancy} />
+        <Route path="/news" component={News} />
+        <Route path="/drug-interaction" component={DrugInteraction} />
+        <Route path="/doctor-prep" component={DoctorPrep} />
+        <Route path="/premium" component={Premium} />
+        <Route path="/weather" component={Weather} />
+        <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
+        <Route path="/profile" component={() => <ProtectedRoute component={Profile} />} />
+        <Route path="/admin-curecheck-secure" component={AdminPanel} />
+        <Route path="/feedback" component={Feedback} />
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 
