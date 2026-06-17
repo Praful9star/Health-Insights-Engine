@@ -6,6 +6,7 @@ import reportExplainerRouter from "./report-explainer";
 import ocrReportRouter from "./ocr-report";
 import symptomCheckerRouter from "./symptom-checker";
 import medicineExplainerRouter from "./medicine-explainer";
+import healthNewsRouter from "./health-news";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(reportExplainerRouter);
 router.use(ocrReportRouter);
 router.use(symptomCheckerRouter);
 router.use(medicineExplainerRouter);
+router.use(healthNewsRouter);
 
 export default router;
