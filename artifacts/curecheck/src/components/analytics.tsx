@@ -4,7 +4,6 @@ import { useEffect } from "react";
 export default function Analytics() {
   useEffect(() => {
     const gaId: string = typeof __GA_ID__ !== "undefined" ? __GA_ID__ : "";
-    const tawkId: string = typeof __TAWK_ID__ !== "undefined" ? __TAWK_ID__ : "";
     const osId: string = typeof __ONESIGNAL_ID__ !== "undefined" ? __ONESIGNAL_ID__ : "";
 
     if (gaId) {
