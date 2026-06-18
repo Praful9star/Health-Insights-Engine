@@ -50,7 +50,6 @@ export default defineConfig(async ({ isSsrBuild }) => {
     },
     define: {
       __GA_ID__: JSON.stringify(process.env.GA_MEASUREMENT_ID ?? ""),
-      __TAWK_ID__: JSON.stringify(process.env.TAWK_PROPERTY_ID ?? ""),
       __ONESIGNAL_ID__: JSON.stringify(process.env.ONESIGNAL_APP_ID ?? ""),
       __SUPABASE_URL__: JSON.stringify(process.env.SUPABASE_URL ?? ""),
       __SUPABASE_ANON_KEY__: JSON.stringify(
