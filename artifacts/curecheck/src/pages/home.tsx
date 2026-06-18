@@ -109,9 +109,9 @@ const CORE_FEATURES = [
     icon: FileSearch, href: "/report-explainer", span: "lg:col-span-2",
     accent: "text-primary", bg: "bg-primary/10", border: "group-hover:border-primary/50",
     topAccent: "from-primary/60 to-primary/10",
-    badge: { en: "Primary Feature", hi: "मुख्य फीचर" },
-    title: { en: "AI Report Explainer", hi: "AI रिपोर्ट समझाने वाला" },
-    desc: { en: "Paste any blood test, thyroid panel or CBC. Get plain-English (or Hindi) explanation, abnormal values highlighted with why they matter, and exact questions to ask your doctor.", hi: "कोई भी blood test, thyroid या CBC paste करें। सरल हिंदी में समझाव, abnormal values क्यों मायने रखती हैं, और डॉक्टर से पूछने के सटीक सवाल।" },
+    badge: { en: "Primary Feature", hi: "मुख्य सुविधा" },
+    title: { en: "AI Report Explainer", hi: "AI रिपोर्ट व्याख्याकार" },
+    desc: { en: "Paste any blood test, thyroid panel or CBC. Get plain-English (or Hindi) explanation, abnormal values highlighted with why they matter, and exact questions to ask your doctor.", hi: "कोई भी ब्लड टेस्ट, थायरॉइड या CBC पेस्ट करें। सरल हिंदी में समझाव, असामान्य मान क्यों मायने रखते हैं, और डॉक्टर से पूछने के सटीक सवाल।" },
     preview: [
       { label: { en: "Hemoglobin", hi: "हीमोग्लोबिन" }, value: "10.2", unit: "g/dL", status: "low" },
       { label: { en: "Blood Sugar", hi: "रक्त शर्करा" }, value: "142", unit: "mg/dL", status: "high" },
@@ -123,8 +123,8 @@ const CORE_FEATURES = [
     accent: "text-violet-400", bg: "bg-violet-500/10", border: "group-hover:border-violet-500/40",
     topAccent: "from-violet-500/50 to-violet-500/10",
     badge: null,
-    title: { en: "Medicine Guide", hi: "दवा गाइड" },
-    desc: { en: "Enter any medicine name. Get what it does, side effects, best time to take, and key precautions — in plain language.", hi: "कोई भी दवा का नाम डालें। वो क्या करती है, side effects, कब लें, और सावधानियाँ — सरल भाषा में।" },
+    title: { en: "Medicine Guide", hi: "दवा मार्गदर्शिका" },
+    desc: { en: "Enter any medicine name. Get what it does, side effects, best time to take, and key precautions — in plain language.", hi: "कोई भी दवा का नाम डालें। वो क्या करती है, दुष्प्रभाव, कब लें, और सावधानियाँ — सरल भाषा में।" },
     preview: null,
   },
   {
@@ -132,8 +132,8 @@ const CORE_FEATURES = [
     accent: "text-emerald-400", bg: "bg-emerald-500/10", border: "group-hover:border-emerald-500/40",
     topAccent: "from-emerald-500/50 to-emerald-500/10",
     badge: { en: "New", hi: "नया" },
-    title: { en: "Health Timeline", hi: "स्वास्थ्य टाइमलाइन" },
-    desc: { en: "Save every report analysis. See your Hemoglobin, Blood Sugar and Cholesterol trends over time. Your history stays on your device.", hi: "हर रिपोर्ट analysis save करें। Hemoglobin, Blood Sugar और Cholesterol के trends देखें। आपका इतिहास आपके device पर।" },
+    title: { en: "Health Timeline", hi: "स्वास्थ्य समयरेखा" },
+    desc: { en: "Save every report analysis. See your Hemoglobin, Blood Sugar and Cholesterol trends over time. Your history stays on your device.", hi: "हर रिपोर्ट विश्लेषण सहेजें। हीमोग्लोबिन, रक्त शर्करा और कोलेस्ट्रॉल के रुझान देखें। आपका इतिहास आपके डिवाइस पर।" },
     preview: null,
   },
   {
@@ -141,18 +141,18 @@ const CORE_FEATURES = [
     accent: "text-amber-400", bg: "bg-amber-500/10", border: "group-hover:border-amber-500/40",
     topAccent: "from-amber-500/50 to-amber-500/10",
     badge: null,
-    title: { en: "Fitness Hub", hi: "फिटनेस हब" },
-    desc: { en: "Daily fitness score, streak tracker, AI-powered suggestions, health challenges and Indian gym diet plans — your daily health companion.", hi: "रोज़ का fitness score, streak tracker, AI सुझाव, health challenges और Indian gym diet plans।" },
+    title: { en: "Fitness Hub", hi: "फिटनेस केंद्र" },
+    desc: { en: "Daily fitness score, streak tracker, AI-powered suggestions, health challenges and Indian gym diet plans — your daily health companion.", hi: "रोज़ का फिटनेस स्कोर, लगातार दिनों का ट्रैकर, AI सुझाव, स्वास्थ्य चुनौतियाँ और भारतीय जिम डाइट प्लान।" },
     preview: null,
   },
 ];
 
 const TRUST_CHIPS = [
-  { icon: BadgeCheck, label: { en: "15+ free tools", hi: "15+ मुफ्त टूल्स" }, color: "text-primary" },
-  { icon: DatabaseZap, label: { en: "No data stored on servers", hi: "Server पर data नहीं" }, color: "text-emerald-400" },
-  { icon: Globe2, label: { en: "Hindi + English", hi: "हिंदी + English" }, color: "text-sky-400" },
+  { icon: BadgeCheck, label: { en: "15+ free tools", hi: "15+ मुफ्त उपकरण" }, color: "text-primary" },
+  { icon: DatabaseZap, label: { en: "No data stored on servers", hi: "सर्वर पर डेटा नहीं" }, color: "text-emerald-400" },
+  { icon: Globe2, label: { en: "Hindi + English", hi: "हिंदी + अंग्रेज़ी" }, color: "text-sky-400" },
   { icon: BadgeCheck, label: { en: "Free forever", hi: "हमेशा मुफ्त" }, color: "text-violet-400" },
-  { icon: HeartPulse, label: { en: "No signup needed", hi: "signup नहीं" }, color: "text-rose-400" },
+  { icon: HeartPulse, label: { en: "No signup needed", hi: "साइनअप की ज़रूरत नहीं" }, color: "text-rose-400" },
 ];
 
 const ALL_TOOLS = [
@@ -173,17 +173,17 @@ const ALL_TOOLS = [
 ];
 
 const HOW_IT_WORKS = [
-  { step: "01", icon: Zap,        title: { en: "Paste your report or medicine", hi: "Report या दवा paste करें" },    desc: { en: "No account needed. Works with any Indian lab format.", hi: "कोई account नहीं। किसी भी Indian lab format के साथ।" } },
-  { step: "02", icon: ShieldCheck, title: { en: "AI explains in plain language", hi: "AI सरल भाषा में समझाता है" }, desc: { en: "Cross-referenced with medical literature. No jargon.", hi: "Medical literature से cross-reference। कोई jargon नहीं।" } },
-  { step: "03", icon: BookOpen,   title: { en: "Use it with your doctor", hi: "डॉक्टर के साथ use करें" },           desc: { en: "Better questions, better consultations, better health.", hi: "बेहतर सवाल, बेहतर consultation, बेहतर स्वास्थ्य।" } },
+  { step: "01", icon: Zap,        title: { en: "Paste your report or medicine", hi: "रिपोर्ट या दवा चिपकाएं" },    desc: { en: "No account needed. Works with any Indian lab format.", hi: "कोई खाता नहीं चाहिए। किसी भी भारतीय लैब फॉर्मेट के साथ।" } },
+  { step: "02", icon: ShieldCheck, title: { en: "AI explains in plain language", hi: "AI सरल भाषा में समझाता है" }, desc: { en: "Cross-referenced with medical literature. No jargon.", hi: "चिकित्सा साहित्य से क्रॉस-रेफरेंस। कोई जटिल शब्द नहीं।" } },
+  { step: "03", icon: BookOpen,   title: { en: "Use it with your doctor", hi: "डॉक्टर के साथ उपयोग करें" },           desc: { en: "Better questions, better consultations, better health.", hi: "बेहतर सवाल, बेहतर परामर्श, बेहतर स्वास्थ्य।" } },
 ];
 
 const FAQS = [
-  { q: { en: "Is CureCheck a replacement for a doctor?", hi: "क्या CureCheck डॉक्टर का विकल्प है?" }, a: { en: "Absolutely not. CureCheck helps you understand your reports so you can have better conversations with your doctor. It never diagnoses or prescribes.", hi: "बिल्कुल नहीं। CureCheck आपको reports समझने में मदद करता है ताकि आप डॉक्टर से बेहतर बात कर सकें।" } },
-  { q: { en: "Is my health data private?", hi: "क्या मेरा डेटा सुरक्षित है?" }, a: { en: "Your queries are never stored on our servers. The Health Timeline saves data locally on your device only — nothing leaves your browser.", hi: "आपके queries हमारे servers पर कभी store नहीं होते। Health Timeline केवल आपके device पर locally save होती है।" } },
-  { q: { en: "Which reports does it support?", hi: "कौन सी reports support करता है?" }, a: { en: "CBC, thyroid panel, lipid profile, blood glucose, HbA1c, liver function, kidney function, Vitamin D, iron studies, and most other Indian lab reports.", hi: "CBC, thyroid panel, lipid profile, blood glucose, HbA1c, liver function, kidney function, Vitamin D और ज़्यादातर Indian lab reports।" } },
-  { q: { en: "Is the Fitness Hub medically accurate?", hi: "क्या Fitness Hub medically accurate है?" }, a: { en: "The Fitness Hub provides general nutrition and wellness guidance for healthy adults. It is not medical advice. Always consult a doctor for medical conditions.", hi: "Fitness Hub स्वस्थ वयस्कों के लिए सामान्य nutrition और wellness guidance देता है। यह medical advice नहीं है।" } },
-  { q: { en: "Is this service free?", hi: "क्या यह सेवा मुफ्त है?" }, a: { en: "Yes, completely free. We believe health clarity should never sit behind a paywall.", hi: "हाँ, पूरी तरह मुफ्त। हमारा मानना है कि health clarity कभी paywall के पीछे नहीं होनी चाहिए।" } },
+  { q: { en: "Is CureCheck a replacement for a doctor?", hi: "क्या CureCheck डॉक्टर का विकल्प है?" }, a: { en: "Absolutely not. CureCheck helps you understand your reports so you can have better conversations with your doctor. It never diagnoses or prescribes.", hi: "बिल्कुल नहीं। CureCheck आपको रिपोर्ट समझने में मदद करता है ताकि आप डॉक्टर से बेहतर बात कर सकें। यह कभी निदान या दवा नहीं देता।" } },
+  { q: { en: "Is my health data private?", hi: "क्या मेरा डेटा सुरक्षित है?" }, a: { en: "Your queries are never stored on our servers. The Health Timeline saves data locally on your device only — nothing leaves your browser.", hi: "आपके प्रश्न हमारे सर्वर पर कभी संग्रहीत नहीं होते। स्वास्थ्य समयरेखा केवल आपके डिवाइस पर स्थानीय रूप से सहेजी जाती है।" } },
+  { q: { en: "Which reports does it support?", hi: "कौन सी रिपोर्ट समझा सकता है?" }, a: { en: "CBC, thyroid panel, lipid profile, blood glucose, HbA1c, liver function, kidney function, Vitamin D, iron studies, and most other Indian lab reports.", hi: "CBC, थायरॉइड, लिपिड प्रोफ़ाइल, ब्लड ग्लूकोज़, HbA1c, लिवर फंक्शन, किडनी फंक्शन, विटामिन D और अधिकतर भारतीय लैब रिपोर्ट।" } },
+  { q: { en: "Is the Fitness Hub medically accurate?", hi: "क्या फिटनेस केंद्र चिकित्सकीय रूप से सटीक है?" }, a: { en: "The Fitness Hub provides general nutrition and wellness guidance for healthy adults. It is not medical advice. Always consult a doctor for medical conditions.", hi: "फिटनेस केंद्र स्वस्थ वयस्कों के लिए सामान्य पोषण और स्वास्थ्य मार्गदर्शन देता है। यह चिकित्सा सलाह नहीं है।" } },
+  { q: { en: "Is this service free?", hi: "क्या यह सेवा मुफ्त है?" }, a: { en: "Yes, completely free. We believe health clarity should never sit behind a paywall.", hi: "हाँ, पूरी तरह मुफ्त। हमारा मानना है कि स्वास्थ्य की स्पष्टता कभी पैसों के पीछे नहीं होनी चाहिए।" } },
 ];
 
 /* ════════════════════════════════════════════════════════════════════ */
@@ -340,12 +340,12 @@ export default function Home() {
       <section className="py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
-            <p className="mono-label text-primary/80 mb-3">{t("Core Features", "मुख्य फीचर्स")}</p>
+            <p className="mono-label text-primary/80 mb-3">{t("Core Features", "मुख्य सुविधाएं")}</p>
             <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">
               {t("Everything you actually need", "जो वाकई ज़रूरी है")}
             </h2>
             <p className="mt-4 text-muted-foreground text-lg max-w-xl mx-auto">
-              {t("AI tools built for real Indian health needs. No clutter, no generic chatbot.", "असली Indian स्वास्थ्य ज़रूरतों के लिए AI tools।")}
+              {t("AI tools built for real Indian health needs. No clutter, no generic chatbot.", "असली भारतीय स्वास्थ्य ज़रूरतों के लिए बनाए AI उपकरण।")}
             </p>
           </motion.div>
 
@@ -400,9 +400,9 @@ export default function Home() {
       <section className="py-16 px-4">
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
-            <p className="mono-label text-primary/80 mb-3">{t("15+ Free Tools", "15+ मुफ्त टूल्स")}</p>
+            <p className="mono-label text-primary/80 mb-3">{t("15+ Free Tools", "15+ मुफ्त उपकरण")}</p>
             <h2 className="text-3xl sm:text-4xl font-serif font-800 text-foreground">
-              {t("Explore all health tools", "सभी health tools देखें")}
+              {t("Explore all health tools", "सभी स्वास्थ्य उपकरण देखें")}
             </h2>
           </motion.div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
@@ -494,7 +494,7 @@ export default function Home() {
                     className="rounded-full border-rose-500/40 text-rose-400 hover:bg-rose-500/10 gap-2 h-9 px-5"
                     onClick={() => setMythRevealed(true)}>
                     <FlaskConical className="w-3.5 h-3.5" />
-                    {t("Reveal the Science", "Science जानें")}
+                    {t("Reveal the Science", "विज्ञान जानें")}
                   </Button>
                 ) : (
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
@@ -511,7 +511,7 @@ export default function Home() {
                     <div className="flex items-center gap-3 flex-wrap">
                       <Link href="/myth-buster">
                         <Button size="sm" variant="outline" className="rounded-full gap-2 text-xs h-8">
-                          {t("See all myths", "सभी myths देखें")} <ArrowRight className="w-3 h-3" />
+                          {t("See all myths", "सभी मिथक देखें")} <ArrowRight className="w-3 h-3" />
                         </Button>
                       </Link>
                       <WhatsAppShare
@@ -578,10 +578,10 @@ export default function Home() {
               </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                  { icon: TrendingUp,   label: { en: "Track reports over time", hi: "Reports को track करें" }, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
-                  { icon: Globe2,       label: { en: "Full Hindi support",       hi: "पूरी Hindi support"   }, color: "text-sky-400",     bg: "bg-sky-500/10",     border: "border-sky-500/20"     },
-                  { icon: ShieldCheck,  label: { en: "Privacy first",            hi: "Privacy पहले"        }, color: "text-primary",     bg: "bg-primary/10",     border: "border-primary/20"     },
-                  { icon: CheckCircle2, label: { en: "Evidence-based AI",        hi: "Evidence-based AI"   }, color: "text-violet-400",  bg: "bg-violet-500/10",  border: "border-violet-500/20"  },
+                  { icon: TrendingUp,   label: { en: "Track reports over time", hi: "रिपोर्ट्स को ट्रैक करें" }, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
+                  { icon: Globe2,       label: { en: "Full Hindi support",       hi: "पूर्ण हिंदी समर्थन" }, color: "text-sky-400",     bg: "bg-sky-500/10",     border: "border-sky-500/20"     },
+                  { icon: ShieldCheck,  label: { en: "Privacy first",            hi: "गोपनीयता पहले"      }, color: "text-primary",     bg: "bg-primary/10",     border: "border-primary/20"     },
+                  { icon: CheckCircle2, label: { en: "Evidence-based AI",        hi: "प्रमाण-आधारित AI"   }, color: "text-violet-400",  bg: "bg-violet-500/10",  border: "border-violet-500/20"  },
                 ].map((item, i) => (
                   <div key={i} className={`rounded-2xl ${item.bg} border ${item.border} p-5 flex flex-col items-center gap-3`}>
                     <item.icon className={`w-7 h-7 ${item.color}`} />

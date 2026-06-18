@@ -51,6 +51,8 @@ const AdminPanel = lazy(() => import("@/pages/admin"));
 const Feedback = lazy(() => import("@/pages/feedback"));
 const Dashboard = lazy(() => import("@/pages/dashboard"));
 const Profile = lazy(() => import("@/pages/profile"));
+const Privacy = lazy(() => import("@/pages/privacy"));
+const Terms = lazy(() => import("@/pages/terms"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 const queryClient = new QueryClient({
@@ -90,6 +92,8 @@ function Routes() {
         <Route path="/profile" component={() => <ProtectedRoute component={Profile} />} />
         <Route path="/admin-curecheck-secure" component={AdminPanel} />
         <Route path="/feedback" component={Feedback} />
+        <Route path="/privacy" component={Privacy} />
+        <Route path="/terms" component={Terms} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

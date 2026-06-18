@@ -19,26 +19,6 @@ export default function Analytics() {
       (window as any).gtag = gtag;
     }
 
-    if (tawkId) {
-      (window as any).Tawk_API = (window as any).Tawk_API ?? {};
-      (window as any).Tawk_API.customStyle = {
-        visibility: {
-          desktop: { position: "bl", xOffset: 20, yOffset: 80 },
-          mobile:  { position: "bl", xOffset: 10, yOffset: 90 },
-        },
-      };
-      (window as any).Tawk_API.onLoad = function () {
-        setTimeout(() => { (window as any).Tawk_API?.minimize?.(); }, 2000);
-      };
-      (window as any).Tawk_LoadStart = new Date();
-      const s = document.createElement("script");
-      s.async = true;
-      s.src = `https://embed.tawk.to/${tawkId}`;
-      s.charset = "UTF-8";
-      s.setAttribute("crossorigin", "*");
-      document.head.appendChild(s);
-    }
-
     if (osId) {
       const s = document.createElement("script");
       s.async = true;

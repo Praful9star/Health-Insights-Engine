@@ -199,15 +199,17 @@ export default function Footer() {
             </p>
             <span className="hidden sm:inline text-muted-foreground/30">·</span>
             <p className="text-xs text-muted-foreground">
-              Built by{" "}
+              {t("Built by", "निर्मित:")}{" "}
               <Link href="/about" className="text-primary hover:underline font-600">Praful Srivastava</Link>
               {" "}·{" "}
-              <a href="mailto:prafulsrivastava2@gmail.com" className="hover:text-primary transition-colors">Contact</a>
+              <a href="mailto:prafulsrivastava2@gmail.com" className="hover:text-primary transition-colors">{t("Contact", "संपर्क")}</a>
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/feedback" className="text-xs text-muted-foreground hover:text-primary transition-colors">Feedback</Link>
-            <Link href="/about" className="text-xs text-muted-foreground hover:text-primary transition-colors">About</Link>
+          <div className="flex items-center gap-4 flex-wrap justify-center">
+            <Link href="/privacy" className="text-xs text-muted-foreground hover:text-primary transition-colors">{t("Privacy Policy", "गोपनीयता नीति")}</Link>
+            <Link href="/terms" className="text-xs text-muted-foreground hover:text-primary transition-colors">{t("Terms", "शर्तें")}</Link>
+            <Link href="/feedback" className="text-xs text-muted-foreground hover:text-primary transition-colors">{t("Feedback", "प्रतिक्रिया")}</Link>
+            <Link href="/about" className="text-xs text-muted-foreground hover:text-primary transition-colors">{t("About", "परिचय")}</Link>
             <p className="text-xs text-muted-foreground flex items-center gap-1.5">
               {t("Made with", "बनाया गया")}{" "}
               <Heart className="w-3.5 h-3.5 text-destructive fill-current" />{" "}
