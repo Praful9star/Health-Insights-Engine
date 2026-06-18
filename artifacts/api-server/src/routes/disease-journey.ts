@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { GetDiseaseJourneyBody, GetDiseaseJourneyResponse } from "@workspace/api-zod";
 import { groqChat, isAiAvailable } from "../lib/groq";
+import { aiLimiter } from "../middleware/rate-limit";
 
 const router: IRouter = Router();
 
@@ -418,7 +419,7 @@ function getMockDiseaseJourney(disease: string, ageGroup: string) {
   };
 }
 
-router.post("/disease-journey", async (req, res): Promise<void> => {
+router.post("/disease-journey", aiLimiter, async (req, res): Promise<void> => {
   const parsed = GetDiseaseJourneyBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });

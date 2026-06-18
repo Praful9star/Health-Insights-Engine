@@ -11,6 +11,7 @@ export interface ClaimInput {
   /**
      * The health claim text to verify
      * @minLength 10
+     * @maxLength 2000
      */
   claim: string;
   /** Response language */

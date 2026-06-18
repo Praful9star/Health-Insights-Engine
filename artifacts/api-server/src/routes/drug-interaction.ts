@@ -1,5 +1,7 @@
 import { Router, type IRouter } from "express";
+import { CheckDrugInteractionBody } from "@workspace/api-zod";
 import { groqChat } from "../lib/groq";
+import { aiLimiter } from "../middleware/rate-limit";
 
 const router: IRouter = Router();
 
@@ -24,17 +26,18 @@ const MOCK: Record<string, unknown> = {
   disclaimer: "This analysis is for educational purposes only and does not replace professional medical advice. Always consult your doctor or pharmacist before combining medicines.",
 };
 
-router.post("/drug-interaction", async (req, res) => {
-  const { medicines } = req.body ?? {};
-
-  if (!Array.isArray(medicines) || medicines.length < 2) {
-    return res.status(400).json({ message: "Provide at least 2 medicine names." });
+router.post("/drug-interaction", aiLimiter, async (req, res): Promise<void> => {
+  const parsed = CheckDrugInteractionBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
   }
 
-  const medList = medicines.filter((m: unknown) => typeof m === "string" && m.trim().length > 1).slice(0, 5);
-  if (medList.length < 2) {
-    return res.status(400).json({ message: "Provide at least 2 valid medicine names." });
-  }
+  const { medicines } = parsed.data;
+
+  const medList = medicines
+    .filter((m) => typeof m === "string" && m.trim().length > 1)
+    .slice(0, 5);
 
   const systemPrompt = `You are CureCheck's Drug Interaction Checker — an educational AI assistant for Indian patients.
 You NEVER prescribe or advise dosage changes. You provide EDUCATIONAL information only.
@@ -63,18 +66,19 @@ Respond ONLY with a JSON object:
   try {
     const content = await groqChat(systemPrompt, userMessage);
 
-    let parsed: Record<string, unknown>;
+    let result: Record<string, unknown>;
     try {
-      parsed = JSON.parse(content);
+      result = JSON.parse(content);
     } catch {
       req.log.warn("Drug interaction JSON parse failed — returning mock");
-      return res.json(MOCK);
+      res.json(MOCK);
+      return;
     }
 
-    return res.json(parsed);
+    res.json(result);
   } catch (err) {
     req.log.warn({ err }, "Groq drug-interaction error — returning mock");
-    return res.json(MOCK);
+    res.json(MOCK);
   }
 });
 

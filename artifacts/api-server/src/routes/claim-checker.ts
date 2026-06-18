@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { CheckHealthClaimBody, CheckHealthClaimResponse } from "@workspace/api-zod";
 import { groqChat, isAiAvailable } from "../lib/groq";
 import { logger } from "../lib/logger";
+import { aiLimiter } from "../middleware/rate-limit";
 
 const router: IRouter = Router();
 
@@ -149,7 +150,7 @@ function getMockClaimResult(claim: string) {
   };
 }
 
-router.post("/claim-checker", async (req, res): Promise<void> => {
+router.post("/claim-checker", aiLimiter, async (req, res): Promise<void> => {
   const parsed = CheckHealthClaimBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });

@@ -8,7 +8,10 @@
 import type { ReportInputLanguage } from './reportInputLanguage';
 
 export interface ReportInput {
-  /** @minLength 20 */
+  /**
+     * @minLength 20
+     * @maxLength 10000
+     */
   reportText: string;
   language?: ReportInputLanguage;
 }

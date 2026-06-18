@@ -8,10 +8,16 @@
 import type { DoctorPrepInputVisitType } from './doctorPrepInputVisitType';
 
 export interface DoctorPrepInput {
-  /** @minLength 5 */
+  /**
+     * @minLength 5
+     * @maxLength 2000
+     */
   concern: string;
+  /** @maxItems 20 */
   symptoms?: string[];
+  /** @maxLength 2000 */
   medicalHistory?: string;
+  /** @maxLength 1000 */
   currentMedications?: string;
   visitType?: DoctorPrepInputVisitType;
 }

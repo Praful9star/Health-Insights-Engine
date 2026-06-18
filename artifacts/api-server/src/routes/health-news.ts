@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { newsLimiter } from "../middleware/rate-limit";
 
 interface NewsArticle {
   title: string;
@@ -13,6 +14,7 @@ interface NewsArticle {
 interface CacheEntry { articles: NewsArticle[]; ts: number }
 const cache = new Map<string, CacheEntry>();
 const CACHE_TTL = 15 * 60 * 1000;
+const MAX_CACHE_ENTRIES = 50;
 
 const FALLBACK: NewsArticle[] = [
   { title: "WHO: India's TB elimination program sets global benchmark", description: "India's TB elimination initiative praised by WHO as a model for developing nations.", url: "#", urlToImage: null, publishedAt: new Date().toISOString(), source: { name: "Health Ministry" } },
@@ -46,8 +48,9 @@ function isHealthRelated(title: string, description = ""): boolean {
 
 const router = Router();
 
-router.get("/health-news", async (req, res) => {
-  const customQ = typeof req.query.q === "string" && req.query.q.trim() ? req.query.q.trim() : "";
+router.get("/health-news", newsLimiter, async (req, res) => {
+  const rawQ = typeof req.query.q === "string" ? req.query.q.trim() : "";
+  const customQ = rawQ.slice(0, 100);
   const isDefaultTicker = !customQ;
   const cacheKey = (customQ || "ticker-default").toLowerCase().slice(0, 80);
 
@@ -114,6 +117,11 @@ router.get("/health-news", async (req, res) => {
       }));
 
     const result = articles.length > 0 ? articles : FALLBACK;
+
+    if (cache.size >= MAX_CACHE_ENTRIES) {
+      const oldestKey = cache.keys().next().value;
+      if (oldestKey !== undefined) cache.delete(oldestKey);
+    }
     cache.set(cacheKey, { articles: result, ts: Date.now() });
     return res.json({ articles: result, source: "api" });
   } catch (err) {

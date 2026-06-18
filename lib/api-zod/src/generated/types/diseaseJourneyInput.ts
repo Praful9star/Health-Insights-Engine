@@ -9,7 +9,10 @@ import type { DiseaseJourneyInputAgeGroup } from './diseaseJourneyInputAgeGroup'
 import type { DiseaseJourneyInputLanguage } from './diseaseJourneyInputLanguage';
 
 export interface DiseaseJourneyInput {
-  /** @minLength 2 */
+  /**
+     * @minLength 2
+     * @maxLength 200
+     */
   disease: string;
   ageGroup: DiseaseJourneyInputAgeGroup;
   language?: DiseaseJourneyInputLanguage;

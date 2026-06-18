@@ -22,11 +22,12 @@ export const HealthCheckResponse = zod.object({
  * @summary Verify a health claim
  */
 export const checkHealthClaimBodyClaimMin = 10;
+export const checkHealthClaimBodyClaimMax = 2000;
 
 
 
 export const CheckHealthClaimBody = zod.object({
-  "claim": zod.string().min(checkHealthClaimBodyClaimMin).describe('The health claim text to verify'),
+  "claim": zod.string().min(checkHealthClaimBodyClaimMin).max(checkHealthClaimBodyClaimMax).describe('The health claim text to verify'),
   "language": zod.enum(['en', 'hi']).optional().describe('Response language')
 })
 
@@ -53,11 +54,12 @@ export const CheckHealthClaimResponse = zod.object({
  * @summary Get disease journey map
  */
 export const getDiseaseJourneyBodyDiseaseMin = 2;
+export const getDiseaseJourneyBodyDiseaseMax = 200;
 
 
 
 export const GetDiseaseJourneyBody = zod.object({
-  "disease": zod.string().min(getDiseaseJourneyBodyDiseaseMin),
+  "disease": zod.string().min(getDiseaseJourneyBodyDiseaseMin).max(getDiseaseJourneyBodyDiseaseMax),
   "ageGroup": zod.enum(['child', 'teen', 'adult', 'senior']),
   "language": zod.enum(['en', 'hi']).optional()
 })
@@ -85,11 +87,12 @@ export const GetDiseaseJourneyResponse = zod.object({
  * @summary Explain a medical report
  */
 export const explainMedicalReportBodyReportTextMin = 20;
+export const explainMedicalReportBodyReportTextMax = 10000;
 
 
 
 export const ExplainMedicalReportBody = zod.object({
-  "reportText": zod.string().min(explainMedicalReportBodyReportTextMin),
+  "reportText": zod.string().min(explainMedicalReportBodyReportTextMin).max(explainMedicalReportBodyReportTextMax),
   "language": zod.enum(['en', 'hi']).optional()
 })
 
@@ -131,9 +134,15 @@ export const ExplainMedicalReportResponse = zod.object({
  * Use AI vision to read and extract text from an uploaded medical report image
  * @summary Extract text from a medical report image
  */
+export const ocrReportBodyImageDataMax = 5500000;
+
+export const ocrReportBodyMimeTypeMax = 50;
+
+
+
 export const OcrReportBody = zod.object({
-  "imageData": zod.string().describe('Base64-encoded image data (no data URI prefix)'),
-  "mimeType": zod.string().describe('MIME type of the image (image\/jpeg, image\/png, etc.)')
+  "imageData": zod.string().max(ocrReportBodyImageDataMax).describe('Base64-encoded image data (no data URI prefix)'),
+  "mimeType": zod.string().max(ocrReportBodyMimeTypeMax).describe('MIME type of the image (image\/jpeg, image\/png, etc.)')
 })
 
 export const OcrReportResponse = zod.object({
@@ -147,14 +156,19 @@ export const OcrReportResponse = zod.object({
  * @summary Analyze symptoms
  */
 export const checkSymptomsBodySymptomsMin = 5;
+export const checkSymptomsBodySymptomsMax = 2000;
+
+export const checkSymptomsBodyAgeMax = 20;
+
+export const checkSymptomsBodyDurationMax = 200;
 
 
 
 export const CheckSymptomsBody = zod.object({
-  "symptoms": zod.string().min(checkSymptomsBodySymptomsMin),
-  "age": zod.string().optional(),
+  "symptoms": zod.string().min(checkSymptomsBodySymptomsMin).max(checkSymptomsBodySymptomsMax),
+  "age": zod.string().max(checkSymptomsBodyAgeMax).optional(),
   "gender": zod.enum(['male', 'female', 'other']).optional(),
-  "duration": zod.string().optional(),
+  "duration": zod.string().max(checkSymptomsBodyDurationMax).optional(),
   "language": zod.enum(['en', 'hi']).optional()
 })
 
@@ -179,11 +193,12 @@ export const CheckSymptomsResponse = zod.object({
  * @summary Explain a medicine
  */
 export const explainMedicineBodyMedicineMin = 2;
+export const explainMedicineBodyMedicineMax = 200;
 
 
 
 export const ExplainMedicineBody = zod.object({
-  "medicine": zod.string().min(explainMedicineBodyMedicineMin),
+  "medicine": zod.string().min(explainMedicineBodyMedicineMin).max(explainMedicineBodyMedicineMax),
   "language": zod.enum(['en', 'hi']).optional()
 })
 
@@ -213,14 +228,23 @@ export const ExplainMedicineResponse = zod.object({
  * @summary Generate doctor visit preparation checklist
  */
 export const doctorPrepBodyConcernMin = 5;
+export const doctorPrepBodyConcernMax = 2000;
+
+export const doctorPrepBodySymptomsItemMax = 200;
+
+export const doctorPrepBodySymptomsMax = 20;
+
+export const doctorPrepBodyMedicalHistoryMax = 2000;
+
+export const doctorPrepBodyCurrentMedicationsMax = 1000;
 
 
 
 export const DoctorPrepBody = zod.object({
-  "concern": zod.string().min(doctorPrepBodyConcernMin),
-  "symptoms": zod.array(zod.string()).optional(),
-  "medicalHistory": zod.string().optional(),
-  "currentMedications": zod.string().optional(),
+  "concern": zod.string().min(doctorPrepBodyConcernMin).max(doctorPrepBodyConcernMax),
+  "symptoms": zod.array(zod.string().max(doctorPrepBodySymptomsItemMax)).max(doctorPrepBodySymptomsMax).optional(),
+  "medicalHistory": zod.string().max(doctorPrepBodyMedicalHistoryMax).optional(),
+  "currentMedications": zod.string().max(doctorPrepBodyCurrentMedicationsMax).optional(),
   "visitType": zod.enum(['general', 'specialist', 'followup', 'emergency']).optional()
 })
 
@@ -236,13 +260,15 @@ export const DoctorPrepResponse = zod.object({
 /**
  * @summary Check drug-drug interactions
  */
+export const checkDrugInteractionBodyMedicinesItemMax = 200;
+
 export const checkDrugInteractionBodyMedicinesMin = 2;
 export const checkDrugInteractionBodyMedicinesMax = 5;
 
 
 
 export const CheckDrugInteractionBody = zod.object({
-  "medicines": zod.array(zod.string()).min(checkDrugInteractionBodyMedicinesMin).max(checkDrugInteractionBodyMedicinesMax)
+  "medicines": zod.array(zod.string().max(checkDrugInteractionBodyMedicinesItemMax)).min(checkDrugInteractionBodyMedicinesMin).max(checkDrugInteractionBodyMedicinesMax)
 })
 
 export const CheckDrugInteractionResponse = zod.object({

@@ -1,5 +1,7 @@
 import { Router, type IRouter } from "express";
+import { DoctorPrepBody } from "@workspace/api-zod";
 import { groqChat } from "../lib/groq";
+import { aiLimiter } from "../middleware/rate-limit";
 
 const router: IRouter = Router();
 
@@ -37,16 +39,17 @@ const MOCK = {
   ],
 };
 
-router.post("/doctor-prep", async (req, res): Promise<void> => {
-  const { concern, symptoms, medicalHistory, currentMedications, visitType } = req.body ?? {};
-
-  if (!concern || typeof concern !== "string" || concern.trim().length < 5) {
-    res.status(400).json({ error: "Please describe your main concern (at least 5 characters)." });
+router.post("/doctor-prep", aiLimiter, async (req, res): Promise<void> => {
+  const parsed = DoctorPrepBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
     return;
   }
 
+  const { concern, symptoms, medicalHistory, currentMedications, visitType } = parsed.data;
+
   const symptomList: string[] = Array.isArray(symptoms)
-    ? symptoms.filter((s: unknown) => typeof s === "string" && s.trim()).slice(0, 10)
+    ? symptoms.filter((s) => typeof s === "string" && s.trim()).slice(0, 10)
     : [];
 
   const systemPrompt = `You are CureCheck's Doctor Visit Prep assistant — helping Indian patients prepare for medical consultations.

@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { OcrReportBody } from "@workspace/api-zod";
 import { claudeVision, isAiAvailable } from "../lib/claude";
+import { ocrLimiter } from "../middleware/rate-limit";
 
 const router: IRouter = Router();
 
@@ -19,7 +20,7 @@ RBC Count: 4.1 million/mcL [Reference: 4.5 - 5.5] LOW
 Impression: Microcytic hypochromic anaemia, likely iron deficiency anaemia.
 Repeat CBC after 3 months of iron supplementation.`;
 
-router.post("/ocr-report", async (req, res): Promise<void> => {
+router.post("/ocr-report", ocrLimiter, async (req, res): Promise<void> => {
   const parsed = OcrReportBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });

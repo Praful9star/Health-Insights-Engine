@@ -9,10 +9,15 @@ import type { SymptomInputGender } from './symptomInputGender';
 import type { SymptomInputLanguage } from './symptomInputLanguage';
 
 export interface SymptomInput {
-  /** @minLength 5 */
+  /**
+     * @minLength 5
+     * @maxLength 2000
+     */
   symptoms: string;
+  /** @maxLength 20 */
   age?: string;
   gender?: SymptomInputGender;
+  /** @maxLength 200 */
   duration?: string;
   language?: SymptomInputLanguage;
 }

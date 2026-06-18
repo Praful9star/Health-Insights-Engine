@@ -28,6 +28,7 @@ export interface ClaimInput {
   /**
      * The health claim text to verify
      * @minLength 10
+     * @maxLength 2000
      */
   claim: string;
   /** Response language */
@@ -90,7 +91,10 @@ export const DiseaseJourneyInputLanguage = {
 } as const;
 
 export interface DiseaseJourneyInput {
-  /** @minLength 2 */
+  /**
+     * @minLength 2
+     * @maxLength 200
+     */
   disease: string;
   ageGroup: DiseaseJourneyInputAgeGroup;
   language?: DiseaseJourneyInputLanguage;
@@ -127,9 +131,15 @@ export interface DiseaseJourneyResult {
 }
 
 export interface OcrInput {
-  /** Base64-encoded image data (no data URI prefix) */
+  /**
+     * Base64-encoded image data (no data URI prefix)
+     * @maxLength 5500000
+     */
   imageData: string;
-  /** MIME type of the image (image/jpeg, image/png, etc.) */
+  /**
+     * MIME type of the image (image/jpeg, image/png, etc.)
+     * @maxLength 50
+     */
   mimeType: string;
 }
 
@@ -156,7 +166,10 @@ export const ReportInputLanguage = {
 } as const;
 
 export interface ReportInput {
-  /** @minLength 20 */
+  /**
+     * @minLength 20
+     * @maxLength 10000
+     */
   reportText: string;
   language?: ReportInputLanguage;
 }
@@ -257,10 +270,15 @@ export const SymptomInputLanguage = {
 } as const;
 
 export interface SymptomInput {
-  /** @minLength 5 */
+  /**
+     * @minLength 5
+     * @maxLength 2000
+     */
   symptoms: string;
+  /** @maxLength 20 */
   age?: string;
   gender?: SymptomInputGender;
+  /** @maxLength 200 */
   duration?: string;
   language?: SymptomInputLanguage;
 }
@@ -313,10 +331,16 @@ export const DoctorPrepInputVisitType = {
 } as const;
 
 export interface DoctorPrepInput {
-  /** @minLength 5 */
+  /**
+     * @minLength 5
+     * @maxLength 2000
+     */
   concern: string;
+  /** @maxItems 20 */
   symptoms?: string[];
+  /** @maxLength 2000 */
   medicalHistory?: string;
+  /** @maxLength 1000 */
   currentMedications?: string;
   visitType?: DoctorPrepInputVisitType;
 }
@@ -383,7 +407,10 @@ export const MedicineInputLanguage = {
 } as const;
 
 export interface MedicineInput {
-  /** @minLength 2 */
+  /**
+     * @minLength 2
+     * @maxLength 200
+     */
   medicine: string;
   language?: MedicineInputLanguage;
 }

@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { CheckSymptomsBody, CheckSymptomsResponse } from "@workspace/api-zod";
 import { groqChat, isAiAvailable } from "../lib/groq";
+import { aiLimiter } from "../middleware/rate-limit";
 
 const router: IRouter = Router();
 
@@ -129,7 +130,7 @@ function getMockSymptomResult(symptoms: string, language: string) {
   };
 }
 
-router.post("/symptom-checker", async (req, res): Promise<void> => {
+router.post("/symptom-checker", aiLimiter, async (req, res): Promise<void> => {
   const parsed = CheckSymptomsBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });

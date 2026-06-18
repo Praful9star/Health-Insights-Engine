@@ -8,7 +8,10 @@
 import type { MedicineInputLanguage } from './medicineInputLanguage';
 
 export interface MedicineInput {
-  /** @minLength 2 */
+  /**
+     * @minLength 2
+     * @maxLength 200
+     */
   medicine: string;
   language?: MedicineInputLanguage;
 }

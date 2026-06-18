@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { ExplainMedicalReportBody, ExplainMedicalReportResponse } from "@workspace/api-zod";
 import { groqChat, isAiAvailable } from "../lib/groq";
+import { aiLimiter } from "../middleware/rate-limit";
 
 const router: IRouter = Router();
 
@@ -308,7 +309,7 @@ function getMockReportResult(reportText: string) {
   };
 }
 
-router.post("/report-explainer", async (req, res): Promise<void> => {
+router.post("/report-explainer", aiLimiter, async (req, res): Promise<void> => {
   const parsed = ExplainMedicalReportBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
