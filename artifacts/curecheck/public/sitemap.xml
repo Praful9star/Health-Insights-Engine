@@ -2,112 +2,146 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://curecheck.in/</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://curecheck.in/claim-checker</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://curecheck.in/symptom-checker</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://curecheck.in/report-explainer</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://curecheck.in/medicine-explainer</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://curecheck.in/disease-journey</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://curecheck.in/drug-interaction</loc>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://curecheck.in/doctor-prep</loc>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://curecheck.in/mental-health</loc>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://curecheck.in/emergency</loc>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://curecheck.in/myth-buster</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://curecheck.in/health-timeline</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://curecheck.in/fitness-hub</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://curecheck.in/mental-health</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://curecheck.in/hospitals</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://curecheck.in/calculators</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://curecheck.in/emergency</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://curecheck.in/fitness-hub</loc>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://curecheck.in/health-timeline</loc>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://curecheck.in/vaccines</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://curecheck.in/pregnancy</loc>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://curecheck.in/ayurveda</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://curecheck.in/insurance</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://curecheck.in/pregnancy</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://curecheck.in/news</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://curecheck.in/drug-interaction</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://curecheck.in/doctor-prep</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://curecheck.in/weather</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://curecheck.in/about</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://curecheck.in/privacy</loc>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://curecheck.in/terms</loc>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
   </url>
 </urlset>

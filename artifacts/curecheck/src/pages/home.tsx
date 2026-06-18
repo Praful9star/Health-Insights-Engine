@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import PageMeta from "@/components/page-meta";
 import {
   FileSearch, Pill, Clock, Dumbbell, ArrowRight, Sparkles,
@@ -202,6 +203,31 @@ export default function Home() {
         description="Free AI-powered health platform for India. Check health claims from WhatsApp forwards, understand symptoms, decode medical reports, and learn about medicines — in Hindi &amp; English."
         path="/"
       />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": FAQS.map(f => ({
+            "@type": "Question",
+            "name": f.q.en,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": f.a.en
+            }
+          }))
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "MedicalWebPage",
+          "name": "CureCheck — Free AI Health Information for Indians",
+          "url": "https://curecheck.in",
+          "description": "Free AI-powered health platform for India covering health claim checking, symptom analysis, medical report explanation, and medicine information.",
+          "audience": { "@type": "Patient" },
+          "medicalAudience": { "@type": "MedicalAudience", "audienceType": "Patient" },
+          "about": { "@type": "MedicalCondition", "name": "General Health Information" },
+          "inLanguage": ["en-IN", "hi-IN"]
+        })}</script>
+      </Helmet>
 
       {/* ══ NEWS TICKER ══════════════════════════════════════════════ */}
       <NewsTicker />

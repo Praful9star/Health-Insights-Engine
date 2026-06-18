@@ -6,6 +6,9 @@
     <title>CureCheck — AI Health Information for Indians</title>
     <meta name="description" content="Free AI-powered health platform for India. Check health claims from WhatsApp forwards, understand your symptoms, decode medical reports, and learn about your medicines — in Hindi & English." />
     <meta name="robots" content="index, follow" />
+    <meta name="keywords" content="health claim checker India, WhatsApp health fact check, symptom checker Hindi, medical report explainer, medicine side effects India, AI health app India, free health information, CureCheck" />
+    <meta name="author" content="CureCheck" />
+    <meta property="og:locale" content="en_IN" />
     <meta property="og:title" content="CureCheck — AI Health Information for Indians" />
     <meta property="og:description" content="Free AI-powered health platform for India. Check health claims from WhatsApp forwards, understand your symptoms, decode medical reports, and learn about your medicines — in Hindi & English." />
     <meta property="og:type" content="website" />
@@ -35,6 +38,45 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body class="dark">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://curecheck.in/#website",
+          "url": "https://curecheck.in",
+          "name": "CureCheck",
+          "description": "Free AI-powered health information platform for India — check health claims, understand symptoms, decode medical reports, and learn about medicines in Hindi & English.",
+          "inLanguage": ["en-IN", "hi-IN"],
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://curecheck.in/claim-checker?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://curecheck.in/#organization",
+          "name": "CureCheck",
+          "url": "https://curecheck.in",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://curecheck.in/icon-512.png",
+            "width": 512,
+            "height": 512
+          },
+          "sameAs": [],
+          "description": "CureCheck is India's free AI health information platform helping users verify health claims, understand medical reports, check symptoms, and learn about medicines in Hindi and English.",
+          "areaServed": "IN",
+          "knowsLanguage": ["en-IN", "hi-IN"]
+        }
+      ]
+    }
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <!-- Tally.so embed loader (loads all data-tally-src iframes) -->
