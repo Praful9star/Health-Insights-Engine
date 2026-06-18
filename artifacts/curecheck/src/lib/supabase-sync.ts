@@ -6,6 +6,39 @@ const CHALLENGES_KEY  = "cc_challenges_v2";
 const REMINDERS_KEY   = "curecheck-reminders";
 const ARTICLES_KEY    = "cc_saved_articles";
 
+const LAST_SYNCED_UID_KEY = "cc_last_synced_uid";
+
+const ALL_HEALTH_KEYS = [
+  FITNESS_KEY, TIMELINE_KEY, CHALLENGES_KEY, REMINDERS_KEY, ARTICLES_KEY,
+];
+
+export function clearLocalHealthData(): void {
+  for (const key of ALL_HEALTH_KEYS) {
+    try { localStorage.removeItem(key); } catch {}
+  }
+  try { localStorage.removeItem(LAST_SYNCED_UID_KEY); } catch {}
+}
+
+export function guardAndClearIfUserChanged(userId: string): void {
+  try {
+    const lastUid = localStorage.getItem(LAST_SYNCED_UID_KEY);
+
+    if (lastUid === userId) {
+      return;
+    }
+
+    const hasResidualData = ALL_HEALTH_KEYS.some(
+      (key) => localStorage.getItem(key) !== null,
+    );
+
+    if (lastUid !== null || hasResidualData) {
+      clearLocalHealthData();
+    }
+
+    localStorage.setItem(LAST_SYNCED_UID_KEY, userId);
+  } catch {}
+}
+
 function readJSON<T>(key: string, fallback: T): T {
   try { return JSON.parse(localStorage.getItem(key) ?? "") as T; } catch { return fallback; }
 }

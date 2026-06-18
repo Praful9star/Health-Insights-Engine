@@ -1,7 +1,12 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 import type { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
-import { pullSupabaseToLocal, pushLocalToSupabase } from "@/lib/supabase-sync";
+import {
+  pullSupabaseToLocal,
+  pushLocalToSupabase,
+  clearLocalHealthData,
+  guardAndClearIfUserChanged,
+} from "@/lib/supabase-sync";
 
 export interface UserProfile {
   name: string;
@@ -59,6 +64,11 @@ async function putProfileToAPI(accessToken: string, data: Partial<UserProfile>):
   }
 }
 
+function syncForUser(userId: string): void {
+  guardAndClearIfUserChanged(userId);
+  pullSupabaseToLocal(userId).then(() => pushLocalToSupabase(userId));
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -76,6 +86,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!supabase) { setLoading(false); return; }
 
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
+      const u = s?.user ?? null;
+      setSession(s ?? null);
+      setUser(u);
+      if (s && u) {
+        loadProfile(s.access_token);
+        syncForUser(u.id);
+      } else {
+        setProfile(null);
+      }
+    });
+
     supabase.auth.getSession().then(({ data }) => {
       const s = data.session;
       const u = s?.user ?? null;
@@ -83,21 +105,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(u);
       if (s && u) {
         loadProfile(s.access_token);
-        pullSupabaseToLocal(u.id).then(() => pushLocalToSupabase(u.id));
+        syncForUser(u.id);
       }
       setLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
-      const u = s?.user ?? null;
-      setSession(s ?? null);
-      setUser(u);
-      if (s && u) {
-        loadProfile(s.access_token);
-        pullSupabaseToLocal(u.id).then(() => pushLocalToSupabase(u.id));
-      } else {
-        setProfile(null);
-      }
     });
 
     return () => subscription.unsubscribe();
@@ -124,6 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     if (supabase) await supabase.auth.signOut();
+    clearLocalHealthData();
   };
 
   const updateProfile = async (data: Partial<UserProfile>) => {
