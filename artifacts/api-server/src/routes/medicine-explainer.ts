@@ -152,7 +152,7 @@ router.post("/medicine-explainer", aiLimiter, async (req, res): Promise<void> =>
   try {
     let result;
     if (hasAi) {
-      req.log.info({ medicine, language }, "Explaining medicine with Groq");
+      req.log.info({ language }, "Explaining medicine with Groq");
       const raw = await groqChat(buildSystemPrompt(language), `Explain this medicine: "${medicine}"`);
       result = JSON.parse(raw);
     } else {
