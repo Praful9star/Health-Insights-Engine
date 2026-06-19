@@ -2,27 +2,18 @@
 
 ## In scope
 - Public CureCheck web routes served by `artifacts/curecheck`
-- Landing page (`/`)
-- Public tool and informational routes:
-  - `/report-explainer`
-  - `/medicine-explainer`
-  - `/health-timeline`
-  - `/fitness-hub`
-  - `/myth-buster`
-  - `/symptom-checker`
-  - `/disease-journey`
-  - `/claim-checker`
-  - `/about`
+- Public landing, informational, and tool pages intended for search, social sharing, and AI citation
+- Route clusters currently exposed in the router, including the myth library and its detail URLs
 
 ## Out of scope
 - API endpoints under `/api/**`
+- Authenticated or account-oriented surfaces not intended for search discovery
 - Dev-only mockup artifact (`artifacts/mockup-sandbox/**`)
 - Separate ad artifact (`artifacts/curecheck-ad/**`)
-- Generated 404 route behavior except where it affects crawlability of public routes
 
 ## Target audience
 - Indian consumers seeking plain-language health information and educational explainers
-- Users who need English and Hindi-friendly health guidance
+- Users who need English- and Hindi-friendly guidance around symptoms, medicines, reports, and health misinformation
 
 ## Primary keywords
 - Inferred, subject to refinement:
@@ -37,5 +28,8 @@
 - None yet
 
 ## Notes from latest scan
-- Public routes are currently served as a Vite SPA with client-side `wouter` routing rather than SSR or prerendered HTML.
-- The highest-impact SEO work is to give each public route a real first-response HTML document with route-specific metadata.
+- CureCheck is no longer a pure SPA for public pages. It now uses a hybrid static-prerender pipeline driven by `prerender.mjs` plus explicit static rewrites in `.replit-artifact/artifact.toml`.
+- Most primary public routes now ship prerendered HTML with route-specific titles, descriptions, canonicals, and social tags.
+- The largest remaining SEO gap is route drift: any public URL omitted from the prerender map and rewrite map loses first-response HTML fidelity, even if the client app can recover after hydration.
+- `/myth-buster/:slug` is the highest-impact remaining route cluster because it is exposed publicly but still falls back to the home shell for first-response HTML.
+- `robots.txt` and `llms.txt` are currently healthy and do not appear to block mainstream search or AI crawlers.
