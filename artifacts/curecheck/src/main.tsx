@@ -21,3 +21,6 @@ if (sentryDsn) {
 }
 
 createRoot(document.getElementById("root")!).render(<App />);
+requestAnimationFrame(() => {
+  document.documentElement.classList.add("js-ready");
+});

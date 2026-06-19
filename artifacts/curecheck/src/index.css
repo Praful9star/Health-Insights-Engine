@@ -731,3 +731,30 @@
     50% { opacity: 0; }
   }
 }
+
+/* ── Hydration gate — prevent prerendered opacity:0 from hiding ATF content ── */
+/* Before JS loads (no .js-ready class), force above-the-fold elements visible  */
+html:not(.js-ready) [style*="opacity:0"],
+html:not(.js-ready) [style*="opacity: 0"] {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* ── Respect prefers-reduced-motion globally ─────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Force framer-motion hidden states to be visible */
+  [style*="opacity:0"],
+  [style*="opacity: 0"] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
