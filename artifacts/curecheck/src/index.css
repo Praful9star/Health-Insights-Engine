@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./styles/tokens.css";
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
@@ -292,6 +293,91 @@
   }
   .glass-panel:hover {
     box-shadow: 0 0 20px rgba(0,229,255,0.08);
+  }
+
+  /* ── Tool page utilities ──────────────────────────────────────────── */
+  .tool-page {
+    max-width: var(--tool-max-w);
+    margin-inline: auto;
+    padding: var(--tool-py) var(--tool-px);
+  }
+  .tool-card {
+    background: var(--elev-1);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-panel);
+    padding: var(--sp-4);
+  }
+  .tool-panel {
+    background: var(--elev-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-panel);
+    padding: var(--sp-3);
+  }
+  .tool-info-banner {
+    display: flex;
+    gap: var(--sp-2);
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--radius-card);
+    background: hsl(var(--primary) / 0.06);
+    border: 1px solid hsl(var(--primary) / 0.2);
+  }
+  .tool-section {
+    margin-top: var(--tool-gap);
+  }
+  .tool-section-label {
+    text-transform: uppercase;
+    font-weight: 700;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+  }
+  .tool-chip {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-badge);
+    background: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
+    border: 1px solid var(--border-default);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    cursor: pointer;
+  }
+  .tool-chip:hover {
+    background: hsl(var(--primary) / 0.12);
+    color: hsl(var(--primary));
+    border-color: hsl(var(--primary) / 0.3);
+  }
+  .tool-badge {
+    display: inline-flex;
+    align-items: center;
+    text-transform: uppercase;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-badge);
+    border: 1px solid currentColor;
+  }
+  .tool-header {
+    display: flex;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-2);
+  }
+  .tool-header-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: hsl(var(--primary) / 0.12);
+    color: hsl(var(--primary));
+  }
+  .tool-header-icon[data-accent] {
+    background: color-mix(in srgb, var(--tool-accent) 15%, transparent);
+    color: var(--tool-accent);
   }
 
   /* Gradient text */

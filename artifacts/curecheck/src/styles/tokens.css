@@ -1,0 +1,54 @@
+/* ─── CureCheck Design Tokens ───────────────────────────────────────── */
+
+/* Spacing — 8px grid */
+:root {
+  --sp-1:  0.5rem;    /* 8px  */
+  --sp-2:  0.75rem;   /* 12px */
+  --sp-3:  1rem;      /* 16px */
+  --sp-4:  1.25rem;   /* 20px */
+  --sp-5:  1.5rem;    /* 24px */
+  --sp-6:  2rem;      /* 32px */
+  --sp-7:  2.5rem;    /* 40px */
+  --sp-8:  3rem;      /* 48px */
+  --sp-9:  3.5rem;    /* 56px */
+  --sp-10: 4rem;      /* 64px */
+  --sp-11: 5rem;      /* 80px */
+  --sp-12: 6rem;      /* 96px */
+
+  /* Radius scale */
+  --radius-badge:   999px;
+  --radius-chip:    6px;
+  --radius-card:    12px;
+  --radius-panel:   16px;
+  --radius-feature: 24px;
+
+  /* Elevation — dark surfaces */
+  --elev-0: hsl(222 47%  8%);
+  --elev-1: hsl(222 47% 11%);
+  --elev-2: hsl(222 47% 14%);
+  --elev-3: hsl(222 40% 18%);
+
+  /* Border tokens */
+  --border-subtle:   rgba(255, 255, 255, 0.05);
+  --border-default:  rgba(255, 255, 255, 0.09);
+  --border-emphasis: rgba(255, 255, 255, 0.18);
+  --border-accent:   hsl(var(--primary) / 0.35);
+
+  /* Tool layout constraints */
+  --tool-max-w:     48rem;
+  --tool-px:        1rem;
+  --tool-py:        3rem;
+  --tool-gap:       1.5rem;
+  --tool-inner-gap: 1rem;
+
+  /* Accent tints per tool category */
+  --accent-report:    hsl(186 100% 60%);  /* cyan    */
+  --accent-medicine:  hsl(262  70% 65%);  /* violet  */
+  --accent-symptom:   hsl(200 100% 60%);  /* sky     */
+  --accent-fitness:   hsl( 38  92% 58%);  /* amber   */
+  --accent-mental:    hsl(270  60% 65%);  /* purple  */
+  --accent-emergency: hsl(  0  80% 60%);  /* red     */
+  --accent-ayurveda:  hsl(142  60% 52%);  /* green   */
+  --accent-pregnancy: hsl(330  70% 65%);  /* pink    */
+  --accent-reference: hsl(231  65% 64%);  /* indigo  */
+}
