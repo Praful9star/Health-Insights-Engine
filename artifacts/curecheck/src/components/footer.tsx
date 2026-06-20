@@ -49,7 +49,7 @@ export default function Footer() {
   const whatsappHref = `https://wa.me/?text=${shareText}%20https%3A%2F%2Fcurecheck.in`;
 
   return (
-    <footer className="relative z-10 mt-24 border-t border-border/60 pb-28 md:pb-0">
+    <footer className="relative z-10 mt-24 border-t border-border/60">
 
       {/* Emergency strip */}
       <div className="border-b border-border/40 bg-red-500/5">
