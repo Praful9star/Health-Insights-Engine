@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Menu, X, Languages, ChevronDown, LogIn, Star, LayoutDashboard,
+  Menu, X, Languages, ChevronDown, LogIn, Star, LayoutDashboard, Search,
   FileSearch, Stethoscope, Pill, AlertCircle, Activity, Calculator,
   Dumbbell, Brain, Baby, Syringe, Wind, ShieldCheck, Lightbulb,
   Leaf, MapPin, AlertTriangle, Shield, Map, ClipboardList, Newspaper,
@@ -234,6 +234,26 @@ export default function Navbar() {
 
         {/* ── Right side controls ───────────────────────────────────── */}
         <div className="flex items-center gap-2 flex-shrink-0">
+
+          {/* Search — desktop pill */}
+          <button
+            onClick={() => window.dispatchEvent(new Event("cc-open-search"))}
+            className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full border border-border/60 bg-muted/30 hover:bg-muted/60 text-xs font-600 text-muted-foreground hover:text-foreground transition-all"
+            aria-label="Search tools"
+          >
+            <Search className="w-3.5 h-3.5" />
+            Search
+            <kbd className="ml-1 px-1.5 py-0.5 rounded bg-muted border border-border/60 text-[10px] font-mono leading-none">⌘K</kbd>
+          </button>
+
+          {/* Search — mobile icon */}
+          <button
+            onClick={() => window.dispatchEvent(new Event("cc-open-search"))}
+            className="lg:hidden flex items-center justify-center w-9 h-9 rounded-full border border-border/60 bg-muted/30 hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-all"
+            aria-label="Search tools"
+          >
+            <Search className="w-4 h-4" />
+          </button>
 
           {/* Language toggle */}
           <button
