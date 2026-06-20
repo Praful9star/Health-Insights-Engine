@@ -209,7 +209,7 @@ export default function Home() {
 
           <motion.h1
             variants={fadeUp} initial="hidden" animate="visible" custom={1}
-            className="mt-2 text-4xl sm:text-5xl lg:text-6xl font-serif font-800 leading-[1.1] text-foreground max-w-3xl"
+            className="mt-2 text-4xl sm:text-5xl lg:text-6xl font-serif font-800 [letter-spacing:var(--type-tracking-h1)] [line-height:var(--type-leading-display)] text-foreground max-w-3xl"
           >
             {t("AI Report Explainer You Can Understand", "AI रिपोर्ट व्याख्याकार जिसे आप समझ सकते हैं")}
           </motion.h1>
@@ -236,18 +236,18 @@ export default function Home() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 bg-amber-500/10 text-amber-400 border border-amber-500/20">
                     <span>{t("Hemoglobin", "हीमोग्लोबिन")}</span>
-                    <span className="font-700">10.2 <span className="font-400 opacity-70">g/dL</span></span>
-                    <span className="uppercase text-[10px] tracking-wide">LOW</span>
+                    <span className="data-value">10.2<span className="data-unit">g/dL</span></span>
+                    <span className="data-status">LOW</span>
                   </div>
                   <div className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 bg-red-500/10 text-red-400 border border-red-500/20">
                     <span>{t("Blood Sugar", "रक्त शर्करा")}</span>
-                    <span className="font-700">142 <span className="font-400 opacity-70">mg/dL</span></span>
-                    <span className="uppercase text-[10px] tracking-wide">HIGH</span>
+                    <span className="data-value">142<span className="data-unit">mg/dL</span></span>
+                    <span className="data-status">HIGH</span>
                   </div>
                   <div className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     <span>{t("Platelets", "प्लेटलेट्स")}</span>
-                    <span className="font-700">2,40,000 <span className="font-400 opacity-70">/mcL</span></span>
-                    <span className="uppercase text-[10px] tracking-wide">NORMAL</span>
+                    <span className="data-value">2,40,000<span className="data-unit">/mcL</span></span>
+                    <span className="data-status">NORMAL</span>
                   </div>
                 </div>
 
@@ -349,8 +349,8 @@ export default function Home() {
                             "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                           }`}>
                             <span>{language === "hi" ? item.label.hi : item.label.en}</span>
-                            <span className="font-700">{item.value} <span className="font-400 opacity-70">{item.unit}</span></span>
-                            <span className="uppercase text-[10px] tracking-wide">{item.status}</span>
+                            <span className="data-value">{item.value}<span className="data-unit">{item.unit}</span></span>
+                            <span className="data-status">{item.status}</span>
                           </div>
                         ))}
                       </div>
