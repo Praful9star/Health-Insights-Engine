@@ -1,4 +1,5 @@
 import { Router, type IRouter } from "express";
+import { LITERACY_SYSTEM_ADDENDUM } from "../lib/health-literacy";
 import { ExplainMedicineBody, ExplainMedicineResponse } from "@workspace/api-zod";
 import { groqChat, isAiAvailable } from "../lib/groq";
 import { aiLimiter } from "../middleware/rate-limit";
@@ -47,7 +48,7 @@ Guidelines:
 - India context: mention Jan Aushadhi alternatives if available, note if it needs prescription
 - commonSideEffects: include 4-6 effects ordered by frequency
 - foodInteractions: specifically mention Indian foods where relevant (e.g., grapefruit, alcohol, milk)
-- Be accurate but approachable — patients should feel informed, not scared`;
+- Be accurate but approachable — patients should feel informed, not scared${LITERACY_SYSTEM_ADDENDUM}`;
 }
 
 function getMockMedicineResult(medicine: string, language: string) {

@@ -1,4 +1,5 @@
 import { Router, type IRouter } from "express";
+import { LITERACY_SYSTEM_ADDENDUM } from "../lib/health-literacy";
 import { CheckSymptomsBody, CheckSymptomsResponse } from "@workspace/api-zod";
 import { groqChat, isAiAvailable } from "../lib/groq";
 import { aiLimiter } from "../middleware/rate-limit";
@@ -41,7 +42,7 @@ Guidelines:
 - Be conservative with urgency — when in doubt, recommend seeing a doctor sooner
 - India context: mention government hospital OPD, 104 health helpline, PMJAY where relevant
 - Be empathetic and practical — acknowledge cost concerns and accessibility in India
-- For chest pain, stroke symptoms, severe breathing difficulty — ALWAYS mark as emergency`;
+- For chest pain, stroke symptoms, severe breathing difficulty — ALWAYS mark as emergency${LITERACY_SYSTEM_ADDENDUM}`;
 }
 
 function getMockSymptomResult(symptoms: string, language: string) {
