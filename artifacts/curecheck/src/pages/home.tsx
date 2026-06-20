@@ -253,21 +253,21 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                    <span>{t("Hemoglobin", "हीमोग्लोबिन")}</span>
-                    <span className="data-value">10.2<span className="data-unit">g/dL</span></span>
-                    <span className="data-status">LOW</span>
+                <div role="list" aria-label="Sample report values" className="space-y-2">
+                  <div role="listitem" aria-label="Hemoglobin 10.2 g/dL — Low" className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <span aria-hidden="true">{t("Hemoglobin", "हीमोग्लोबिन")}</span>
+                    <span aria-hidden="true" className="data-value">10.2<span className="data-unit">g/dL</span></span>
+                    <span aria-hidden="true" className="data-status">LOW</span>
                   </div>
-                  <div className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 bg-red-500/10 text-red-400 border border-red-500/20">
-                    <span>{t("Blood Sugar", "रक्त शर्करा")}</span>
-                    <span className="data-value">142<span className="data-unit">mg/dL</span></span>
-                    <span className="data-status">HIGH</span>
+                  <div role="listitem" aria-label="Blood Sugar 142 mg/dL — High" className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 bg-red-500/10 text-red-400 border border-red-500/20">
+                    <span aria-hidden="true">{t("Blood Sugar", "रक्त शर्करा")}</span>
+                    <span aria-hidden="true" className="data-value">142<span className="data-unit">mg/dL</span></span>
+                    <span aria-hidden="true" className="data-status">HIGH</span>
                   </div>
-                  <div className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <span>{t("Platelets", "प्लेटलेट्स")}</span>
-                    <span className="data-value">2,40,000<span className="data-unit">/mcL</span></span>
-                    <span className="data-status">NORMAL</span>
+                  <div role="listitem" aria-label="Platelets 2,40,000 /mcL — Normal" className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span aria-hidden="true">{t("Platelets", "प्लेटलेट्स")}</span>
+                    <span aria-hidden="true" className="data-value">2,40,000<span className="data-unit">/mcL</span></span>
+                    <span aria-hidden="true" className="data-status">NORMAL</span>
                   </div>
                 </div>
 
@@ -462,9 +462,9 @@ export default function Home() {
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-xl bg-rose-500/15 flex items-center justify-center">
-                      <Flame className="w-4 h-4 text-rose-400 animate-pulse" />
+                      <Flame className="w-4 h-4 text-rose-400 animate-pulse" aria-hidden="true" />
                     </div>
-                    <p className="mono-label text-rose-400">
+                    <p id="myth-heading" className="mono-label text-rose-400">
                       {t("Myth of the Day", "आज का मिथक")}
                     </p>
                   </div>
@@ -525,14 +525,14 @@ export default function Home() {
       </section>
 
       {/* ══ VERIFIABLE TRUST & PRIVACY ═════════════════════════════════════ */}
-      <section className="py-16 px-4 relative overflow-hidden">
+      <section className="py-16 px-4 relative overflow-hidden" aria-labelledby="privacy-heading">
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mono-label text-primary mb-4">
-              <ShieldCheck className="w-3.5 h-3.5" />
+              <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
               {t("Privacy & Accuracy", "गोपनीयता और सटीकता")}
             </div>
-            <h2 className="text-2xl sm:text-3xl font-serif font-800 text-foreground">
+            <h2 id="privacy-heading" className="text-2xl sm:text-3xl font-serif font-800 text-foreground">
               {t("How we protect you and your data", "हम आपकी और आपके डेटा की सुरक्षा कैसे करते हैं")}
             </h2>
           </motion.div>
@@ -614,11 +614,11 @@ export default function Home() {
       </section>
 
       {/* ══ FAQ ══════════════════════════════════════════════════════ */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-4" aria-labelledby="faq-heading">
         <div className="max-w-3xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
             <p className="mono-label text-primary/80 mb-3">FAQ</p>
-            <h2 className="text-3xl sm:text-4xl font-serif font-800 text-foreground">{t("Questions, answered", "सवालों के जवाब")}</h2>
+            <h2 id="faq-heading" className="text-3xl sm:text-4xl font-serif font-800 text-foreground">{t("Questions, answered", "सवालों के जवाब")}</h2>
           </motion.div>
           <Accordion type="single" collapsible className="space-y-3">
             {FAQS.map((f, i) => (
