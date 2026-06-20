@@ -8,7 +8,7 @@ import {
   CheckCircle2, Zap, ShieldCheck, BookOpen, TrendingUp, Flame,
   BadgeCheck, DatabaseZap, Globe2, HeartPulse, Quote,
   Activity, FlaskConical, MapPin, Share2,
-  Brain, Leaf, Syringe, Baby, Newspaper, Calculator, PhoneCall, Shield, Stethoscope,
+  Brain, Leaf, Syringe, Baby, Newspaper, Calculator, PhoneCall, Shield, Stethoscope, AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CureCheckMark } from "@/components/logo";
@@ -57,22 +57,7 @@ function EcgAnimation() {
   );
 }
 
-/* ─── India state badges ─────────────────────────────────────────────── */
-const INDIA_STATES = [
-  "Maharashtra", "Delhi", "Karnataka", "Tamil Nadu", "Gujarat",
-  "Rajasthan", "West Bengal", "Telangana", "Uttar Pradesh", "Punjab",
-  "Kerala", "Madhya Pradesh", "Bihar", "Assam", "Haryana", "Goa",
-  "Odisha", "Jharkhand", "Himachal Pradesh", "Uttarakhand",
-];
 
-const STATE_COLORS = [
-  "border-primary/30 text-primary/80 hover:border-primary/60",
-  "border-violet-500/30 text-violet-400/80 hover:border-violet-500/60",
-  "border-emerald-500/30 text-emerald-400/80 hover:border-emerald-500/60",
-  "border-amber-500/30 text-amber-400/80 hover:border-amber-500/60",
-  "border-sky-500/30 text-sky-400/80 hover:border-sky-500/60",
-  "border-rose-500/30 text-rose-400/80 hover:border-rose-500/60",
-];
 
 /* ─── Core features ──────────────────────────────────────────────────── */
 const CORE_FEATURES = [
@@ -512,35 +497,58 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══ TRUSTED ACROSS INDIA ═════════════════════════════════════ */}
+      {/* ══ VERIFIABLE TRUST & PRIVACY ═════════════════════════════════════ */}
       <section className="py-16 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none" aria-hidden="true"
-          style={{ background: "transparent" }} />
         <div className="max-w-5xl mx-auto">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/8 border border-primary/20 mono-label text-primary mb-4">
-              <MapPin className="w-3.5 h-3.5" />
-              {t("Trusted Across India", "पूरे भारत का भरोसा")}
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mono-label text-primary mb-4">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              {t("Privacy & Accuracy", "गोपनीयता और सटीकता")}
             </div>
-            <h2 className="text-2xl sm:text-4xl font-serif font-800 text-foreground">
-              {t("From Kashmir to Kanyakumari", "कश्मीर से कन्याकुमारी तक")} 🇮🇳
+            <h2 className="text-2xl sm:text-3xl font-serif font-800 text-foreground">
+              {t("How we protect you and your data", "हम आपकी और आपके डेटा की सुरक्षा कैसे करते हैं")}
             </h2>
-            <p className="text-muted-foreground mt-2 text-sm">{t("Used by people across all 20 major states", "20 प्रमुख राज्यों के लोगों द्वारा उपयोग")}</p>
           </motion.div>
-          <div className="flex flex-wrap justify-center gap-2.5">
-            {INDIA_STATES.map((state, i) => (
-              <motion.div
-                key={state}
-                initial={{ opacity: 0, scale: 0.8, y: 10 }}
-                whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.035, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className={`state-badge-item inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full glass-panel border text-xs font-600 transition-all cursor-default ${STATE_COLORS[i % STATE_COLORS.length]}`}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-current flex-shrink-0 opacity-70" />
-                {state}
-              </motion.div>
-            ))}
+
+          <div className="grid sm:grid-cols-3 gap-6">
+            <motion.div
+              variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
+              className="glass-panel p-6 rounded-2xl border border-border/50 bg-background/50 flex flex-col items-center text-center gap-3"
+            >
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <Shield className="w-6 h-6" />
+              </div>
+              <h3 className="font-700 text-foreground">{t("100% Privacy First", "100% गोपनीयता")}</h3>
+              <p className="text-sm text-muted-foreground">
+                {t("We never sell your data. Your uploaded reports are processed securely and deleted automatically.", "हम आपका डेटा कभी नहीं बेचते। आपकी अपलोड की गई रिपोर्ट सुरक्षित रूप से प्रोसेस की जाती हैं और स्वचालित रूप से हटा दी जाती हैं।")}
+              </p>
+            </motion.div>
+
+            <motion.div
+              variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: 0.1 }}
+              className="glass-panel p-6 rounded-2xl border border-border/50 bg-background/50 flex flex-col items-center text-center gap-3"
+            >
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <BookOpen className="w-6 h-6" />
+              </div>
+              <h3 className="font-700 text-foreground">{t("Evidence-Based", "प्रमाण-आधारित")}</h3>
+              <p className="text-sm text-muted-foreground">
+                {t("Our AI cross-references standard medical literature and established health guidelines to provide context.", "हमारा AI संदर्भ प्रदान करने के लिए मानक चिकित्सा साहित्य और स्थापित स्वास्थ्य दिशानिर्देशों का संदर्भ देता है।")}
+              </p>
+            </motion.div>
+
+            <motion.div
+              variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: 0.2 }}
+              className="glass-panel p-6 rounded-2xl border border-border/50 bg-background/50 flex flex-col items-center text-center gap-3"
+            >
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <h3 className="font-700 text-foreground">{t("Educational Only", "केवल शिक्षा के लिए")}</h3>
+              <p className="text-sm text-muted-foreground">
+                {t("CureCheck is not a doctor. We help you understand complex terms so you can have better conversations with your physician.", "CureCheck डॉक्टर नहीं है। हम जटिल शब्दों को समझने में आपकी मदद करते हैं ताकि आप अपने डॉक्टर से बेहतर बातचीत कर सकें।")}
+              </p>
+            </motion.div>
           </div>
         </div>
       </section>
