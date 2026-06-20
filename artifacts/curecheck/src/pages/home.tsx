@@ -4,8 +4,8 @@ import { useState, lazy, Suspense, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import PageMeta from "@/components/page-meta";
 import {
-  FileSearch, Pill, Clock, Dumbbell, ArrowRight,
-  CheckCircle2, Zap, ShieldCheck, TrendingUp, Flame,
+  FileSearch, Pill, ArrowRight,
+  CheckCircle2, ShieldCheck, TrendingUp, Flame,
   Activity, FlaskConical, MapPin, Share2,
   Brain, Leaf, Syringe, Baby, Newspaper, Calculator, PhoneCall, Shield, Stethoscope,
 } from "lucide-react";
@@ -57,47 +57,28 @@ function EcgAnimation() {
 
 
 
-/* ─── Core features ──────────────────────────────────────────────────── */
-const CORE_FEATURES = [
+/* ─── Primary tools ──────────────────────────────────────────────────── */
+const PRIMARY_TOOLS = [
   {
-    icon: FileSearch, href: "/report-explainer", span: "lg:col-span-2",
-    accent: "text-primary", bg: "bg-primary/10", border: "group-hover:border-primary/50",
-    topAccent: "from-primary/60 to-primary/10",
-    badge: { en: "Primary Feature", hi: "मुख्य सुविधा" },
+    icon: FileSearch, href: "/report-explainer",
+    accent: "text-primary", bg: "bg-primary/10",
     title: { en: "AI Report Explainer", hi: "AI रिपोर्ट व्याख्याकार" },
     desc: { en: "Paste any blood test, thyroid panel or CBC. Get plain-English (or Hindi) explanation, abnormal values highlighted with why they matter, and exact questions to ask your doctor.", hi: "कोई भी ब्लड टेस्ट, थायरॉइड या CBC पेस्ट करें। सरल हिंदी में समझाव, असामान्य मान क्यों मायने रखते हैं, और डॉक्टर से पूछने के सटीक सवाल।" },
-    preview: [
-      { label: { en: "Hemoglobin", hi: "हीमोग्लोबिन" }, value: "10.2", unit: "g/dL", status: "low" },
-      { label: { en: "Blood Sugar", hi: "रक्त शर्करा" }, value: "142", unit: "mg/dL", status: "high" },
-      { label: { en: "Platelets", hi: "प्लेटलेट्स" }, value: "2,40,000", unit: "/mcL", status: "normal" },
-    ],
+    primary: true,
   },
   {
-    icon: Pill, href: "/medicine-explainer", span: "lg:col-span-1",
-    accent: "text-violet-400", bg: "bg-violet-500/10", border: "group-hover:border-violet-500/40",
-    topAccent: "from-violet-500/50 to-violet-500/10",
-    badge: null,
+    icon: Pill, href: "/medicine-explainer",
+    accent: "text-violet-400", bg: "bg-violet-500/10",
     title: { en: "Medicine Guide", hi: "दवा मार्गदर्शिका" },
-    desc: { en: "Enter any medicine name. Get what it does, side effects, best time to take, and key precautions — in plain language.", hi: "कोई भी दवा का नाम डालें। वो क्या करती है, दुष्प्रभाव, कब लें, और सावधानियाँ — सरल भाषा में।" },
-    preview: null,
+    desc: { en: "Enter any medicine name. Get what it does, side effects, best time to take, and key precautions.", hi: "कोई भी दवा का नाम डालें। वो क्या करती है, दुष्प्रभाव, कब लें, और सावधानियाँ।" },
+    primary: false,
   },
   {
-    icon: Clock, href: "/health-timeline", span: "lg:col-span-1",
-    accent: "text-emerald-400", bg: "bg-emerald-500/10", border: "group-hover:border-emerald-500/40",
-    topAccent: "from-emerald-500/50 to-emerald-500/10",
-    badge: { en: "New", hi: "नया" },
-    title: { en: "Health Timeline", hi: "स्वास्थ्य समयरेखा" },
-    desc: { en: "Save every report analysis. See your Hemoglobin, Blood Sugar and Cholesterol trends over time. Your history stays on your device.", hi: "हर रिपोर्ट विश्लेषण सहेजें। हीमोग्लोबिन, रक्त शर्करा और कोलेस्ट्रॉल के रुझान देखें। आपका इतिहास आपके डिवाइस पर।" },
-    preview: null,
-  },
-  {
-    icon: Dumbbell, href: "/fitness-hub", span: "lg:col-span-2",
-    accent: "text-amber-400", bg: "bg-amber-500/10", border: "group-hover:border-amber-500/40",
-    topAccent: "from-amber-500/50 to-amber-500/10",
-    badge: null,
-    title: { en: "Fitness Hub", hi: "फिटनेस केंद्र" },
-    desc: { en: "Daily fitness score, streak tracker, AI-generated suggestions, health challenges, and Indian gym diet plans.", hi: "रोज़ का फिटनेस स्कोर, लगातार दिनों का ट्रैकर, AI सुझाव, स्वास्थ्य चुनौतियाँ और भारतीय जिम डाइट प्लान।" },
-    preview: null,
+    icon: Stethoscope, href: "/symptom-checker",
+    accent: "text-sky-400", bg: "bg-sky-500/10",
+    title: { en: "Symptom Checker", hi: "लक्षण जांच" },
+    desc: { en: "Describe your symptoms. Get a plain-language overview of possible causes and when to see a doctor.", hi: "अपने लक्षण बताएं। संभावित कारणों और डॉक्टर से कब मिलें का सरल विवरण पाएं।" },
+    primary: false,
   },
 ];
 
@@ -274,7 +255,7 @@ export default function Home() {
           >
             <Link href="/report-explainer">
               <Button size="lg"
-                className="gap-2 rounded-full px-8 h-12 text-base font-700 w-full sm:w-auto"
+                className="gap-2 rounded-full px-8 h-12 text-base font-700"
                 data-testid="button-hero-report"
               >
                 <FileSearch className="w-5 h-5" />
@@ -299,60 +280,56 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══ CORE FEATURES ════════════════════════════════════════════ */}
-      <section className="py-20 px-4" aria-labelledby="core-features-heading">
-        <div className="max-w-5xl mx-auto">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
-            <p className="mono-label text-primary/80 mb-3">{t("Core Features", "मुख्य सुविधाएं")}</p>
-            <h2 id="core-features-heading" className="text-3xl sm:text-5xl font-serif font-800 text-foreground">
-              {t("Four tools. Built for Indian lab reports.", "चार उपकरण। भारतीय लैब रिपोर्ट के लिए।")}
+      {/* ══ PRIMARY TOOLS ════════════════════════════════════════════ */}
+      <section className="py-16 px-4" aria-labelledby="primary-tools-heading">
+        <div className="max-w-2xl mx-auto">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="mb-8">
+            <p className="mono-label text-primary/80 mb-3">{t("Start here", "यहाँ से शुरू करें")}</p>
+            <h2 id="primary-tools-heading" className="text-3xl sm:text-4xl font-serif font-800 text-foreground">
+              {t("Paste a report. Understand it in minutes.", "रिपोर्ट paste करें। मिनटों में समझें।")}
             </h2>
-            <p className="mt-4 text-muted-foreground text-lg max-w-xl mx-auto">
-              {t("Upload a CBC. Type a medicine name. Get a plain-English answer in under 30 seconds.", "CBC upload करें। दवा का नाम टाइप करें। 30 सेकंड में सरल जवाब पाएं।")}
-            </p>
           </motion.div>
 
-          <div className="grid lg:grid-cols-3 gap-5">
-            {CORE_FEATURES.map((feat, i) => (
-              <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i % 3} className={feat.span}>
-                <Link href={feat.href}>
-                  <div className={`group tile relative h-full glass-panel rounded-[1.5rem] p-7 cursor-pointer overflow-hidden border border-border/40 ${feat.border} transition-all`}>
-                    {/* Colored top accent bar */}
-                    <div className={`absolute top-0 left-0 right-0 h-[3px] bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-                    {feat.badge && (
-                      <span className="absolute top-5 right-5 text-[11px] font-700 px-2.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/25">
-                        {language === "hi" ? feat.badge.hi : feat.badge.en}
-                      </span>
-                    )}
-                    <div className={`w-12 h-12 rounded-2xl ${feat.bg} ${feat.accent} flex items-center justify-center mb-5 icon-ring`}>
-                      <feat.icon className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-xl sm:text-2xl font-serif font-700 text-foreground mb-2">
-                      {language === "hi" ? feat.title.hi : feat.title.en}
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {language === "hi" ? feat.desc.hi : feat.desc.en}
-                    </p>
-                    {feat.preview && (
-                      <div className="mt-5 space-y-2">
-                        {feat.preview.map((item, j) => (
-                          <div key={j} className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 ${
-                            item.status === "high"   ? "bg-red-500/10 text-red-400 border border-red-500/20" :
-                            item.status === "low"    ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
-                            "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                          }`}>
-                            <span>{language === "hi" ? item.label.hi : item.label.en}</span>
-                            <span className="data-value">{item.value}<span className="data-unit">{item.unit}</span></span>
-                            <span className="data-status">{item.status}</span>
-                          </div>
-                        ))}
+          <div className="flex flex-col gap-3">
+            {PRIMARY_TOOLS.map((tool, i) => (
+              <motion.div key={tool.href} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}>
+                {tool.primary ? (
+                  <Link href={tool.href}>
+                    <div className="group glass-panel rounded-2xl p-7 border border-primary/40 hover:border-primary/70 transition-all cursor-pointer">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className={`w-10 h-10 rounded-xl ${tool.bg} ${tool.accent} flex items-center justify-center`}>
+                          <tool.icon className="w-5 h-5" />
+                        </div>
+                        <h3 className="text-xl sm:text-2xl font-serif font-700 text-foreground">
+                          {language === "hi" ? tool.title.hi : tool.title.en}
+                        </h3>
                       </div>
-                    )}
-                    <div className={`mt-5 inline-flex items-center gap-1.5 text-sm font-600 ${feat.accent} group-hover:gap-2.5 transition-all`}>
-                      {t("Open", "खोलें")} <ArrowRight className="w-4 h-4" />
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                        {language === "hi" ? tool.desc.hi : tool.desc.en}
+                      </p>
+                      <Button size="sm" className="gap-2 rounded-full px-5 pointer-events-none" data-testid="button-primary-report">
+                        <FileSearch className="w-4 h-4" /> {t("Analyze My Report", "मेरी रिपोर्ट analyze करें")}
+                      </Button>
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+                ) : (
+                  <Link href={tool.href}>
+                    <div className="group glass-panel rounded-xl p-5 border border-border/30 hover:border-border/60 transition-all cursor-pointer flex items-center gap-4">
+                      <div className={`w-9 h-9 rounded-xl ${tool.bg} ${tool.accent} flex items-center justify-center flex-shrink-0`}>
+                        <tool.icon className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base font-serif font-700 text-foreground">
+                          {language === "hi" ? tool.title.hi : tool.title.en}
+                        </h3>
+                        <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">
+                          {language === "hi" ? tool.desc.hi : tool.desc.en}
+                        </p>
+                      </div>
+                      <span className={`text-xs font-600 ${tool.accent} flex-shrink-0`}>Open →</span>
+                    </div>
+                  </Link>
+                )}
               </motion.div>
             ))}
           </div>
@@ -362,28 +339,18 @@ export default function Home() {
       <div ref={belowFoldRef} aria-hidden="true" />
       {belowFoldVisible && (
         <>
-      {/* ══ ALL TOOLS GRID ═══════════════════════════════════════════ */}
-      <section className="py-16 px-4" aria-labelledby="all-tools-heading">
-        <div className="max-w-5xl mx-auto">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
-            <p className="mono-label text-primary/80 mb-3">{t("15+ Free Tools", "15+ मुफ्त उपकरण")}</p>
-            <h2 id="all-tools-heading" className="text-3xl sm:text-4xl font-serif font-800 text-foreground">
-              {t("All 14 tools, free", "सभी 14 उपकरण, मुफ्त")}
-            </h2>
-          </motion.div><div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-4 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 scrollbar-hide">
-            {ALL_TOOLS.map((tool, i) => (
-              <motion.div key={tool.href} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i % 5} className="flex-none w-36 sm:w-auto snap-start">
-                <Link href={tool.href}>
-                  <div className="group glass-panel rounded-2xl p-4 cursor-pointer border border-border/40 hover:border-primary/30 hover:-translate-y-1 transition-all text-center min-h-[110px] flex flex-col justify-center">
-                    <div className={`w-10 h-10 rounded-xl ${tool.bg} flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
-                      <tool.icon className={`w-5 h-5 ${tool.accent}`} />
-                    </div>
-                    <p className="text-xs font-600 text-foreground leading-snug group-hover:text-primary transition-colors">
-                      {language === "hi" ? tool.hi : tool.en}
-                    </p>
-                  </div>
-                </Link>
-              </motion.div>
+      {/* ══ MORE TOOLS ═══════════════════════════════════════════════ */}
+      <section className="py-10 px-4 border-t border-border/20" aria-label="More tools">
+        <div className="max-w-2xl mx-auto">
+          <p className="mono-label text-muted-foreground/60 mb-4">{t("More tools", "अधिक उपकरण")}</p>
+          <div className="flex flex-wrap gap-2">
+            {ALL_TOOLS.map((tool) => (
+              <Link key={tool.href} href={tool.href}>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/30 hover:border-border/60 transition-colors cursor-pointer">
+                  <tool.icon className={`w-3.5 h-3.5 ${tool.accent}`} />
+                  <span className="text-xs font-500 text-foreground/80">{language === "hi" ? tool.hi : tool.en}</span>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -640,19 +607,14 @@ export default function Home() {
               <p className="mt-4 text-muted-foreground text-lg max-w-xl mx-auto">
                 {t("Paste it in. Understand it in minutes.", "Paste करें। मिनटों में समझें।")}
               </p>
-              <div className="mt-8 flex flex-wrap gap-3 justify-center">
+              <div className="mt-8 flex justify-center">
                 <Link href="/report-explainer">
                   <Button size="lg"
-                    className=" gap-2 rounded-full px-8 h-12 font-700"
+                    className="gap-2 rounded-full px-8 h-12 font-700"
                     style={{ boxShadow: "none" }}
                     data-testid="button-cta-report"
                   >
                     <FileSearch className="w-5 h-5" /> {t("Analyze My Report", "मेरी रिपोर्ट analyze करें")}
-                  </Button>
-                </Link>
-                <Link href="/fitness-hub">
-                  <Button size="lg" variant="outline" className="gap-2 rounded-full px-8 h-12 border-border/60 hover:border-primary/40" data-testid="button-cta-fitness">
-                    <Dumbbell className="w-5 h-5" /> {t("Open Fitness Hub", "Fitness Hub खोलें")}
                   </Button>
                 </Link>
               </div>
