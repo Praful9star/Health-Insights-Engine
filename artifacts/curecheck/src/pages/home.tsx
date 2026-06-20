@@ -5,7 +5,7 @@ import { Helmet } from "react-helmet-async";
 import PageMeta from "@/components/page-meta";
 import {
   FileSearch, Pill, ArrowRight,
-  CheckCircle2, ShieldCheck, TrendingUp, Flame,
+  ShieldCheck, TrendingUp,
   Activity, FlaskConical, MapPin, Share2,
   Brain, Leaf, Syringe, Baby, Newspaper, Calculator, PhoneCall, Shield, Stethoscope,
 } from "lucide-react";
@@ -15,7 +15,7 @@ import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useLanguage } from "@/contexts/language-context";
-import { DAILY_MYTHS } from "@/data/myths";
+import DailyCheckIn from "@/components/daily-checkin";
 const WhatsAppShare = lazy(() => import("@/components/whatsapp-share").then(m => ({ default: m.WhatsAppShare })));
 const NewsTicker = lazy(() => import("@/components/news-ticker"));
 const WeatherWidget = lazy(() => import("@/components/weather-widget"));
@@ -128,9 +128,6 @@ function useBelowFold(rootMargin = "300px") {
 /* ════════════════════════════════════════════════════════════════════ */
 export default function Home() {
   const { language, t } = useLanguage();
-  const todayMythIdx = Math.floor(Date.now() / 86_400_000) % DAILY_MYTHS.length;
-  const todayMyth = DAILY_MYTHS[todayMythIdx];
-  const [mythRevealed, setMythRevealed] = useState(false);
   const { ref: belowFoldRef, visible: belowFoldVisible } = useBelowFold("300px");
 
   return (
@@ -170,6 +167,8 @@ export default function Home() {
       <Suspense fallback={null}>
         <NewsTicker />
       </Suspense>
+
+      <DailyCheckIn />
 
       {/* ══ HERO ═════════════════════════════════════════════════════ */}
       <section className="relative  overflow-hidden pt-16 pb-32 px-4" aria-label="Hero">
@@ -380,88 +379,6 @@ export default function Home() {
               <p className="text-muted-foreground text-sm leading-relaxed">We generate the exact questions to ask at your appointment, based on your specific values. Most consultations run under 10 minutes — arriving prepared makes them count.</p>
             </motion.div>
           </div>
-        </div>
-      </section>
-
-      {/* ══ MYTH OF THE DAY ══════════════════════════════════════════ */}
-      <section className="py-10 px-4" aria-labelledby="myth-heading">
-        <div className="max-w-3xl mx-auto">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <div className="rounded-2xl p-7 border border-rose-500/30 relative overflow-hidden"
-              style={{
-                background: "transparent",
-                backdropFilter: "blur(20px)",
-                boxShadow: "none",
-              }}>
-              {/* Glow blobs */}
-              <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full pointer-events-none"
-                style={{ background: "transparent", filter: "none" }} />
-              <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full pointer-events-none"
-                style={{ background: "transparent", filter: "none" }} />
-
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-rose-500/15 flex items-center justify-center">
-                      <Flame className="w-4 h-4 text-rose-400 animate-pulse" aria-hidden="true" />
-                    </div>
-                    <p id="myth-heading" className="mono-label text-rose-400">
-                      {t("Myth of the Day", "आज का मिथक")}
-                    </p>
-                  </div>
-                  <span className="text-[11px] mono-label text-muted-foreground/60 border border-border/40 rounded-full px-2.5 py-1">
-                    #{todayMythIdx + 1} / {DAILY_MYTHS.length}
-                  </span>
-                </div>
-
-                {/* Myth label */}
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[11px] font-700 mono-label mb-4">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse flex-shrink-0" />
-                  {t("MYTH", "मिथक")}
-                </div>
-
-                <p className="text-lg sm:text-xl font-serif font-700 text-foreground/90 leading-snug mb-5">
-                  "{language === "hi" ? todayMyth.myth.hi : todayMyth.myth.en}"
-                </p>
-
-                {!mythRevealed ? (
-                  <Button size="sm" variant="outline"
-                    className="rounded-full border-rose-500/40 text-rose-400 hover:bg-rose-500/10 gap-2 h-9 px-5"
-                    onClick={() => setMythRevealed(true)}>
-                    <FlaskConical className="w-3.5 h-3.5" />
-                    {t("Reveal the Science", "विज्ञान जानें")}
-                  </Button>
-                ) : (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-                    <div className="rounded-xl px-5 py-4 mb-4 border border-emerald-500/25"
-                      style={{ background: "transparent" }}>
-                      <p className="text-xs mono-label text-emerald-400 mb-2 flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        {t("The Truth", "सच्चाई")}
-                      </p>
-                      <p className="text-sm text-foreground/85 leading-relaxed">
-                        {language === "hi" ? todayMyth.truth.hi : todayMyth.truth.en}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <Link href="/myth-buster">
-                        <Button size="sm" variant="outline" className="rounded-full gap-2 text-xs h-8">
-                          {t("See all myths", "सभी मिथक देखें")} <ArrowRight className="w-3 h-3" />
-                        </Button>
-                      </Link>
-                      <Suspense fallback={null}>
-                        <WhatsAppShare
-                          text={`🧪 Health Myth:\n\n"${language === "hi" ? todayMyth.myth.hi : todayMyth.myth.en}"\n\n✅ Truth: ${language === "hi" ? todayMyth.truth.hi : todayMyth.truth.en}\n\nvia CureCheck — curecheck.in`}
-                          label={t("Share on WhatsApp", "WhatsApp पर शेयर करें")}
-                          className="rounded-full text-xs h-8 px-3"
-                        />
-                      </Suspense>
-                    </div>
-                  </motion.div>
-                )}
-              </div>
-            </div>
-          </motion.div>
         </div>
       </section>
 
