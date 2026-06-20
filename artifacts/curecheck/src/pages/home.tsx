@@ -680,17 +680,7 @@ export default function Home() {
       </section>
 
 
-      {/* ══ MOBILE STICKY CTA ════════════════════════════════════════ */}
-      <div className="md:hidden fixed bottom-24 left-4 right-20 z-40">
-        <Link href="/report-explainer">
-          <Button size="lg"
-            className="w-full gap-2 rounded-full h-14 font-700 bg-primary text-primary-foreground hover:bg-primary/90"
-            data-testid="mobile-sticky-cta"
-          >
-            <FileSearch className="w-5 h-5" /> {t("Analyze My Report", "मेरी रिपोर्ट analyze करें")}
-          </Button>
-        </Link>
-      </div>
+
 
     </div>
   );
