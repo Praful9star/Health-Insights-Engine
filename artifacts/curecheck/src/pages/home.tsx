@@ -98,7 +98,7 @@ const CORE_FEATURES = [
     topAccent: "from-amber-500/50 to-amber-500/10",
     badge: null,
     title: { en: "Fitness Hub", hi: "फिटनेस केंद्र" },
-    desc: { en: "Daily fitness score, streak tracker, AI-powered suggestions, health challenges and Indian gym diet plans — your daily health companion.", hi: "रोज़ का फिटनेस स्कोर, लगातार दिनों का ट्रैकर, AI सुझाव, स्वास्थ्य चुनौतियाँ और भारतीय जिम डाइट प्लान।" },
+    desc: { en: "Daily fitness score, streak tracker, AI-generated suggestions, health challenges, and Indian gym diet plans.", hi: "रोज़ का फिटनेस स्कोर, लगातार दिनों का ट्रैकर, AI सुझाव, स्वास्थ्य चुनौतियाँ और भारतीय जिम डाइट प्लान।" },
     preview: null,
   },
 ];
@@ -123,7 +123,7 @@ const ALL_TOOLS = [
 const HOW_IT_WORKS = [
   { step: "01", icon: Zap,        title: { en: "Paste your report or medicine", hi: "रिपोर्ट या दवा चिपकाएं" },    desc: { en: "No account needed. Works with any Indian lab format.", hi: "कोई खाता नहीं चाहिए। किसी भी भारतीय लैब फॉर्मेट के साथ।" } },
   { step: "02", icon: ShieldCheck, title: { en: "AI explains in plain language", hi: "AI सरल भाषा में समझाता है" }, desc: { en: "Cross-referenced with medical literature. No jargon.", hi: "चिकित्सा साहित्य से क्रॉस-रेफरेंस। कोई जटिल शब्द नहीं।" } },
-  { step: "03", icon: BookOpen,   title: { en: "Use it with your doctor", hi: "डॉक्टर के साथ उपयोग करें" },           desc: { en: "Better questions, better consultations, better health.", hi: "बेहतर सवाल, बेहतर परामर्श, बेहतर स्वास्थ्य।" } },
+  { step: "03", icon: BookOpen,   title: { en: "Take the questions to your appointment", hi: "सवाल डॉक्टर को दिखाएं" },           desc: { en: "Show the highlighted values. Ask the personalized questions we generate. Most users leave with answers they've never gotten before.", hi: "हाइलाइट किए गए values दिखाएं। हमारे generate किए सवाल पूछें। ज़्यादातर लोग पहली बार सही जवाब लेकर जाते हैं।" } },
 ];
 
 const FAQS = [
@@ -131,7 +131,7 @@ const FAQS = [
   { q: { en: "Is my health data private?", hi: "क्या मेरा डेटा सुरक्षित है?" }, a: { en: "Your queries are never stored on our servers. The Health Timeline saves data locally on your device only — nothing leaves your browser.", hi: "आपके प्रश्न हमारे सर्वर पर कभी संग्रहीत नहीं होते। स्वास्थ्य समयरेखा केवल आपके डिवाइस पर स्थानीय रूप से सहेजी जाती है।" } },
   { q: { en: "Which reports does it support?", hi: "कौन सी रिपोर्ट समझा सकता है?" }, a: { en: "CBC, thyroid panel, lipid profile, blood glucose, HbA1c, liver function, kidney function, Vitamin D, iron studies, and most other Indian lab reports.", hi: "CBC, थायरॉइड, लिपिड प्रोफ़ाइल, ब्लड ग्लूकोज़, HbA1c, लिवर फंक्शन, किडनी फंक्शन, विटामिन D और अधिकतर भारतीय लैब रिपोर्ट।" } },
   { q: { en: "Is the Fitness Hub medically accurate?", hi: "क्या फिटनेस केंद्र चिकित्सकीय रूप से सटीक है?" }, a: { en: "The Fitness Hub provides general nutrition and wellness guidance for healthy adults. It is not medical advice. Always consult a doctor for medical conditions.", hi: "फिटनेस केंद्र स्वस्थ वयस्कों के लिए सामान्य पोषण और स्वास्थ्य मार्गदर्शन देता है। यह चिकित्सा सलाह नहीं है।" } },
-  { q: { en: "Is this service free?", hi: "क्या यह सेवा मुफ्त है?" }, a: { en: "Yes, completely free. We believe health clarity should never sit behind a paywall.", hi: "हाँ, पूरी तरह मुफ्त। हमारा मानना है कि स्वास्थ्य की स्पष्टता कभी पैसों के पीछे नहीं होनी चाहिए।" } },
+  { q: { en: "Is this service free?", hi: "क्या यह सेवा मुफ्त है?" }, a: { en: "Yes, completely free. No subscription. No account required to analyze a report or check a medicine.", hi: "हाँ, पूरी तरह मुफ्त। कोई subscription नहीं। Report analyze करने या दवा चेक करने के लिए कोई account नहीं चाहिए।" } },
 ];
 
 /* ════════════════════════════════════════════════════════════════════ */
@@ -312,10 +312,10 @@ export default function Home() {
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
             <p className="mono-label text-primary/80 mb-3">{t("Core Features", "मुख्य सुविधाएं")}</p>
             <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">
-              {t("Everything you actually need", "जो वाकई ज़रूरी है")}
+              {t("Four tools. Built for Indian lab reports.", "चार उपकरण। भारतीय लैब रिपोर्ट के लिए।")}
             </h2>
             <p className="mt-4 text-muted-foreground text-lg max-w-xl mx-auto">
-              {t("AI tools built for real Indian health needs. No clutter, no generic chatbot.", "असली भारतीय स्वास्थ्य ज़रूरतों के लिए बनाए AI उपकरण।")}
+              {t("Upload a CBC. Type a medicine name. Get a plain-English answer in under 30 seconds.", "CBC upload करें। दवा का नाम टाइप करें। 30 सेकंड में सरल जवाब पाएं।")}
             </p>
           </motion.div>
 
@@ -372,7 +372,7 @@ export default function Home() {
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
             <p className="mono-label text-primary/80 mb-3">{t("15+ Free Tools", "15+ मुफ्त उपकरण")}</p>
             <h2 className="text-3xl sm:text-4xl font-serif font-800 text-foreground">
-              {t("Explore all health tools", "सभी स्वास्थ्य उपकरण देखें")}
+              {t("All 14 tools, free", "सभी 14 उपकरण, मुफ्त")}
             </h2>
           </motion.div><div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-4 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 scrollbar-hide">
             {ALL_TOOLS.map((tool, i) => (
@@ -398,7 +398,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
             <p className="mono-label text-primary/80 mb-3">{t("How It Works", "कैसे काम करता है")}</p>
-            <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">{t("Three simple steps", "तीन आसान कदम")}</h2>
+            <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">{t("Paste, read, ask.", "Paste करें, पढ़ें, पूछें।")}</h2>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-6">
             {HOW_IT_WORKS.map((step, i) => (
@@ -531,9 +531,9 @@ export default function Home() {
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                 <BookOpen className="w-6 h-6" />
               </div>
-              <h3 className="font-700 text-foreground">{t("Evidence-Based", "प्रमाण-आधारित")}</h3>
+              <h3 className="font-700 text-foreground">{t("Referenced to Indian lab standards", "भारतीय लैब मानकों के अनुसार")}</h3>
               <p className="text-sm text-muted-foreground">
-                {t("Our AI cross-references standard medical literature and established health guidelines to provide context.", "हमारा AI संदर्भ प्रदान करने के लिए मानक चिकित्सा साहित्य और स्थापित स्वास्थ्य दिशानिर्देशों का संदर्भ देता है।")}
+                {t("Explanations reference standard Indian lab ranges and published clinical guidelines — not opinion.", "स्पष्टीकरण भारतीय लैब मानकों और प्रकाशित नैदानिक दिशानिर्देशों पर आधारित हैं — न कि राय पर।")}
               </p>
             </motion.div>
 
@@ -546,7 +546,7 @@ export default function Home() {
               </div>
               <h3 className="font-700 text-foreground">{t("Educational Only", "केवल शिक्षा के लिए")}</h3>
               <p className="text-sm text-muted-foreground">
-                {t("CureCheck is not a doctor. We help you understand complex terms so you can have better conversations with your physician.", "CureCheck डॉक्टर नहीं है। हम जटिल शब्दों को समझने में आपकी मदद करते हैं ताकि आप अपने डॉक्टर से बेहतर बातचीत कर सकें।")}
+                {t("CureCheck is not a doctor. It translates lab numbers and medical terms into plain language — so you walk into your consultation prepared.", "CureCheck डॉक्टर नहीं है। यह लैब नंबर और medical शब्दों को सरल भाषा में बदलता है — ताकि आप consultation के लिए तैयार जाएं।")}
               </p>
             </motion.div>
           </div>
@@ -566,7 +566,7 @@ export default function Home() {
             <div className="relative z-10">
               <p className="mono-label text-primary/80 mb-3">{t("Why CureCheck?", "CureCheck क्यों?")}</p>
               <h2 className="text-2xl sm:text-4xl font-serif font-800 text-foreground mb-8">
-                {t("Built for how India actually uses healthcare", "भारत की असली healthcare आदतों के लिए")}
+                {t("Designed for Indian labs, Indian medicines, and Hindi speakers", "भारतीय लैब, भारतीय दवाओं और हिंदी बोलने वालों के लिए")}
               </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
@@ -629,8 +629,8 @@ export default function Home() {
                 </h3>
                 <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
                   {t(
-                    "Share CureCheck with your family and friends. Free health clarity for every Indian.",
-                    "CureCheck को अपने परिवार और दोस्तों के साथ शेयर करें। हर भारतीय के लिए मुफ्त।",
+                    "Share CureCheck with your family and friends. They can analyze a report without downloading an app or creating an account.",
+                    "CureCheck को परिवार और दोस्तों के साथ शेयर करें। कोई app download या account नहीं — सीधे report analyze करें।",
                   )}
                 </p>
                 <WhatsAppShare
