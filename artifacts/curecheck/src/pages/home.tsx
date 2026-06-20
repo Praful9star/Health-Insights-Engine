@@ -42,7 +42,7 @@ function EcgAnimation() {
             {/* Glow layer */}
             <path d={path} fill="none" stroke="hsl(183 100% 60%)" strokeWidth="6"
               strokeLinecap="round" strokeLinejoin="round" opacity="0.18"
-              style={{ filter: "blur(6px)" }} />
+              style={{ filter: "none" }} />
             {/* Main line */}
             <path d={path} fill="none" stroke="hsl(183 100% 55%)" strokeWidth="2.2"
               strokeLinecap="round" strokeLinejoin="round" opacity="0.85"
@@ -50,39 +50,6 @@ function EcgAnimation() {
           </svg>
         ))}
       </div>
-    </div>
-  );
-}
-
-/* ─── Floating particles — bigger & visible ───────────────────────────── */
-const PARTICLES = [
-  { top: "10%", left: "3.5%",  icon: "🧬", sz: 36, delay: 0,   opacity: 0.55 },
-  { top: "16%", left: "91%",   icon: "❤️", sz: 30, delay: 1.2, opacity: 0.50 },
-  { top: "62%", left: "94%",   icon: "🩺", sz: 32, delay: 0.6, opacity: 0.48 },
-  { top: "76%", left: "5%",    icon: "💊", sz: 26, delay: 2.1, opacity: 0.45 },
-  { top: "38%", left: "96.5%", icon: "🫀", sz: 28, delay: 2.5, opacity: 0.50 },
-  { top: "52%", left: "2%",    icon: "🔬", sz: 22, delay: 3.1, opacity: 0.40 },
-  { top: "28%", left: "88%",   icon: "⚕️", sz: 24, delay: 1.8, opacity: 0.42 },
-];
-
-function FloatingParticles() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none" aria-hidden="true">
-      {PARTICLES.map((p, i) => (
-        <span
-          key={i}
-          className="absolute particle-float"
-          style={{
-            top: p.top, left: p.left,
-            fontSize: p.sz,
-            animationDelay: `${p.delay}s`,
-            opacity: p.opacity,
-            filter: "drop-shadow(0 0 8px rgba(0,230,210,0.4))",
-          }}
-        >
-          {p.icon}
-        </span>
-      ))}
     </div>
   );
 }
@@ -146,14 +113,6 @@ const CORE_FEATURES = [
     desc: { en: "Daily fitness score, streak tracker, AI-powered suggestions, health challenges and Indian gym diet plans — your daily health companion.", hi: "रोज़ का फिटनेस स्कोर, लगातार दिनों का ट्रैकर, AI सुझाव, स्वास्थ्य चुनौतियाँ और भारतीय जिम डाइट प्लान।" },
     preview: null,
   },
-];
-
-const TRUST_CHIPS = [
-  { icon: BadgeCheck, label: { en: "15+ free tools", hi: "15+ मुफ्त उपकरण" }, color: "text-primary" },
-  { icon: DatabaseZap, label: { en: "No data stored on servers", hi: "सर्वर पर डेटा नहीं" }, color: "text-emerald-400" },
-  { icon: Globe2, label: { en: "Hindi + English", hi: "हिंदी + अंग्रेज़ी" }, color: "text-sky-400" },
-  { icon: BadgeCheck, label: { en: "Free forever", hi: "हमेशा मुफ्त" }, color: "text-violet-400" },
-  { icon: HeartPulse, label: { en: "No signup needed", hi: "साइनअप की ज़रूरत नहीं" }, color: "text-rose-400" },
 ];
 
 const ALL_TOOLS = [
@@ -233,99 +192,96 @@ export default function Home() {
       <NewsTicker />
 
       {/* ══ HERO ═════════════════════════════════════════════════════ */}
-      <section className="relative hero-gradient overflow-hidden pt-16 pb-32 px-4">
+      <section className="relative  overflow-hidden pt-16 pb-32 px-4">
 
         {/* Big central glow behind content */}
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[420px] rounded-full"
             style={{
-              background: "radial-gradient(ellipse, hsl(183 100% 50% / 0.11) 0%, hsl(207 90% 55% / 0.07) 45%, transparent 70%)",
-              filter: "blur(40px)",
+              background: "transparent",
+              filter: "none",
             }} />
           {/* Purple accent blob — top right */}
           <div className="absolute -top-20 right-0 w-[380px] h-[380px] rounded-full"
-            style={{ background: "radial-gradient(circle, hsl(270 80% 55% / 0.12) 0%, transparent 65%)", filter: "blur(50px)" }} />
+            style={{ background: "transparent", filter: "none" }} />
           {/* Teal blob — bottom left */}
           <div className="absolute bottom-0 -left-10 w-[300px] h-[300px] rounded-full"
-            style={{ background: "radial-gradient(circle, hsl(183 100% 50% / 0.09) 0%, transparent 65%)", filter: "blur(45px)" }} />
+            style={{ background: "transparent", filter: "none" }} />
         </div>
 
-        <FloatingParticles />
-
-        <div className="max-w-4xl mx-auto text-center relative z-10">
+        <div className="max-w-4xl mx-auto text-center relative z-10 flex flex-col items-center">
           <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0} className="flex justify-center mb-7">
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="absolute inset-0 rounded-2xl blur-xl" style={{ background: "hsl(183 100% 50% / 0.3)" }} />
-                <CureCheckMark size={56} id="hero-logo" />
-              </div>
-              <span className="font-serif font-800 text-foreground text-[2.5rem] sm:text-5xl tracking-tight leading-none">
-                Cure<span className="text-primary" style={{ textShadow: "0 0 30px hsl(183 100% 50% / 0.5)" }}>Check</span>
+              <CureCheckMark size={40} id="hero-logo" />
+              <span className="font-serif font-800 text-foreground text-3xl tracking-tight leading-none">
+                Cure<span className="text-primary">Check</span>
               </span>
             </div>
           </motion.div>
 
-          <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0.5}>
-            <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-primary/30 bg-primary/8 mono-label text-primary"
-              style={{ boxShadow: "0 0 20px hsl(183 100% 50% / 0.12), inset 0 0 20px hsl(183 100% 50% / 0.05)" }}>
-              <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-              {t("Cut through health misinformation with evidence-based guidance.", "AI-powered · भारत के लिए बना")}
-            </span>
-          </motion.div>
-
           <motion.h1
             variants={fadeUp} initial="hidden" animate="visible" custom={1}
-            className="mt-8 text-[2.5rem] sm:text-6xl lg:text-7xl font-serif font-800 leading-[1.04] text-foreground"
+            className="mt-2 text-4xl sm:text-5xl lg:text-6xl font-serif font-800 leading-[1.1] text-foreground max-w-3xl"
           >
-            {t("Healthcare Information", "स्वास्थ्य जानकारी")}
-            <br />
-            {t("You Can Actually", "जो आप वाकई")}
-            <br />
-            <span className="gradient-text" style={{ textShadow: "none" }}>
-              {t("Understand.", "समझ सकते हैं।")}
-            </span>
+            {t("AI Report Explainer You Can Understand", "AI रिपोर्ट व्याख्याकार जिसे आप समझ सकते हैं")}
           </motion.h1>
 
-          <motion.p
+          <motion.div
             variants={fadeUp} initial="hidden" animate="visible" custom={2}
-            className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
+            className="mt-8 w-full max-w-lg mx-auto"
           >
-            {t(
-              "Verify health claims, understand your reports, and navigate your health journey — with AI-powered educational guidance built for India.",
-              "health claims verify करें, reports समझें, और अपनी health journey navigate करें — AI-powered educational guidance के साथ।",
-            )}
-          </motion.p>
+             <div className="glass-panel rounded-2xl p-5 border border-border/40 text-left bg-background/50 backdrop-blur-md relative overflow-hidden">
+
+
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                     <FileSearch className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-serif font-700 text-foreground">
+                      {t("Report Analysis", "रिपोर्ट विश्लेषण")}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">Demo Data</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <span>{t("Hemoglobin", "हीमोग्लोबिन")}</span>
+                    <span className="font-700">10.2 <span className="font-400 opacity-70">g/dL</span></span>
+                    <span className="uppercase text-[10px] tracking-wide">LOW</span>
+                  </div>
+                  <div className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 bg-red-500/10 text-red-400 border border-red-500/20">
+                    <span>{t("Blood Sugar", "रक्त शर्करा")}</span>
+                    <span className="font-700">142 <span className="font-400 opacity-70">mg/dL</span></span>
+                    <span className="uppercase text-[10px] tracking-wide">HIGH</span>
+                  </div>
+                  <div className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span>{t("Platelets", "प्लेटलेट्स")}</span>
+                    <span className="font-700">2,40,000 <span className="font-400 opacity-70">/mcL</span></span>
+                    <span className="uppercase text-[10px] tracking-wide">NORMAL</span>
+                  </div>
+                </div>
+
+                <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+                   {t("Plain-English explanation, abnormal values highlighted with why they matter, and exact questions to ask your doctor.", "सरल हिंदी में समझाव, असामान्य मान क्यों मायने रखते हैं, और डॉक्टर से पूछने के सटीक सवाल।")}
+                </p>
+             </div>
+          </motion.div>
 
           <motion.div
             variants={fadeUp} initial="hidden" animate="visible" custom={3}
-            className="mt-10 flex flex-wrap gap-3 justify-center"
+            className="mt-8 flex justify-center w-full"
           >
             <Link href="/report-explainer">
               <Button size="lg"
-                className="shimmer-btn gap-2 rounded-full px-8 h-12 text-base font-700"
-                style={{ boxShadow: "0 0 0 1px hsl(183 100% 50% / 0.4), 0 0 30px hsl(183 100% 50% / 0.25), 0 4px 20px rgba(0,0,0,0.3)" }}
+                className="gap-2 rounded-full px-8 h-12 text-base font-700 w-full sm:w-auto"
                 data-testid="button-hero-report"
               >
                 <FileSearch className="w-5 h-5" />
                 {t("Analyze My Report", "मेरी रिपोर्ट Analyze करें")}
               </Button>
             </Link>
-            <Link href="/symptom-checker">
-              <Button size="lg" variant="outline" className="gap-2 rounded-full px-8 h-12 text-base border-border/60 hover:border-primary/40" data-testid="button-hero-symptoms">
-                <Stethoscope className="w-5 h-5" />
-                {t("Check Symptoms", "लक्षण जांचें")}
-              </Button>
-            </Link>
-          </motion.div>
-
-          {/* Trust chips */}
-          <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={4} className="mt-8 flex flex-wrap justify-center gap-2.5">
-            {TRUST_CHIPS.map((chip, i) => (
-              <div key={i} className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-muted/25 border border-border/50 text-xs font-600">
-                <chip.icon className={`w-3.5 h-3.5 ${chip.color}`} />
-                <span className="text-foreground/75">{language === "hi" ? chip.label.hi : chip.label.en}</span>
-              </div>
-            ))}
           </motion.div>
         </div>
 
@@ -347,7 +303,7 @@ export default function Home() {
         <div className="max-w-2xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <div className="glass-panel rounded-2xl px-6 py-5 border border-primary/15 flex gap-4 items-start"
-              style={{ boxShadow: "0 4px 24px hsl(183 100% 50% / 0.05)" }}>
+              style={{ boxShadow: "none" }}>
               <Quote className="w-5 h-5 text-primary/50 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="text-sm sm:text-base text-foreground/85 leading-relaxed italic">
@@ -381,7 +337,7 @@ export default function Home() {
                 <Link href={feat.href}>
                   <div className={`group tile relative h-full glass-panel rounded-[1.5rem] p-7 cursor-pointer overflow-hidden border border-border/40 ${feat.border} transition-all`}>
                     {/* Colored top accent bar */}
-                    <div className={`absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r ${feat.topAccent} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                    <div className={`absolute top-0 left-0 right-0 h-[3px] bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                     {feat.badge && (
                       <span className="absolute top-5 right-5 text-[11px] font-700 px-2.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/25">
                         {language === "hi" ? feat.badge.hi : feat.badge.en}
@@ -461,8 +417,8 @@ export default function Home() {
             {HOW_IT_WORKS.map((step, i) => (
               <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}
                 className="glass-panel rounded-2xl p-7 text-center border border-border/40 relative overflow-hidden group hover:border-primary/30 transition-colors">
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <p className="text-6xl font-serif font-800 leading-none mb-4 gradient-text opacity-60">{step.step}</p>
+
+                <p className="text-6xl font-serif font-800 leading-none mb-4  opacity-60">{step.step}</p>
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
                   <step.icon className="w-5 h-5" />
                 </div>
@@ -480,15 +436,15 @@ export default function Home() {
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <div className="rounded-2xl p-7 border border-rose-500/30 relative overflow-hidden"
               style={{
-                background: "linear-gradient(135deg, rgba(239,68,68,0.06) 0%, rgba(13,21,21,0.7) 60%)",
+                background: "transparent",
                 backdropFilter: "blur(20px)",
-                boxShadow: "0 0 0 1px rgba(239,68,68,0.15), 0 8px 32px rgba(239,68,68,0.08)",
+                boxShadow: "none",
               }}>
               {/* Glow blobs */}
               <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full pointer-events-none"
-                style={{ background: "radial-gradient(circle, hsl(0 80% 60% / 0.12) 0%, transparent 65%)", filter: "blur(30px)" }} />
+                style={{ background: "transparent", filter: "none" }} />
               <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full pointer-events-none"
-                style={{ background: "radial-gradient(circle, hsl(270 80% 55% / 0.08) 0%, transparent 65%)", filter: "blur(25px)" }} />
+                style={{ background: "transparent", filter: "none" }} />
 
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-5">
@@ -525,7 +481,7 @@ export default function Home() {
                 ) : (
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                     <div className="rounded-xl px-5 py-4 mb-4 border border-emerald-500/25"
-                      style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(16,185,129,0.03) 100%)" }}>
+                      style={{ background: "transparent" }}>
                       <p className="text-xs mono-label text-emerald-400 mb-2 flex items-center gap-1.5">
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         {t("The Truth", "सच्चाई")}
@@ -557,7 +513,7 @@ export default function Home() {
       {/* ══ TRUSTED ACROSS INDIA ═════════════════════════════════════ */}
       <section className="py-16 px-4 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true"
-          style={{ background: "radial-gradient(ellipse 70% 60% at 50% 50%, hsl(183 100% 50% / 0.03), transparent 70%)" }} />
+          style={{ background: "transparent" }} />
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-8">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/8 border border-primary/20 mono-label text-primary mb-4">
@@ -593,10 +549,10 @@ export default function Home() {
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
             className="rounded-[1.75rem] p-8 sm:p-12 text-center relative overflow-hidden border border-border/40"
             style={{
-              background: "linear-gradient(135deg, rgba(0,212,188,0.05) 0%, rgba(13,21,21,0.8) 50%, rgba(99,102,241,0.05) 100%)",
+              background: "transparent",
               backdropFilter: "blur(24px)",
             }}>
-            <div className="absolute inset-0 hero-gradient opacity-40 pointer-events-none" />
+            <div className="absolute inset-0  opacity-40 pointer-events-none" />
             <div className="relative z-10">
               <p className="mono-label text-primary/80 mb-3">{t("Why CureCheck?", "CureCheck क्यों?")}</p>
               <h2 className="text-2xl sm:text-4xl font-serif font-800 text-foreground mb-8">
@@ -648,12 +604,12 @@ export default function Home() {
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <div className="rounded-2xl p-8 border border-emerald-500/25 relative overflow-hidden text-center"
               style={{
-                background: "linear-gradient(135deg, rgba(16,185,129,0.07) 0%, rgba(13,21,21,0.8) 100%)",
+                background: "transparent",
                 backdropFilter: "blur(20px)",
-                boxShadow: "0 0 0 1px rgba(16,185,129,0.1), 0 8px 32px rgba(16,185,129,0.06)",
+                boxShadow: "none",
               }}>
               <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full pointer-events-none"
-                style={{ background: "radial-gradient(circle, hsl(150 70% 50% / 0.12) 0%, transparent 65%)", filter: "blur(30px)" }} />
+                style={{ background: "transparent", filter: "none" }} />
               <div className="relative z-10">
                 <div className="w-14 h-14 rounded-2xl bg-emerald-500/12 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
                   <Share2 className="w-7 h-7 text-emerald-400" />
@@ -673,7 +629,7 @@ export default function Home() {
                     `🏥 CureCheck — भारत का मुफ्त AI health platform!\n\n✅ Medical reports को सरल भाषा में समझें\n✅ किसी भी दवा के बारे में जानें\n✅ Fitness, steps और streaks track करें\n✅ Science से health myths तोड़ें\n\n100% मुफ्त। कोई signup नहीं।\n👉 curecheck.in`,
                   )}
                   label={t("Share CureCheck on WhatsApp", "WhatsApp पर शेयर करें")}
-                  className="glow-whatsapp rounded-full px-8 h-12 text-base"
+                  className=" rounded-full px-8 h-12 text-base"
                 />
               </div>
             </div>
@@ -687,12 +643,12 @@ export default function Home() {
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
             className="relative rounded-[2rem] p-10 sm:p-14 text-center overflow-hidden border border-primary/20"
             style={{
-              background: "linear-gradient(135deg, rgba(0,212,188,0.08) 0%, rgba(13,21,21,0.9) 50%, rgba(99,102,241,0.06) 100%)",
+              background: "transparent",
               backdropFilter: "blur(24px)",
-              boxShadow: "0 0 0 1px hsl(183 100% 50% / 0.15), 0 20px 60px hsl(183 100% 50% / 0.08)",
+              boxShadow: "none",
             }}>
-            <div className="absolute inset-0 hero-gradient opacity-50 pointer-events-none" />
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+            <div className="absolute inset-0  opacity-50 pointer-events-none" />
+
             <div className="relative z-10">
               <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">
                 {t("Your next report is waiting.", "आपकी अगली रिपोर्ट ready है।")}
@@ -703,8 +659,8 @@ export default function Home() {
               <div className="mt-8 flex flex-wrap gap-3 justify-center">
                 <Link href="/report-explainer">
                   <Button size="lg"
-                    className="shimmer-btn gap-2 rounded-full px-8 h-12 font-700"
-                    style={{ boxShadow: "0 0 0 1px hsl(183 100% 50% / 0.4), 0 0 30px hsl(183 100% 50% / 0.2)" }}
+                    className=" gap-2 rounded-full px-8 h-12 font-700"
+                    style={{ boxShadow: "none" }}
                     data-testid="button-cta-report"
                   >
                     <FileSearch className="w-5 h-5" /> {t("Analyze My Report", "मेरी रिपोर्ट analyze करें")}
