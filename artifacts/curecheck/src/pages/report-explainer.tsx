@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   FileSearch, AlertTriangle, CheckCircle, Info, ArrowRight,
   Stethoscope, BookOpen, Save, CheckCircle2, Camera,
-  Upload, FileText, ChevronDown, ChevronUp, Sparkles,
+  Upload, FileText, ChevronDown, Sparkles,
   TrendingUp, TrendingDown, Minus, AlertCircle, Heart,
   Clipboard, X, RotateCcw, ChevronLeft, History,
 } from "lucide-react";
@@ -116,6 +116,7 @@ function ParameterCard({ param, language }: { param: ReportParameter; language: 
       layout
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.18 }}
       className={`rounded-2xl border ${cfg.border} ${cfg.bg} overflow-hidden`}
     >
       <button
@@ -134,7 +135,7 @@ function ParameterCard({ param, language }: { param: ReportParameter; language: 
           </div>
           {(param.userValue || param.normalRange) && (
             <p className="text-xs text-muted-foreground mt-0.5 tabular-nums">
-              {param.userValue && <span className={`font-700 ${cfg.color}`}>{param.userValue}</span>}
+              {param.userValue && <motion.span initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.16, delay: 0.1 }} className={`font-700 ${cfg.color}`}>{param.userValue}</motion.span>}
               {param.userValue && param.normalRange && <span className="mx-1.5 opacity-40">·</span>}
               {param.normalRange && <span className="opacity-70">{language === "en" ? "Ref:" : "सामान्य:"} {param.normalRange}</span>}
             </p>
@@ -142,7 +143,7 @@ function ParameterCard({ param, language }: { param: ReportParameter; language: 
         </div>
         {isAbnormal && (
           <div className="flex-shrink-0 text-muted-foreground">
-            {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
           </div>
         )}
       </button>
