@@ -50,6 +50,9 @@ function EcgAnimation() {
           </svg>
         ))}
       </div>
+
+
+
     </div>
   );
 }
@@ -386,12 +389,11 @@ export default function Home() {
             <h2 className="text-3xl sm:text-4xl font-serif font-800 text-foreground">
               {t("Explore all health tools", "सभी स्वास्थ्य उपकरण देखें")}
             </h2>
-          </motion.div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          </motion.div><div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-4 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 scrollbar-hide">
             {ALL_TOOLS.map((tool, i) => (
-              <motion.div key={tool.href} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i % 5}>
+              <motion.div key={tool.href} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i % 5} className="flex-none w-36 sm:w-auto snap-start">
                 <Link href={tool.href}>
-                  <div className="group glass-panel rounded-2xl p-4 cursor-pointer border border-border/40 hover:border-primary/30 hover:-translate-y-1 transition-all text-center">
+                  <div className="group glass-panel rounded-2xl p-4 cursor-pointer border border-border/40 hover:border-primary/30 hover:-translate-y-1 transition-all text-center min-h-[110px] flex flex-col justify-center">
                     <div className={`w-10 h-10 rounded-xl ${tool.bg} flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
                       <tool.icon className={`w-5 h-5 ${tool.accent}`} />
                     </div>
@@ -676,6 +678,19 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+
+      {/* ══ MOBILE STICKY CTA ════════════════════════════════════════ */}
+      <div className="md:hidden fixed bottom-24 left-4 right-20 z-40">
+        <Link href="/report-explainer">
+          <Button size="lg"
+            className="w-full gap-2 rounded-full h-14 font-700 bg-primary text-primary-foreground hover:bg-primary/90"
+            data-testid="mobile-sticky-cta"
+          >
+            <FileSearch className="w-5 h-5" /> {t("Analyze My Report", "मेरी रिपोर्ट analyze करें")}
+          </Button>
+        </Link>
+      </div>
 
     </div>
   );
