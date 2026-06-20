@@ -33,6 +33,7 @@ export * from './medicineResult';
 export * from './medicineSideEffect';
 export * from './medicineSideEffectFrequency';
 export * from './ocrInput';
+export * from './ocrInputMimeType';
 export * from './ocrResult';
 export * from './ocrResultConfidence';
 export * from './reportFinding';

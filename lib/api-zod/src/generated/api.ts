@@ -136,13 +136,11 @@ export const ExplainMedicalReportResponse = zod.object({
  */
 export const ocrReportBodyImageDataMax = 5500000;
 
-export const ocrReportBodyMimeTypeMax = 50;
-
 
 
 export const OcrReportBody = zod.object({
   "imageData": zod.string().max(ocrReportBodyImageDataMax).describe('Base64-encoded image data (no data URI prefix)'),
-  "mimeType": zod.string().max(ocrReportBodyMimeTypeMax).describe('MIME type of the image (image\/jpeg, image\/png, etc.)')
+  "mimeType": zod.enum(['image/jpeg', 'image/png', 'image/gif', 'image/webp']).describe('MIME type of the image (image\/jpeg, image\/png, etc.)')
 })
 
 export const OcrReportResponse = zod.object({

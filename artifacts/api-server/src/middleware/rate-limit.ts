@@ -1,6 +1,16 @@
 import { rateLimit } from "express-rate-limit";
+import { slowDown } from "express-slow-down";
 
 const WINDOW_MS = 15 * 60 * 1000;
+
+// Progressive slow-down: free for first 20 req/window, then +150 ms per
+// request above that (capped at 3 s). Applies globally before hard limits.
+export const apiSlowDown = slowDown({
+  windowMs: WINDOW_MS,
+  delayAfter: 20,
+  delayMs: (hits: number) => (hits - 20) * 150,
+  maxDelayMs: 3000,
+});
 
 export const globalLimiter = rateLimit({
   windowMs: WINDOW_MS,

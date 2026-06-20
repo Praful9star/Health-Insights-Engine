@@ -5,6 +5,7 @@
  * CureCheck API - AI-powered health information platform
  * OpenAPI spec version: 0.1.0
  */
+import type { OcrInputMimeType } from './ocrInputMimeType';
 
 export interface OcrInput {
   /**
@@ -12,9 +13,6 @@ export interface OcrInput {
      * @maxLength 5500000
      */
   imageData: string;
-  /**
-     * MIME type of the image (image/jpeg, image/png, etc.)
-     * @maxLength 50
-     */
-  mimeType: string;
+  /** MIME type of the image (image/jpeg, image/png, etc.) */
+  mimeType: OcrInputMimeType;
 }
