@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, lazy, Suspense, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import PageMeta from "@/components/page-meta";
 import {
@@ -18,9 +18,9 @@ import {
 import { useLanguage } from "@/contexts/language-context";
 import { useQuoteOfDay } from "@/hooks/use-quote-of-day";
 import { DAILY_MYTHS } from "@/data/myths";
-import { WhatsAppShare } from "@/components/whatsapp-share";
-import NewsTicker from "@/components/news-ticker";
-import WeatherWidget from "@/components/weather-widget";
+const WhatsAppShare = lazy(() => import("@/components/whatsapp-share").then(m => ({ default: m.WhatsAppShare })));
+const NewsTicker = lazy(() => import("@/components/news-ticker"));
+const WeatherWidget = lazy(() => import("@/components/weather-widget"));
 
 /* ─── Animation variants ───────────────────────────────────────────── */
 const fadeUp = {
@@ -134,6 +134,23 @@ const FAQS = [
   { q: { en: "Is this service free?", hi: "क्या यह सेवा मुफ्त है?" }, a: { en: "Yes, completely free. No subscription. No account required to analyze a report or check a medicine.", hi: "हाँ, पूरी तरह मुफ्त। कोई subscription नहीं। Report analyze करने या दवा चेक करने के लिए कोई account नहीं चाहिए।" } },
 ];
 
+/* ─── useBelowFold — defers below-fold render until sentinel is visible ── */
+function useBelowFold(rootMargin = "300px") {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { rootMargin }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [rootMargin]);
+  return { ref, visible };
+}
+
 /* ════════════════════════════════════════════════════════════════════ */
 export default function Home() {
   const { language, t } = useLanguage();
@@ -142,6 +159,7 @@ export default function Home() {
   const todayMythIdx = Math.floor(Date.now() / 86_400_000) % DAILY_MYTHS.length;
   const todayMyth = DAILY_MYTHS[todayMythIdx];
   const [mythRevealed, setMythRevealed] = useState(false);
+  const { ref: belowFoldRef, visible: belowFoldVisible } = useBelowFold("300px");
 
   return (
     <div className="relative z-10">
@@ -177,10 +195,12 @@ export default function Home() {
       </Helmet>
 
       {/* ══ NEWS TICKER ══════════════════════════════════════════════ */}
-      <NewsTicker />
+      <Suspense fallback={null}>
+        <NewsTicker />
+      </Suspense>
 
       {/* ══ HERO ═════════════════════════════════════════════════════ */}
-      <section className="relative  overflow-hidden pt-16 pb-32 px-4">
+      <section className="relative  overflow-hidden pt-16 pb-32 px-4" aria-label="Hero">
 
         {/* Big central glow behind content */}
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
@@ -278,21 +298,23 @@ export default function Home() {
       </section>
 
       {/* ══ WEATHER + HEALTH TIPS ════════════════════════════════════ */}
-      <section className="px-4 pt-6 pb-0">
+      <section className="px-4 pt-6 pb-0" aria-label="Weather and health tips">
         <div className="max-w-2xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <WeatherWidget />
+            <Suspense fallback={<div className="h-20 rounded-2xl bg-muted/20 animate-pulse" />}>
+              <WeatherWidget />
+            </Suspense>
           </motion.div>
         </div>
       </section>
 
       {/* ══ QUOTE OF THE DAY ═════════════════════════════════════════ */}
-      <section className="px-4 pt-6 pb-4">
+      <section className="px-4 pt-6 pb-4" aria-label="Quote of the day">
         <div className="max-w-2xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <div className="glass-panel rounded-2xl px-6 py-5 border border-primary/15 flex gap-4 items-start"
               style={{ boxShadow: "none" }}>
-              <Quote className="w-5 h-5 text-primary/50 flex-shrink-0 mt-0.5" />
+              <Quote className="w-5 h-5 text-primary/50 flex-shrink-0 mt-0.5" aria-hidden="true" />
               <div>
                 <p className="text-sm sm:text-base text-foreground/85 leading-relaxed italic">
                   "{language === "hi" ? quote.text.hi : quote.text.en}"
@@ -307,11 +329,11 @@ export default function Home() {
       </section>
 
       {/* ══ CORE FEATURES ════════════════════════════════════════════ */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4" aria-labelledby="core-features-heading">
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
             <p className="mono-label text-primary/80 mb-3">{t("Core Features", "मुख्य सुविधाएं")}</p>
-            <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">
+            <h2 id="core-features-heading" className="text-3xl sm:text-5xl font-serif font-800 text-foreground">
               {t("Four tools. Built for Indian lab reports.", "चार उपकरण। भारतीय लैब रिपोर्ट के लिए।")}
             </h2>
             <p className="mt-4 text-muted-foreground text-lg max-w-xl mx-auto">
@@ -366,12 +388,15 @@ export default function Home() {
         </div>
       </section>
 
+      <div ref={belowFoldRef} aria-hidden="true" />
+      {belowFoldVisible && (
+        <>
       {/* ══ ALL TOOLS GRID ═══════════════════════════════════════════ */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-4" aria-labelledby="all-tools-heading">
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
             <p className="mono-label text-primary/80 mb-3">{t("15+ Free Tools", "15+ मुफ्त उपकरण")}</p>
-            <h2 className="text-3xl sm:text-4xl font-serif font-800 text-foreground">
+            <h2 id="all-tools-heading" className="text-3xl sm:text-4xl font-serif font-800 text-foreground">
               {t("All 14 tools, free", "सभी 14 उपकरण, मुफ्त")}
             </h2>
           </motion.div><div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-4 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 scrollbar-hide">
@@ -394,11 +419,11 @@ export default function Home() {
       </section>
 
       {/* ══ HOW IT WORKS ═════════════════════════════════════════════ */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-4" aria-labelledby="how-it-works-heading">
         <div className="max-w-4xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
             <p className="mono-label text-primary/80 mb-3">{t("How It Works", "कैसे काम करता है")}</p>
-            <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">{t("Paste, read, ask.", "Paste करें, पढ़ें, पूछें।")}</h2>
+            <h2 id="how-it-works-heading" className="text-3xl sm:text-5xl font-serif font-800 text-foreground">{t("Paste, read, ask.", "Paste करें, पढ़ें, पूछें।")}</h2>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-6">
             {HOW_IT_WORKS.map((step, i) => (
@@ -418,7 +443,7 @@ export default function Home() {
       </section>
 
       {/* ══ MYTH OF THE DAY ══════════════════════════════════════════ */}
-      <section className="py-10 px-4">
+      <section className="py-10 px-4" aria-labelledby="myth-heading">
         <div className="max-w-3xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <div className="rounded-2xl p-7 border border-rose-500/30 relative overflow-hidden"
@@ -483,11 +508,13 @@ export default function Home() {
                           {t("See all myths", "सभी मिथक देखें")} <ArrowRight className="w-3 h-3" />
                         </Button>
                       </Link>
-                      <WhatsAppShare
-                        text={`🧪 Health Myth:\n\n"${language === "hi" ? todayMyth.myth.hi : todayMyth.myth.en}"\n\n✅ Truth: ${language === "hi" ? todayMyth.truth.hi : todayMyth.truth.en}\n\nvia CureCheck — curecheck.in`}
-                        label={t("Share on WhatsApp", "WhatsApp पर शेयर करें")}
-                        className="rounded-full text-xs h-8 px-3"
-                      />
+                      <Suspense fallback={null}>
+                        <WhatsAppShare
+                          text={`🧪 Health Myth:\n\n"${language === "hi" ? todayMyth.myth.hi : todayMyth.myth.en}"\n\n✅ Truth: ${language === "hi" ? todayMyth.truth.hi : todayMyth.truth.en}\n\nvia CureCheck — curecheck.in`}
+                          label={t("Share on WhatsApp", "WhatsApp पर शेयर करें")}
+                          className="rounded-full text-xs h-8 px-3"
+                        />
+                      </Suspense>
                     </div>
                   </motion.div>
                 )}
@@ -633,14 +660,16 @@ export default function Home() {
                     "CureCheck को परिवार और दोस्तों के साथ शेयर करें। कोई app download या account नहीं — सीधे report analyze करें।",
                   )}
                 </p>
-                <WhatsAppShare
-                  text={t(
-                    `🏥 CureCheck — India's free AI health platform!\n\n✅ Analyze your medical reports in plain language\n✅ Check any medicine — uses, side effects & timing\n✅ Track fitness, steps & streaks\n✅ Bust health myths with science\n\n100% Free. No signup needed.\n👉 curecheck.in`,
-                    `🏥 CureCheck — भारत का मुफ्त AI health platform!\n\n✅ Medical reports को सरल भाषा में समझें\n✅ किसी भी दवा के बारे में जानें\n✅ Fitness, steps और streaks track करें\n✅ Science से health myths तोड़ें\n\n100% मुफ्त। कोई signup नहीं।\n👉 curecheck.in`,
-                  )}
-                  label={t("Share CureCheck on WhatsApp", "WhatsApp पर शेयर करें")}
-                  className=" rounded-full px-8 h-12 text-base"
-                />
+                <Suspense fallback={null}>
+                  <WhatsAppShare
+                    text={t(
+                      `🏥 CureCheck — India's free AI health platform!\n\n✅ Analyze your medical reports in plain language\n✅ Check any medicine — uses, side effects & timing\n✅ Track fitness, steps & streaks\n✅ Bust health myths with science\n\n100% Free. No signup needed.\n👉 curecheck.in`,
+                      `🏥 CureCheck — भारत का मुफ्त AI health platform!\n\n✅ Medical reports को सरल भाषा में समझें\n✅ किसी भी दवा के बारे में जानें\n✅ Fitness, steps और streaks track करें\n✅ Science से health myths तोड़ें\n\n100% मुफ्त। कोई signup नहीं।\n👉 curecheck.in`,
+                    )}
+                    label={t("Share CureCheck on WhatsApp", "WhatsApp पर शेयर करें")}
+                    className=" rounded-full px-8 h-12 text-base"
+                  />
+                </Suspense>
               </div>
             </div>
           </motion.div>
@@ -687,9 +716,8 @@ export default function Home() {
         </div>
       </section>
 
-
-
-
+        </>
+      )}
     </div>
   );
 }

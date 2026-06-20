@@ -23,6 +23,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
   });
 
+  useEffect(() => {
+    document.documentElement.lang = language === "hi" ? "hi" : "en";
+  }, [language]);
+
   const setLanguage = (l: Language) => {
     setLanguageState(l);
     try { localStorage.setItem("curecheck-lang", l); } catch {}

@@ -193,34 +193,29 @@ function scoreItem(item: SearchItem, query: string): number {
   const descHiLower = item.desc.hi.toLowerCase();
   const keywordsLower = item.keywords.map(k => k.toLowerCase());
 
-  // Exact match
   if (nameLower === q || nameHiLower === q) return 100;
-  // Starts with
   if (nameLower.startsWith(q) || nameHiLower.startsWith(q)) return 80;
-  // Name includes
   if (nameLower.includes(q) || nameHiLower.includes(q)) return 60;
-  // Exact keyword match
   if (keywordsLower.some(k => k === q)) return 40;
-  // Keyword starts with / includes
   if (keywordsLower.some(k => k.startsWith(q))) return 35;
   if (keywordsLower.some(k => k.includes(q))) return 30;
-  // Description includes
   if (descLower.includes(q) || descHiLower.includes(q)) return 30;
 
-  // Multi-word partial: every word in query matches somewhere
   const words = q.split(/\s+/).filter(Boolean);
   if (words.length > 1) {
     const allTargets = [nameLower, nameHiLower, descLower, descHiLower, ...keywordsLower].join(" ");
     if (words.every(w => allTargets.includes(w))) return 20;
   }
 
-  // Word prefix: any query word is a prefix of a name word or keyword
   const nameWords = nameLower.split(/\s+/);
   if (words.some(w => nameWords.some(nw => nw.startsWith(w)))) return 10;
   if (words.some(w => keywordsLower.some(k => k.startsWith(w)))) return 10;
 
   return 0;
 }
+
+/* ── Focusable selector ─────────────────────────────────────────────── */
+const FOCUSABLE = 'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])';
 
 /* ── Animation variants ─────────────────────────────────────────────── */
 const backdropVariants = {
@@ -248,6 +243,8 @@ export function SearchPalette({ open, onClose }: SearchPaletteProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const prevFocusRef = useRef<Element | null>(null);
 
   /* Debounce query 150ms */
   useEffect(() => {
@@ -255,13 +252,20 @@ export function SearchPalette({ open, onClose }: SearchPaletteProps) {
     return () => clearTimeout(t);
   }, [query]);
 
-  /* Reset on open */
+  /* Store previous focus, restore on close */
   useEffect(() => {
     if (open) {
+      prevFocusRef.current = document.activeElement;
       setQuery("");
       setDebouncedQuery("");
       setActiveIndex(0);
       setTimeout(() => inputRef.current?.focus(), 30);
+    } else {
+      const el = prevFocusRef.current as HTMLElement | null;
+      if (el && typeof el.focus === "function") {
+        setTimeout(() => el.focus(), 10);
+      }
+      prevFocusRef.current = null;
     }
   }, [open]);
 
@@ -289,7 +293,7 @@ export function SearchPalette({ open, onClose }: SearchPaletteProps) {
     onClose();
   }, [navigate, onClose]);
 
-  /* Keyboard navigation */
+  /* Keyboard navigation + focus trap */
   useEffect(() => {
     if (!open) return;
     const h = (e: KeyboardEvent) => {
@@ -305,6 +309,25 @@ export function SearchPalette({ open, onClose }: SearchPaletteProps) {
       } else if (e.key === "Escape") {
         e.preventDefault();
         onClose();
+      } else if (e.key === "Tab") {
+        /* Focus trap — cycle within the panel */
+        const panel = panelRef.current;
+        if (!panel) return;
+        const focusable = Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE));
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
       }
     };
     window.addEventListener("keydown", h);
@@ -322,6 +345,7 @@ export function SearchPalette({ open, onClose }: SearchPaletteProps) {
             initial="hidden" animate="visible" exit="exit"
             className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm"
             onMouseDown={onClose}
+            aria-hidden="true"
           />
 
           {/* Palette */}
@@ -331,12 +355,15 @@ export function SearchPalette({ open, onClose }: SearchPaletteProps) {
             initial="hidden" animate="visible" exit="exit"
             className="fixed z-[201] top-[12vh] left-1/2 -translate-x-1/2 w-full max-w-xl px-4"
             onMouseDown={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Search health tools"
           >
-            <div className="glass-panel rounded-2xl border border-border/60 shadow-2xl overflow-hidden">
+            <div ref={panelRef} className="glass-panel rounded-2xl border border-border/60 shadow-2xl overflow-hidden">
 
               {/* Search input */}
               <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border/40">
-                <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" aria-hidden="true" />
                 <input
                   ref={inputRef}
                   value={query}
@@ -345,18 +372,31 @@ export function SearchPalette({ open, onClose }: SearchPaletteProps) {
                   className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60 outline-none"
                   autoComplete="off"
                   spellCheck={false}
+                  aria-label="Search health tools"
+                  aria-autocomplete="list"
+                  aria-controls="search-results"
                 />
                 {query && (
-                  <button onClick={() => setQuery("")} className="text-muted-foreground hover:text-foreground transition-colors text-xs">
+                  <button
+                    onClick={() => setQuery("")}
+                    className="text-muted-foreground hover:text-foreground transition-colors text-xs"
+                    aria-label="Clear search"
+                  >
                     Clear
                   </button>
                 )}
               </div>
 
               {/* Results */}
-              <ul ref={listRef} className="py-1.5 max-h-80 overflow-y-auto">
+              <ul
+                id="search-results"
+                ref={listRef}
+                className="py-1.5 max-h-80 overflow-y-auto"
+                role="listbox"
+                aria-label="Search results"
+              >
                 {results.length === 0 ? (
-                  <li className="px-4 py-8 text-center text-sm text-muted-foreground">
+                  <li className="px-4 py-8 text-center text-sm text-muted-foreground" role="option" aria-selected={false}>
                     No tools found for "{debouncedQuery}"
                   </li>
                 ) : (
@@ -364,20 +404,21 @@ export function SearchPalette({ open, onClose }: SearchPaletteProps) {
                     const Icon = item.icon;
                     const isActive = i === activeIndex;
                     return (
-                      <li key={item.id}>
+                      <li key={item.id} role="option" aria-selected={isActive}>
                         <button
                           className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors group ${isActive ? "bg-primary/12 text-foreground" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"}`}
                           onMouseEnter={() => setActiveIndex(i)}
                           onClick={() => handleSelect(item.href)}
+                          tabIndex={-1}
                         >
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${isActive ? "bg-primary/20 text-primary" : "bg-muted/50 text-muted-foreground group-hover:text-foreground"}`}>
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${isActive ? "bg-primary/20 text-primary" : "bg-muted/50 text-muted-foreground group-hover:text-foreground"}`} aria-hidden="true">
                             <Icon className="w-4 h-4" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className={`text-sm font-600 leading-tight ${isActive ? "text-foreground" : ""}`}>{item.name.en}</p>
                             <p className="text-xs text-muted-foreground mt-0.5 truncate">{item.desc.en}</p>
                           </div>
-                          <ArrowRight className={`w-3.5 h-3.5 flex-shrink-0 transition-opacity ${isActive ? "opacity-100 text-primary" : "opacity-0"}`} />
+                          <ArrowRight className={`w-3.5 h-3.5 flex-shrink-0 transition-opacity ${isActive ? "opacity-100 text-primary" : "opacity-0"}`} aria-hidden="true" />
                         </button>
                       </li>
                     );
@@ -386,7 +427,7 @@ export function SearchPalette({ open, onClose }: SearchPaletteProps) {
               </ul>
 
               {/* Footer hints */}
-              <div className="flex items-center gap-4 px-4 py-2.5 border-t border-border/40 bg-muted/20">
+              <div className="flex items-center gap-4 px-4 py-2.5 border-t border-border/40 bg-muted/20" aria-hidden="true">
                 <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground/70">
                   <kbd className="px-1.5 py-0.5 rounded bg-muted border border-border/60 text-[10px] font-mono">↑↓</kbd>
                   navigate

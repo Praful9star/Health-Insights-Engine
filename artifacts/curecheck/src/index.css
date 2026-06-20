@@ -774,6 +774,31 @@
   }
 }
 
+/* Skip link — keyboard-only, slides down on focus */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  padding: .5rem 1rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: 0 0 8px 8px;
+  font-weight: 700;
+  font-size: .875rem;
+  text-decoration: none;
+  transition: top .1s;
+}
+.skip-link:focus { top: 0; }
+
+/* Global focus ring — composited, WCAG 2.1 AA compliant */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
 /* Accordion — composited open/close using grid-template-rows, avoids height layout thrash */
 .accordion-content {
   display: grid;
