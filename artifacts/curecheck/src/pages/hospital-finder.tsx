@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import PageMeta from "@/components/page-meta";
 import { Link } from "wouter";
 import {
-  ChevronLeft, MapPin, Loader2, AlertCircle, Phone,
+  ChevronLeft, MapPin, Loader2, AlertCircle,
   Navigation, Building2, FlaskConical, Clock, RefreshCw, Search, RotateCcw,
+  Ambulance, Stethoscope, Brain,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import "leaflet/dist/leaflet.css";
@@ -24,11 +25,10 @@ function escHtml(s: string): string {
 
 /* ─── Emergency contacts ──────────────────────────────────────────────── */
 const EMERGENCY = [
-  { name: "Ambulance", number: "108", color: "text-red-400", bg: "bg-red-500/10 border-red-500/20" },
-  { name: "Health Helpline", number: "104", color: "text-teal-400", bg: "bg-teal-500/10 border-teal-500/20" },
-  { name: "iCall Mental Health", number: "9152987821", color: "text-violet-400", bg: "bg-violet-500/10 border-violet-500/20" },
+  { name: "Ambulance",          number: "108",        Icon: Ambulance,   color: "text-red-400",    bg: "bg-red-500/10 border-red-500/20"       },
+  { name: "Health Helpline",    number: "104",        Icon: Stethoscope, color: "text-teal-400",   bg: "bg-teal-500/10 border-teal-500/20"     },
+  { name: "iCall Mental Health",number: "9152987821", Icon: Brain,       color: "text-violet-400", bg: "bg-violet-500/10 border-violet-500/20" },
 ];
-
 /* ─── Types ───────────────────────────────────────────────────────────── */
 interface Hospital {
   id: number;
@@ -440,7 +440,7 @@ export default function HospitalFinder() {
             href={`tel:${e.number}`}
             className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border ${e.bg} hover:opacity-80 transition-opacity`}
           >
-            <Phone className={`w-4 h-4 ${e.color}`} />
+            <e.Icon className={`w-4 h-4 ${e.color}`} />
             <span className={`text-sm font-700 tabular-nums ${e.color}`}>{e.number}</span>
             <span className="text-[10px] text-muted-foreground text-center leading-tight">{e.name}</span>
           </a>
