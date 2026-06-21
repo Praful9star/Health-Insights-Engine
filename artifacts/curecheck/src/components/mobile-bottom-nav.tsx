@@ -1,9 +1,10 @@
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Home, FileSearch, Stethoscope, Dumbbell, Menu } from "lucide-react";
+import { Home, FileSearch, Stethoscope, Dumbbell, Menu, Sun, Moon } from "lucide-react";
 import { useState } from "react";
+import { useTheme } from "@/components/theme-provider";
 
-const TABS = [
+const NAV_TABS = [
   { href: "/",                  icon: Home,         label: "Home"     },
   { href: "/report-explainer",  icon: FileSearch,   label: "Reports"  },
   { href: "/symptom-checker",   icon: Stethoscope,  label: "Symptoms" },
@@ -14,6 +15,7 @@ const TABS = [
 export default function MobileBottomNav() {
   const [location] = useLocation();
   const [pressed, setPressed] = useState<string | null>(null);
+  const { theme, setTheme } = useTheme();
 
   const isActive = (href: string) => {
     if (href === "/") return location === "/";
@@ -25,7 +27,7 @@ export default function MobileBottomNav() {
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
       <div className="mx-2 mb-2 bg-background/80 backdrop-blur-2xl border border-border/50 rounded-2xl shadow-2xl overflow-hidden">
         <div className="flex items-center">
-          {TABS.map((tab) => {
+          {NAV_TABS.map((tab) => {
             const active = tab.href !== null && isActive(tab.href);
             const isMenu = tab.href === null;
             const button = (
@@ -52,7 +54,7 @@ export default function MobileBottomNav() {
                   className={`w-5 h-5 transition-colors relative z-10 ${active ? "text-primary" : "text-muted-foreground"}`}
                   strokeWidth={active ? 2.2 : 1.8}
                 />
-                <span className={`text-[10px] font-600 tracking-wide relative z-10 transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}>
+                <span className={`text-[10px] font-semibold tracking-wide relative z-10 transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}>
                   {tab.label}
                 </span>
               </motion.button>
@@ -63,6 +65,22 @@ export default function MobileBottomNav() {
               </Link>
             );
           })}
+
+          {/* Theme toggle */}
+          <motion.button
+            whileTap={{ scale: 0.88 }}
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="flex-1 flex flex-col items-center justify-center gap-1 py-3 px-1 cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {theme === "dark"
+              ? <Sun  className="w-5 h-5" strokeWidth={1.8} />
+              : <Moon className="w-5 h-5" strokeWidth={1.8} />
+            }
+            <span className="text-[10px] font-semibold tracking-wide">
+              {theme === "dark" ? "Light" : "Dark"}
+            </span>
+          </motion.button>
         </div>
       </div>
     </nav>
