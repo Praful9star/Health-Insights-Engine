@@ -4,13 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>CureCheck — AI Health Information for Indians</title>
-    <meta name="description" content="Free AI-powered health platform for India. Check health claims from WhatsApp forwards, understand your symptoms, decode medical reports, and learn about your medicines — in Hindi & English." />
+    <meta name="description" content="India's free AI health platform. Understand blood reports in plain language, check medicines, verify health myths, track fitness, find hospitals and get emergency guides — in Hindi &amp; English." />
     <meta name="robots" content="index, follow" />
     <meta name="keywords" content="health claim checker India, WhatsApp health fact check, symptom checker Hindi, medical report explainer, medicine side effects India, AI health app India, free health information, CureCheck" />
     <meta name="author" content="CureCheck" />
     <meta property="og:locale" content="en_IN" />
     <meta property="og:title" content="CureCheck — AI Health Information for Indians" />
-    <meta property="og:description" content="Free AI-powered health platform for India. Check health claims from WhatsApp forwards, understand your symptoms, decode medical reports, and learn about your medicines — in Hindi & English." />
+    <meta property="og:description" content="India's free AI health platform. Understand blood reports in plain language, check medicines, verify health myths, track fitness, find hospitals and get emergency guides — in Hindi &amp; English." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://curecheck.in" />
     <meta property="og:site_name" content="CureCheck" />
@@ -21,7 +21,7 @@
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="CureCheck — AI Health Information for Indians" />
-    <meta name="twitter:description" content="Free AI-powered health platform for India. Check health claims from WhatsApp forwards, understand your symptoms, decode medical reports, and learn about your medicines — in Hindi & English." />
+    <meta name="twitter:description" content="India's free AI health platform. Understand blood reports in plain language, check medicines, verify health myths, track fitness, find hospitals and get emergency guides — in Hindi & English." />
     <meta name="twitter:image" content="https://curecheck.in/opengraph.jpg" />
     <meta name="twitter:image:alt" content="CureCheck — AI Health Information for Indians" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -36,11 +36,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Inter — primary font, non-blocking with font-display:swap -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" media="print" onload="this.media='all'">
     <!-- Mono font — non-critical, fully deferred -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"></noscript>
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"></noscript>
     <!-- Theme FOUC prevention: read localStorage before React boots -->
     <script>
       (function(){
@@ -92,8 +92,8 @@
     </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- Tally.so embed loader (loads all data-tally-src iframes) -->
-    <script>var d=document,w="https://tally.so/widgets/embed.js",v=function(){"undefined"!=typeof Tally?Tally.loadEmbeds():d.querySelectorAll("iframe[data-tally-src]:not([src])").forEach((function(e){e.src=e.dataset.tallySrc}))};if("undefined"!=typeof Tally)v();else if(d.querySelector('script[src="'+w+'"]')==null){var s=d.createElement("script");s.src=w,s.onload=v,s.onerror=v,d.body.appendChild(s);}</script>
+    <!-- Tally.so embed loader — deferred until after load so it doesn't block LCP -->
+    <script>window.addEventListener('load',function(){var d=document,w="https://tally.so/widgets/embed.js",v=function(){"undefined"!=typeof Tally?Tally.loadEmbeds():d.querySelectorAll("iframe[data-tally-src]:not([src])").forEach((function(e){e.src=e.dataset.tallySrc}))};if("undefined"!=typeof Tally)v();else if(d.querySelector('script[src="'+w+'"]')==null){var s=d.createElement("script");s.src=w,s.onload=v,s.onerror=v,d.body.appendChild(s);}});</script>
     <!-- OneSignal Web Push Notifications -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>

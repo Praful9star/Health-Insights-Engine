@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import type { ReactNode } from "react";
 import { Helmet } from "react-helmet-async";
 import PageMeta from "@/components/page-meta";
 import {
@@ -31,6 +32,24 @@ const fadeUp = {
     transition: { delay: i * 0.08, duration: 0.6, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
   }),
 };
+
+/* Hero-specific variant: opacity stays 1 so LCP is not delayed by a
+   fade-in. Only Y-offset animates, which doesn't affect LCP timing. */
+const heroSlide = {
+  hidden: { opacity: 1, y: 20 },
+  visible: (i = 0) => ({
+    opacity: 1, y: 0,
+    transition: { delay: i * 0.07, duration: 0.55, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+  }),
+};
+
+/* Defers children to client-only render to avoid hydration mismatch
+   for components that run browser APIs (geolocation, etc.). */
+function ClientOnly({ children, fallback = null }: { children: ReactNode; fallback?: ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  return <>{mounted ? children : fallback}</>;
+}
 
 /* ─── Static ECG divider — calm, no animation, no glow ──────────────── */
 function EcgDivider() {
@@ -117,8 +136,8 @@ export default function Home() {
   return (
     <div className="relative z-10">
       <PageMeta
-        title="CureCheck — Free AI Health Information for Indians"
-        description="Free AI-powered health platform for India. Check health claims from WhatsApp forwards, understand symptoms, decode medical reports, and learn about medicines — in Hindi &amp; English."
+        title="CureCheck — AI Health Platform for India | Reports, Medicines & More"
+        description="India's free AI health platform. Decode blood reports in plain language, check medicines, verify health myths, track fitness, find hospitals and get emergency guides — in Hindi & English."
         path="/"
       />
       <Helmet>
@@ -168,7 +187,7 @@ export default function Home() {
 
           {/* ── Left: branding + headline + desktop CTA ── */}
           <div className="flex flex-col items-center lg:items-start">
-            <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0}
+            <motion.div variants={heroSlide} initial="hidden" animate="visible" custom={0}
               className="flex items-center gap-3 mb-7">
               <CureCheckMark size={40} id="hero-logo" />
               <span className="font-serif font-800 text-foreground text-3xl tracking-tight leading-none">
@@ -177,14 +196,14 @@ export default function Home() {
             </motion.div>
 
             <motion.h1
-              variants={fadeUp} initial="hidden" animate="visible" custom={1}
+              variants={heroSlide} initial="hidden" animate="visible" custom={1}
               className="text-4xl sm:text-5xl lg:text-6xl font-serif font-800 leading-[1.1] text-foreground"
             >
               {t("AI Report Explainer You Can Understand", "AI रिपोर्ट व्याख्याकार जिसे आप समझ सकते हैं")}
             </motion.h1>
 
             <motion.p
-              variants={fadeUp} initial="hidden" animate="visible" custom={2}
+              variants={heroSlide} initial="hidden" animate="visible" custom={2}
               className="mt-5 text-muted-foreground text-lg leading-relaxed hidden lg:block"
             >
               {t(
@@ -195,7 +214,7 @@ export default function Home() {
 
             {/* CTA — desktop only; mobile version sits below the demo card */}
             <motion.div
-              variants={fadeUp} initial="hidden" animate="visible" custom={3}
+              variants={heroSlide} initial="hidden" animate="visible" custom={3}
               className="mt-8 hidden lg:flex justify-start"
             >
               <Link href="/report-explainer">
@@ -212,7 +231,7 @@ export default function Home() {
 
           {/* ── Right: demo card ── */}
           <motion.div
-            variants={fadeUp} initial="hidden" animate="visible" custom={2}
+            variants={heroSlide} initial="hidden" animate="visible" custom={2}
             className="mt-8 lg:mt-0 w-full max-w-lg mx-auto lg:max-w-none"
           >
             <div className="glass-panel rounded-2xl p-5 border border-border/40 text-left bg-background/50 backdrop-blur-md relative overflow-hidden">
@@ -260,7 +279,7 @@ export default function Home() {
 
           {/* CTA — mobile only, below demo card to preserve mobile order */}
           <motion.div
-            variants={fadeUp} initial="hidden" animate="visible" custom={3}
+            variants={heroSlide} initial="hidden" animate="visible" custom={3}
             className="mt-8 flex justify-center w-full lg:hidden"
           >
             <Link href="/report-explainer">
@@ -282,9 +301,21 @@ export default function Home() {
       {/* ══ WEATHER + QUOTE (side-by-side on desktop) ═══════════════ */}
       <section className="px-4 pt-6 pb-4">
         <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+          {/* WeatherWidget is client-only: it runs geolocation APIs that
+              should not block SSR or run before the page is interactive. */}
+          <ClientOnly fallback={
+            <div className="glass-panel rounded-2xl p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <MapPin className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-600 text-foreground">See local weather &amp; AQI</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Enable location for personalised health tips</p>
+              </div>
+            </div>
+          }>
             <WeatherWidget />
-          </motion.div>
+          </ClientOnly>
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1}>
             <div className="glass-panel rounded-2xl px-6 py-5 border border-primary/15 flex gap-4 items-start h-full"
               style={{ boxShadow: "none" }}>

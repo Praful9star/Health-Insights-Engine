@@ -90,8 +90,8 @@ if (typeof globalThis.navigator === "undefined") {
 const ROUTES = [
   [
     "/",
-    "CureCheck — Free AI Health Information for Indians",
-    "Free AI-powered health platform for India. Check health claims from WhatsApp forwards, understand symptoms, decode medical reports, and learn about medicines — in Hindi & English.",
+    "CureCheck — AI Health Platform for India | Reports, Medicines & More",
+    "India's free AI health platform. Decode blood reports in plain language, check medicines, verify health myths, track fitness, find hospitals and get emergency guides — in Hindi & English.",
   ],
   [
     "/claim-checker",

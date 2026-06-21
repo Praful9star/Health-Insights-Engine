@@ -129,11 +129,12 @@ export default function WeatherWidget() {
     );
   }, []);
 
-  // Only auto-fetch if user has already granted consent
+  // Auto-fetch if user has already granted consent, but defer until the
+  // page is interactive so geolocation + 3 API calls don't compete with LCP.
   useEffect(() => {
-    if (consent === "granted") {
-      fetchWeather();
-    }
+    if (consent !== "granted") return;
+    const t = setTimeout(fetchWeather, 2000);
+    return () => clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

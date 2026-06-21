@@ -24,12 +24,23 @@ export default function NewsTicker() {
   const [news, setNews] = useState<NewsItem[]>(FALLBACK);
 
   useEffect(() => {
-    fetch("/api/health-news")
-      .then((r) => r.json())
-      .then((d: { articles?: NewsItem[] }) => {
-        if (d.articles && d.articles.length > 0) setNews(d.articles);
-      })
-      .catch(() => {});
+    const doFetch = () => {
+      fetch("/api/health-news")
+        .then((r) => r.json())
+        .then((d: { articles?: NewsItem[] }) => {
+          if (d.articles && d.articles.length > 0) setNews(d.articles);
+        })
+        .catch(() => {});
+    };
+
+    // Defer the live-news fetch until the browser is idle so it doesn't
+    // compete with LCP-critical resources during initial page load.
+    if (typeof requestIdleCallback !== "undefined") {
+      const id = requestIdleCallback(doFetch, { timeout: 5000 });
+      return () => cancelIdleCallback(id);
+    }
+    const t = setTimeout(doFetch, 3000);
+    return () => clearTimeout(t);
   }, []);
 
   const items = [...news, ...news];
