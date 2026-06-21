@@ -37,7 +37,7 @@ export default function NewsTicker() {
   return (
     <div className="flex items-center border-b border-border/30 bg-background/60 backdrop-blur-sm overflow-hidden" aria-label="Health news ticker">
       <div className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 bg-primary text-background font-700 text-[11px] mono-label z-10 self-stretch">
-        <Activity className="w-3 h-3 animate-pulse" />
+        <Activity className="w-3 h-3" />
         LIVE
       </div>
       <div className="flex-shrink-0 items-center gap-1.5 px-3 py-2 border-r border-border/30 text-primary font-600 text-[11px] mono-label hidden sm:flex">
@@ -64,4 +64,4 @@ export default function NewsTicker() {
       </div>
     </div>
   );
-}
+                }
