@@ -332,4 +332,4 @@ export default function MedicineExplainer() {
       </motion.div>
     </div>
   );
-      }
+              }

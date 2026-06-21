@@ -118,4 +118,4 @@ export function ToolModal({ open, onClose, title, description, children }: ToolM
       )}
     </AnimatePresence>
   );
-}
+                }

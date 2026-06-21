@@ -416,4 +416,4 @@ export default function SymptomChecker() {
       </motion.div>
     </div>
   );
-                  }
+                                          }
