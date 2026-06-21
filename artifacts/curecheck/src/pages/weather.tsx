@@ -1,9 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
-import { Wind, Droplets, Thermometer, MapPin, RefreshCw, AlertTriangle, Eye, Gauge } from "lucide-react";
+import {
+  Wind, Droplets, Thermometer, MapPin, RefreshCw,
+  AlertTriangle, Eye, Gauge, Search, RotateCcw,
+} from "lucide-react";
 import PageMeta from "@/components/page-meta";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/page-header";
+import { useLanguage } from "@/contexts/language-context";
+import { useLocationConsent } from "@/hooks/use-location-consent";
+import { LocationConsentModal } from "@/components/location-consent-modal";
 
 interface WeatherData {
   city: string;
@@ -69,86 +75,154 @@ function getHealthTips(w: WeatherData): string[] {
 }
 
 export default function WeatherPage() {
-  const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { language, t } = useLanguage();
+  const { consent, grant, deny, reset } = useLocationConsent();
 
-  const fetchWeather = () => {
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [consentModalOpen, setConsentModalOpen] = useState(false);
+  const [cityQuery, setCityQuery] = useState("");
+  const [citySearching, setCitySearching] = useState(false);
+  const cityInputRef = useRef<HTMLInputElement>(null);
+
+  // ── Fetch by coords ──────────────────────────────────────────────────────
+
+  const fetchWeatherByCoords = useCallback(async (lat: number, lon: number) => {
     setLoading(true);
     setError(null);
+    try {
+      const [weatherRes, aqiRes, geoRes] = await Promise.allSettled([
+        fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,visibility&timezone=auto`
+        ),
+        fetch(
+          `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=european_aqi,pm2_5,pm10`
+        ),
+        fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+        ),
+      ]);
 
+      let city = t("Your Location", "आपका स्थान");
+      let country = "India";
+      if (geoRes.status === "fulfilled" && geoRes.value.ok) {
+        const geo = await geoRes.value.json();
+        city = geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || t("Your Location", "आपका स्थान");
+        country = geo.address?.country || "India";
+      }
+
+      if (weatherRes.status !== "fulfilled" || !weatherRes.value.ok) throw new Error("Weather API failed");
+      const wd = await weatherRes.value.json();
+      const c = wd.current;
+
+      let aqi: number | null = null;
+      let pm25: number | null = null;
+      let pm10: number | null = null;
+      if (aqiRes.status === "fulfilled" && aqiRes.value.ok) {
+        const aqiData = await aqiRes.value.json();
+        aqi = aqiData.current?.european_aqi ?? null;
+        pm25 = aqiData.current?.pm2_5 ?? null;
+        pm10 = aqiData.current?.pm10 ?? null;
+      }
+
+      setWeather({
+        city, country,
+        temp: Math.round(c.temperature_2m),
+        feelsLike: Math.round(c.apparent_temperature),
+        humidity: c.relative_humidity_2m,
+        windSpeed: Math.round(c.wind_speed_10m),
+        code: c.weather_code,
+        aqi, pm25, pm10,
+        visibility: c.visibility ? Math.round(c.visibility / 1000) : undefined,
+      });
+    } catch {
+      setError(t("Could not load weather data. Check your internet connection.", "Weather data load नहीं हो सका। Internet connection check करें।"));
+    }
+    setLoading(false);
+  }, [t]);
+
+  // ── Browser geolocation ──────────────────────────────────────────────────
+
+  const requestGeoLocation = useCallback(() => {
     if (!navigator.geolocation) {
-      setError("Geolocation is not supported by your browser.");
-      setLoading(false);
+      setError(t("Geolocation is not supported by your browser.", "आपका browser geolocation support नहीं करता।"));
       return;
     }
-
+    setLoading(true);
+    setError(null);
     navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude: lat, longitude: lon } = pos.coords;
-        try {
-          const [weatherRes, aqiRes, geoRes] = await Promise.allSettled([
-            fetch(
-              `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,visibility&timezone=auto`
-            ),
-            fetch(
-              `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=european_aqi,pm2_5,pm10`
-            ),
-            fetch(
-              `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
-            ),
-          ]);
-
-          let city = "Your Location";
-          let country = "India";
-          if (geoRes.status === "fulfilled" && geoRes.value.ok) {
-            const geo = await geoRes.value.json();
-            city = geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || "Your Location";
-            country = geo.address?.country || "India";
-          }
-
-          if (weatherRes.status !== "fulfilled" || !weatherRes.value.ok) throw new Error("Weather API failed");
-          const wd = await weatherRes.value.json();
-          const c = wd.current;
-
-          let aqi: number | null = null;
-          let pm25: number | null = null;
-          let pm10: number | null = null;
-          if (aqiRes.status === "fulfilled" && aqiRes.value.ok) {
-            const aqiData = await aqiRes.value.json();
-            aqi = aqiData.current?.european_aqi ?? null;
-            pm25 = aqiData.current?.pm2_5 ?? null;
-            pm10 = aqiData.current?.pm10 ?? null;
-          }
-
-          setWeather({
-            city, country,
-            temp: Math.round(c.temperature_2m),
-            feelsLike: Math.round(c.apparent_temperature),
-            humidity: c.relative_humidity_2m,
-            windSpeed: Math.round(c.wind_speed_10m),
-            code: c.weather_code,
-            aqi, pm25, pm10,
-            visibility: c.visibility ? Math.round(c.visibility / 1000) : undefined,
-          });
-        } catch {
-          setError("Could not load weather data. Check your internet connection.");
-        }
-        setLoading(false);
-      },
+      (pos) => fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude),
       (err) => {
-        if (err.code === 1) setError("Location access denied. Please allow location permission to see local weather.");
-        else setError("Could not get your location.");
+        if (err.code === 1) {
+          setError(t(
+            "Location access denied. You can search by city name below.",
+            "Location access deny हो गई। नीचे city name से search करें।",
+          ));
+        } else {
+          setError(t("Could not get your location. Try searching by city name.", "Location नहीं मिली। City name से search करें।"));
+        }
         setLoading(false);
       },
       { timeout: 10000 }
     );
+  }, [fetchWeatherByCoords, t]);
+
+  // ── City name search fallback ────────────────────────────────────────────
+
+  const searchByCity = useCallback(async () => {
+    const q = cityQuery.trim();
+    if (!q) return;
+    setCitySearching(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&language=en&format=json`
+      );
+      const data = await res.json();
+      const loc = data.results?.[0];
+      if (!loc) throw new Error("Not found");
+      await fetchWeatherByCoords(loc.latitude, loc.longitude);
+    } catch {
+      setError(t("City not found. Please try a different name (e.g. Mumbai, Delhi).", "City नहीं मिली। दूसरा नाम try करें (जैसे Mumbai, Delhi)।"));
+    }
+    setCitySearching(false);
+  }, [cityQuery, fetchWeatherByCoords, t]);
+
+  // ── Init ────────────────────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (consent === "granted") {
+      requestGeoLocation();
+    } else if (consent === null) {
+      setConsentModalOpen(true);
+    }
+    // denied → show city search (no fetch, no modal)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleAllow = () => {
+    grant();
+    setConsentModalOpen(false);
+    requestGeoLocation();
   };
 
-  useEffect(() => { fetchWeather(); }, []);
+  const handleDeny = () => {
+    deny();
+    setConsentModalOpen(false);
+    setTimeout(() => cityInputRef.current?.focus(), 120);
+  };
+
+  const handleReset = () => {
+    reset();
+    setWeather(null);
+    setError(null);
+    setConsentModalOpen(true);
+  };
 
   const aqiInfo = weather?.aqi !== null && weather?.aqi !== undefined ? aqiLevel(weather.aqi) : null;
   const tips = weather ? getHealthTips(weather) : [];
+  const showCitySearch = !loading && !weather && consent !== null;
 
   return (
     <div className="relative z-10 max-w-2xl mx-auto px-4 py-10 pb-24 lg:pb-10">
@@ -157,13 +231,22 @@ export default function WeatherPage() {
         description="Real-time air quality index, pollen counts, and personalised health advisories based on your local weather across India."
         path="/weather"
       />
-      <PageHeader
-        icon={<span className="text-2xl">{weather ? wmoIcon(weather.code) : "🌤️"}</span>}
-        title="Weather & Health Tips"
-        subtitle="Real-time air quality and personalised health guidance based on your local weather."
-        badge="Live"
+
+      <LocationConsentModal
+        open={consentModalOpen}
+        onAllow={handleAllow}
+        onDeny={handleDeny}
+        language={language as "en" | "hi"}
       />
 
+      <PageHeader
+        icon={<span className="text-2xl">{weather ? wmoIcon(weather.code) : "🌤️"}</span>}
+        title={t("Weather & Health Tips", "मौसम और Health Tips")}
+        subtitle={t("Real-time air quality and personalised health guidance based on your local weather.", "आपके local weather के अनुसार real-time air quality और health guidance।")}
+        badge={t("Live", "Live")}
+      />
+
+      {/* Loading skeletons */}
       {loading && (
         <div className="space-y-4">
           {[1, 2, 3].map(i => (
@@ -175,16 +258,71 @@ export default function WeatherPage() {
         </div>
       )}
 
-      {error && !loading && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-panel rounded-2xl p-6 text-center">
-          <AlertTriangle className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-          <p className="text-muted-foreground mb-4">{error}</p>
-          <Button onClick={fetchWeather} variant="outline" className="gap-2 rounded-full">
-            <RefreshCw className="w-4 h-4" /> Try Again
-          </Button>
+      {/* City search — shown when consent denied or after a location error */}
+      {showCitySearch && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-panel rounded-2xl p-6 mb-4"
+        >
+          <p className="font-serif font-700 text-foreground mb-1">
+            {t("Search by city", "City से खोजें")}
+          </p>
+          <p className="text-sm text-muted-foreground mb-4">
+            {consent === "denied"
+              ? t("Location access is off. Enter a city name to see local weather.", "Location access बंद है। City का नाम enter करें।")
+              : t("Enter a city name to see local weather.", "City का नाम enter करें।")}
+          </p>
+          <div className="flex gap-2">
+            <input
+              ref={cityInputRef}
+              type="text"
+              value={cityQuery}
+              onChange={(e) => setCityQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && searchByCity()}
+              placeholder={t("e.g. Mumbai, Delhi, Bengaluru", "जैसे Mumbai, Delhi, Bengaluru")}
+              className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] placeholder:text-[var(--text-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+            <Button
+              onClick={searchByCity}
+              disabled={citySearching || !cityQuery.trim()}
+              className="rounded-xl gap-2 px-4"
+            >
+              {citySearching
+                ? <RefreshCw className="w-4 h-4 animate-spin" />
+                : <Search className="w-4 h-4" />}
+              {t("Search", "खोजें")}
+            </Button>
+          </div>
+          {consent === "denied" && (
+            <button
+              onClick={handleReset}
+              className="mt-3 text-xs text-primary underline underline-offset-2 hover:opacity-80"
+            >
+              {t("Re-enable location access", "Location access फिर से enable करें")}
+            </button>
+          )}
         </motion.div>
       )}
 
+      {/* Error */}
+      {error && !loading && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-panel rounded-2xl p-6 mb-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm text-muted-foreground">{error}</p>
+              {consent === "granted" && (
+                <Button onClick={requestGeoLocation} variant="outline" size="sm" className="gap-2 rounded-full mt-3">
+                  <RefreshCw className="w-3.5 h-3.5" /> {t("Try again", "फिर try करें")}
+                </Button>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Weather results */}
       {weather && !loading && (
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
 
@@ -199,19 +337,23 @@ export default function WeatherPage() {
                   <span className="text-5xl font-bold text-foreground">{weather.temp}°C</span>
                   <span className="text-5xl">{wmoIcon(weather.code)}</span>
                 </div>
-                <p className="text-muted-foreground mt-1">{wmoLabel(weather.code)} · Feels like {weather.feelsLike}°C</p>
+                <p className="text-muted-foreground mt-1">{wmoLabel(weather.code)} · {t("Feels like", "Feels like")} {weather.feelsLike}°C</p>
               </div>
-              <button onClick={fetchWeather} className="p-2 rounded-xl hover:bg-muted/40 transition-colors text-muted-foreground hover:text-foreground">
+              <button
+                onClick={consent === "granted" ? requestGeoLocation : searchByCity}
+                className="p-2 rounded-xl hover:bg-muted/40 transition-colors text-muted-foreground hover:text-foreground"
+                aria-label={t("Refresh", "Refresh")}
+              >
                 <RefreshCw className="w-4 h-4" />
               </button>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
               {[
-                { icon: Droplets, label: "Humidity", value: `${weather.humidity}%`, color: "text-sky-400" },
-                { icon: Wind, label: "Wind", value: `${weather.windSpeed} km/h`, color: "text-teal-400" },
-                ...(weather.visibility !== undefined ? [{ icon: Eye, label: "Visibility", value: `${weather.visibility} km`, color: "text-violet-400" }] : []),
-                { icon: Thermometer, label: "Feels Like", value: `${weather.feelsLike}°C`, color: "text-orange-400" },
+                { icon: Droplets, label: t("Humidity", "Humidity"), value: `${weather.humidity}%`, color: "text-sky-400" },
+                { icon: Wind, label: t("Wind", "Wind"), value: `${weather.windSpeed} km/h`, color: "text-teal-400" },
+                ...(weather.visibility !== undefined ? [{ icon: Eye, label: t("Visibility", "Visibility"), value: `${weather.visibility} km`, color: "text-violet-400" }] : []),
+                { icon: Thermometer, label: t("Feels Like", "Feels Like"), value: `${weather.feelsLike}°C`, color: "text-orange-400" },
               ].map((item) => (
                 <div key={item.label} className="bg-muted/20 rounded-xl p-3">
                   <item.icon className={`w-4 h-4 ${item.color} mb-1`} />
@@ -227,7 +369,7 @@ export default function WeatherPage() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Gauge className="w-5 h-5 text-muted-foreground" />
-                  <span className="font-semibold text-foreground">Air Quality Index</span>
+                  <span className="font-semibold text-foreground">{t("Air Quality Index", "Air Quality Index")}</span>
                 </div>
                 <span className={`text-sm font-bold ${aqiInfo.color} px-2.5 py-0.5 rounded-full bg-black/20`}>
                   {weather.aqi} · {aqiInfo.label}
@@ -248,7 +390,7 @@ export default function WeatherPage() {
           )}
 
           <div className="glass-panel rounded-2xl p-5">
-            <h2 className="font-semibold text-foreground mb-3">Today's Health Tips</h2>
+            <h2 className="font-semibold text-foreground mb-3">{t("Today's Health Tips", "आज के Health Tips")}</h2>
             <div className="space-y-3">
               {tips.map((tip, i) => (
                 <motion.div
@@ -265,11 +407,26 @@ export default function WeatherPage() {
             </div>
           </div>
 
+          {consent === "denied" && (
+            <div className="flex items-center justify-between px-1">
+              <p className="text-xs text-muted-foreground">
+                {t("Showing weather for searched city.", "Searched city का weather दिखा रहे हैं।")}
+              </p>
+              <button onClick={handleReset} className="flex items-center gap-1.5 text-xs text-primary hover:opacity-80">
+                <RotateCcw className="w-3 h-3" />
+                {t("Use my location", "मेरा location use करें")}
+              </button>
+            </div>
+          )}
+
           <p className="text-xs text-muted-foreground text-center px-4">
-            Weather from Open-Meteo · Air quality from Open-Meteo AQ API · Location from Nominatim. Data updates on page load.
+            {t(
+              "Weather from Open-Meteo · Air quality from Open-Meteo AQ API · Location from Nominatim. Data updates on page load.",
+              "Weather: Open-Meteo · Air quality: Open-Meteo AQ API · Location: Nominatim। Data page load पर update होता है।",
+            )}
           </p>
         </motion.div>
       )}
     </div>
   );
-}
+  }
