@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
-import { motion, AnimatePresence } from "framer-motion";
+import { MotionConfig, motion, AnimatePresence } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
@@ -129,6 +129,7 @@ function ServiceWorkerRegistrar() {
 export default function App() {
   return (
     <HelmetProvider>
+    <MotionConfig reducedMotion="user">
     <ThemeProvider defaultTheme="light" storageKey="curecheck-theme">
       <LanguageProvider>
         <AuthProvider>
@@ -139,10 +140,10 @@ export default function App() {
                 <Analytics />
                 <ScrollToTop />
                 <div className="grain relative min-h-dvh flex flex-col overflow-x-hidden">
-  <PremiumBackground />
-  <DisclaimerBanner />
-  <Navbar />
-  <main className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
+                  <PremiumBackground />
+                  <DisclaimerBanner />
+                  <Navbar />
+                  <main className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
                     <AnimatedRouter />
                   </main>
                   <Footer />
@@ -158,6 +159,7 @@ export default function App() {
         </AuthProvider>
       </LanguageProvider>
     </ThemeProvider>
+    </MotionConfig>
     </HelmetProvider>
   );
 }
