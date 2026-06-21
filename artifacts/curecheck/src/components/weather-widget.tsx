@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Wind, Droplets, Thermometer, MapPin, AlertTriangle, RefreshCw } from "lucide-react";
 import { Link } from "wouter";
+import { useLocationConsent } from "@/hooks/use-location-consent";
+import { LocationConsentModal } from "@/components/location-consent-modal";
 
 interface WeatherData {
   city: string;
@@ -59,19 +61,19 @@ function getHealthTip(w: WeatherData): string {
 }
 
 export default function WeatherWidget() {
+  const { consent, grant, deny } = useLocationConsent();
   const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [consentModalOpen, setConsentModalOpen] = useState(false);
 
-  const fetchWeather = () => {
-    setLoading(true);
-    setError(null);
-
+  const fetchWeather = useCallback(() => {
     if (!navigator.geolocation) {
       setError("Geolocation not supported");
-      setLoading(false);
       return;
     }
+    setLoading(true);
+    setError(null);
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
@@ -92,12 +94,7 @@ export default function WeatherWidget() {
           let city = "Your Location";
           if (geoRes.status === "fulfilled" && geoRes.value.ok) {
             const geo = await geoRes.value.json();
-            city =
-              geo.address?.city ||
-              geo.address?.town ||
-              geo.address?.village ||
-              geo.address?.county ||
-              "Your Location";
+            city = geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || "Your Location";
           }
 
           if (weatherRes.status !== "fulfilled" || !weatherRes.value.ok) throw new Error("Weather fetch failed");
@@ -130,10 +127,69 @@ export default function WeatherWidget() {
       },
       { timeout: 8000 }
     );
+  }, []);
+
+  // Only auto-fetch if user has already granted consent
+  useEffect(() => {
+    if (consent === "granted") {
+      fetchWeather();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleAllow = () => {
+    grant();
+    setConsentModalOpen(false);
+    fetchWeather();
   };
 
-  useEffect(() => { fetchWeather(); }, []);
+  const handleDeny = () => {
+    deny();
+    setConsentModalOpen(false);
+  };
 
+  // ── Consent not yet given — show a prompt card ───────────────────────────
+  if (consent === null) {
+    return (
+      <>
+        <LocationConsentModal
+          open={consentModalOpen}
+          onAllow={handleAllow}
+          onDeny={handleDeny}
+        />
+        <button
+          onClick={() => setConsentModalOpen(true)}
+          className="glass-panel rounded-2xl p-4 flex items-center gap-3 w-full text-left hover:border-primary/30 transition-colors group"
+        >
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+            <MapPin className="w-5 h-5 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-600 text-foreground">See local weather &amp; AQI</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Tap to enable · location never stored</p>
+          </div>
+          <span className="text-xs font-600 text-primary bg-primary/10 px-2.5 py-1 rounded-full flex-shrink-0">Enable</span>
+        </button>
+      </>
+    );
+  }
+
+  // ── Consent denied — show a placeholder linking to the weather page ───────
+  if (consent === "denied") {
+    return (
+      <Link href="/weather">
+        <div className="glass-panel rounded-2xl p-4 flex items-center gap-3 w-full text-left hover:border-primary/30 transition-colors cursor-pointer">
+          <span className="text-2xl">🌤️</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-600 text-foreground">Weather &amp; Health Tips</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Open to search by city name</p>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
+  // ── Loading ───────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="glass-panel rounded-2xl p-4 flex items-center gap-3 animate-pulse">
@@ -146,6 +202,7 @@ export default function WeatherWidget() {
     );
   }
 
+  // ── Error ─────────────────────────────────────────────────────────────────
   if (error || !weather) {
     return (
       <button
@@ -159,6 +216,7 @@ export default function WeatherWidget() {
     );
   }
 
+  // ── Weather card ──────────────────────────────────────────────────────────
   const aqiInfo = weather.aqi !== null ? aqiLabel(weather.aqi) : null;
   const tip = getHealthTip(weather);
 
@@ -212,4 +270,4 @@ export default function WeatherWidget() {
       </Link>
     </motion.div>
   );
-}
+      }
