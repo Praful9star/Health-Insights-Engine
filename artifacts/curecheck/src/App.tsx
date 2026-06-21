@@ -10,7 +10,6 @@ import { LanguageProvider } from "@/contexts/language-context";
 import { AuthProvider } from "@/contexts/auth-context";
 import Analytics from "@/components/analytics";
 import Navbar from "@/components/navbar";
-import { SearchController } from "@/components/search-palette";
 import DisclaimerBanner from "@/components/disclaimer-banner";
 import ScrollToTop from "@/components/scroll-to-top";
 import PremiumBackground from "@/components/premium-background";
@@ -130,7 +129,7 @@ function ServiceWorkerRegistrar() {
 export default function App() {
   return (
     <HelmetProvider>
-    <ThemeProvider defaultTheme="dark" forcedTheme="dark" storageKey="curecheck-theme">
+    <ThemeProvider defaultTheme="light" storageKey="curecheck-theme">
       <LanguageProvider>
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
@@ -143,8 +142,7 @@ export default function App() {
                   <PremiumBackground />
                   <DisclaimerBanner />
                   <Navbar />
-                  <SearchController />
-                  <main id="main-content" className="flex-1 pb-20 lg:pb-0">
+                  <main className="flex-1 pb-20 lg:pb-0">
                     <AnimatedRouter />
                   </main>
                   <Footer />
