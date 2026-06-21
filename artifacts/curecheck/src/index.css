@@ -652,6 +652,14 @@
     border-radius: 8px;
   }
 
+  /* Global keyboard focus rings for all interactive elements */
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+    border-radius: 8px;
+  }
+
   /* Live data indicator badge */
   .badge-live {
     display: inline-flex;
