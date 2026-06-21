@@ -166,7 +166,7 @@ export default function News() {
               <div className="glass-panel rounded-2xl overflow-hidden border border-border/40 hover:border-primary/30 transition-colors">
                 {featured.urlToImage && (
                   <div className="h-56 overflow-hidden">
-                    <img src={featured.urlToImage} alt={featured.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    <img src={featured.urlToImage} alt={featured.title} width="800" height="224" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                   </div>
                 )}
                 <div className="p-5">
@@ -195,7 +195,7 @@ export default function News() {
                 className="glass-panel rounded-2xl overflow-hidden border border-border/40 hover:border-primary/30 transition-all group flex flex-col">
                 {a.urlToImage && (
                   <div className="h-36 overflow-hidden flex-shrink-0">
-                    <img src={a.urlToImage} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    <img src={a.urlToImage} alt={a.title} width="400" height="144" loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                   </div>
                 )}
                 <div className="p-4 flex flex-col flex-1">
