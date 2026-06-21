@@ -18,6 +18,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/language-context";
 import { WhatsAppShare } from "@/components/whatsapp-share";
+import { ToolModal } from "@/components/tool-modal";
 
 const URGENCY_CONFIG = {
   emergency: {
@@ -90,6 +91,7 @@ export default function SymptomChecker() {
   const [age, setAge] = useState("");
   const [gender, setGender] = useState<string>("");
   const [duration, setDuration] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
   const { toast } = useToast();
   const { language, t } = useLanguage();
   const checkSymptoms = useCheckSymptoms();
@@ -100,6 +102,7 @@ export default function SymptomChecker() {
       toast({ title: t("Please describe your symptoms", "कृपया अपने लक्षण बताएं") });
       return;
     }
+    setModalOpen(false);
     checkSymptoms.mutate({
       data: {
         symptoms,
@@ -148,11 +151,31 @@ export default function SymptomChecker() {
           </p>
         </div>
 
-        {/* Input form */}
-        <Card className="mt-6 border-border">
-          <CardContent className="pt-6 space-y-4">
+        {/* Trigger */}
+        <div className="mt-6">
+          <button
+            onClick={() => setModalOpen(true)}
+            className="w-full h-12 flex items-center justify-center gap-2.5 rounded-2xl bg-primary text-primary-foreground font-600 text-base hover:opacity-90 active:scale-[0.98] transition-all"
+            data-testid="button-open-symptoms-modal"
+          >
+            <Activity className="w-5 h-5" />
+            {result
+              ? t("Check Again", "फिर से जांचें")
+              : t("Describe My Symptoms", "लक्षण बताएं")}
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Modal */}
+        <ToolModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          title={t("Symptom Checker", "लक्षण जांच")}
+          description={t("Describe your symptoms for urgency guidance and next steps", "लक्षण बताएं — तत्कालता मार्गदर्शन पाएं")}
+        >
+          <div className="space-y-4">
             <div>
-              <label className="text-sm font-500 text-foreground mb-1.5 block">
+              <label className="text-sm font-500 text-[var(--text)] mb-1.5 block">
                 {t("Describe your symptoms *", "अपने लक्षण बताएं *")}
               </label>
               <Textarea
@@ -172,7 +195,7 @@ export default function SymptomChecker() {
                   <button
                     key={i}
                     onClick={() => setSymptoms(ex)}
-                    className="text-xs px-2.5 py-1 rounded-full bg-muted hover:bg-muted-foreground/10 text-muted-foreground hover:text-foreground transition-colors border border-border"
+                    className="text-xs px-2.5 py-1 rounded-full bg-[var(--surface-alt)] hover:bg-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors border border-[var(--border)]"
                     data-testid={`button-example-symptom-${i}`}
                   >
                     {ex.length > 35 ? ex.slice(0, 35) + "…" : ex}
@@ -184,7 +207,7 @@ export default function SymptomChecker() {
             {/* Optional fields */}
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="text-xs font-500 text-muted-foreground mb-1 block">
+                <label className="text-xs font-500 text-[var(--text-muted)] mb-1 block">
                   {t("Age (optional)", "उम्र (वैकल्पिक)")}
                 </label>
                 <Input
@@ -196,7 +219,7 @@ export default function SymptomChecker() {
                 />
               </div>
               <div>
-                <label className="text-xs font-500 text-muted-foreground mb-1 block">
+                <label className="text-xs font-500 text-[var(--text-muted)] mb-1 block">
                   {t("Gender (optional)", "लिंग (वैकल्पिक)")}
                 </label>
                 <Select value={gender} onValueChange={setGender}>
@@ -211,7 +234,7 @@ export default function SymptomChecker() {
                 </Select>
               </div>
               <div>
-                <label className="text-xs font-500 text-muted-foreground mb-1 block">
+                <label className="text-xs font-500 text-[var(--text-muted)] mb-1 block">
                   {t("Duration (optional)", "कितने समय से")}
                 </label>
                 <Input
@@ -226,17 +249,16 @@ export default function SymptomChecker() {
 
             <Button
               onClick={handleCheck}
-              disabled={checkSymptoms.isPending || symptoms.trim().length < 5}
+              disabled={symptoms.trim().length < 5}
               className="w-full rounded-xl gap-2"
               size="lg"
               data-testid="button-check-symptoms"
             >
-              {checkSymptoms.isPending
-                ? t("Analyzing symptoms…", "लक्षण विश्लेषण हो रहा है…")
-                : <><span>{t("Check Symptoms", "लक्षण जांचें")}</span><ArrowRight className="w-4 h-4" /></>}
+              <span>{t("Check Symptoms", "लक्षण जांचें")}</span>
+              <ArrowRight className="w-4 h-4" />
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </ToolModal>
 
         {/* Loading */}
         <AnimatePresence>
@@ -260,152 +282,133 @@ export default function SymptomChecker() {
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
               className="mt-6 space-y-4"
             >
-              {/* Urgency Banner */}
+              {/* Urgency banner */}
               {(() => {
-                const cfg = URGENCY_CONFIG[result.urgencyLevel];
+                const cfg = URGENCY_CONFIG[result.urgencyLevel] ?? URGENCY_CONFIG.monitor;
                 const Icon = cfg.icon;
                 return (
-                  <Card className={`border-2 ${cfg.bg}`}>
-                    <CardContent className="pt-5 pb-5">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${result.urgencyLevel === "emergency" ? "bg-red-100 dark:bg-red-900" : "bg-white/50 dark:bg-black/20"}`}>
-                          <Icon className={`w-5 h-5 ${cfg.color}`} />
-                        </div>
-                        <div>
-                          <p className={`font-serif font-700 text-xl ${cfg.color}`}>
-                            {language === "hi" ? cfg.label.hi : cfg.label.en}
-                          </p>
-                        </div>
+                  <div className={`p-4 rounded-2xl border-2 ${cfg.bg}`}>
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className={`relative ${cfg.pulse ? "pulse-dot" : ""}`}>
+                        <Icon className={`w-6 h-6 ${cfg.color}`} />
                       </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{result.urgencyExplanation}</p>
-                      {result.urgencyLevel === "emergency" && (
-                        <a
-                          href="tel:108"
-                          className="mt-4 flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-700 text-lg transition-colors"
-                          data-testid="button-call-108"
-                        >
-                          <Phone className="w-5 h-5" /> {t("Call 108 Now", "अभी 108 कॉल करें")}
-                        </a>
-                      )}
-                    </CardContent>
-                  </Card>
+                      <h2 className={`text-lg font-serif font-700 ${cfg.color}`}>
+                        {language === "hi" ? cfg.label.hi : cfg.label.en}
+                      </h2>
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{result.urgencyExplanation}</p>
+                  </div>
                 );
               })()}
 
-              {/* Possible Causes */}
-              <Card className="border-border">
-                <CardHeader className="pb-3 pt-5 px-5">
-                  <CardTitle className="text-base font-600 text-foreground flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-primary" />
-                    {t("Possible Causes", "संभावित कारण")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="px-5 pb-5">
-                  <div className="space-y-3">
-                    {result.possibleCauses.map((cause, i) => {
-                      const lCfg = LIKELIHOOD_CONFIG[cause.likelihood];
+              {/* Immediate steps */}
+              {result.immediateSteps && result.immediateSteps.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-2 pt-4">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      {t("Immediate Steps", "तुरंत क्या करें")}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <ol className="space-y-2">
+                      {result.immediateSteps.map((step, i) => (
+                        <li key={i} className="flex gap-3 text-sm text-muted-foreground">
+                          <span className="w-5 h-5 rounded-full bg-primary/15 text-primary text-xs font-700 flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                          {step}
+                        </li>
+                      ))}
+                    </ol>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Possible conditions */}
+              {result.possibleConditions && result.possibleConditions.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-2 pt-4">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Stethoscope className="w-4 h-4 text-primary" />
+                      {t("Possible Conditions", "संभावित कारण")}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0 space-y-3">
+                    {result.possibleConditions.map((cond, i) => {
+                      const lCfg = LIKELIHOOD_CONFIG[cond.likelihood as keyof typeof LIKELIHOOD_CONFIG] ?? LIKELIHOOD_CONFIG.possible;
                       return (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0, x: -12 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: i * 0.08 }}
-                          className="rounded-lg border border-border p-3 bg-muted/20"
-                        >
+                        <div key={i} className="p-3 rounded-xl bg-muted/30 border border-border/50">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className={`text-xs font-600 px-2 py-0.5 rounded-full ${lCfg.className}`}>
+                            <span className="font-600 text-sm text-foreground">{cond.name}</span>
+                            <Badge className={`text-xs ${lCfg.className}`}>
                               {language === "hi" ? lCfg.label.hi : lCfg.label.en}
-                            </span>
-                            <span className="font-600 text-sm text-foreground">{cause.cause}</span>
+                            </Badge>
                           </div>
-                          <p className="text-xs text-muted-foreground leading-relaxed">{cause.explanation}</p>
-                        </motion.div>
+                          <p className="text-xs text-muted-foreground">{cond.reason}</p>
+                        </div>
                       );
                     })}
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              )}
 
-              {/* Immediate Steps */}
-              <Card className="border-blue-200 dark:border-blue-800/50 bg-blue-50/50 dark:bg-blue-950/20">
-                <CardHeader className="pb-3 pt-5 px-5">
-                  <CardTitle className="text-base font-600 text-blue-700 dark:text-blue-400 flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4" />
-                    {t("What to Do Right Now", "अभी क्या करें")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="px-5 pb-5">
-                  <ol className="space-y-2">
-                    {result.immediateSteps.map((step, i) => (
-                      <li key={i} className="flex gap-2.5 text-sm text-muted-foreground">
-                        <span className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs font-700 flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
-                        <span>{step}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </CardContent>
-              </Card>
+              {/* Red flags */}
+              {result.redFlags && result.redFlags.length > 0 && (
+                <Card className="border-red-200 dark:border-red-800/50">
+                  <CardHeader className="pb-2 pt-4">
+                    <CardTitle className="text-base flex items-center gap-2 text-red-600 dark:text-red-400">
+                      <AlertTriangle className="w-4 h-4" />
+                      {t("Seek Help Immediately If…", "तुरंत मदद लें अगर…")}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <ul className="space-y-1.5">
+                      {result.redFlags.map((flag, i) => (
+                        <li key={i} className="flex gap-2 text-sm text-muted-foreground">
+                          <span className="text-red-500 flex-shrink-0">❗</span> {flag}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
 
-              {/* Red Flags */}
-              <Card className="border-red-200 dark:border-red-800/50 bg-red-50/50 dark:bg-red-950/20">
-                <CardHeader className="pb-3 pt-5 px-5">
-                  <CardTitle className="text-base font-600 text-red-700 dark:text-red-400 flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4" />
-                    {t("Seek Emergency Help If You Notice:", "अगर ये दिखे तो तुरंत अस्पताल जाएं:")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="px-5 pb-5">
-                  <ul className="space-y-2">
-                    {result.redFlags.map((flag, i) => (
-                      <li key={i} className="flex gap-2 text-sm text-muted-foreground">
-                        <span className="text-red-500 font-700 mt-0.5">!</span>
-                        <span>{flag}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+              {/* Questions for doctor */}
+              {result.questionsForDoctor && result.questionsForDoctor.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-2 pt-4">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <MessageCircle className="w-4 h-4 text-primary" />
+                      {t("Questions to Ask Your Doctor", "डॉक्टर से पूछें")}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <ul className="space-y-2">
+                      {result.questionsForDoctor.map((q, i) => (
+                        <li key={i} className="flex gap-2 text-sm text-muted-foreground">
+                          <span className="text-primary font-700 flex-shrink-0">{i + 1}.</span> {q}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
 
-              {/* Doctor info */}
-              <Card className="border-border">
-                <CardContent className="pt-5 pb-5">
-                  <div className="flex items-start gap-3">
-                    <Stethoscope className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-sm font-600 text-foreground mb-1">
-                        {t("Recommended Specialist", "सुझाया गया विशेषज्ञ")}
-                      </p>
-                      <p className="text-sm text-muted-foreground">{result.doctorSpeciality}</p>
-                      <p className="text-sm text-muted-foreground mt-2">{result.whenToSeekHelp}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Share */}
+              {shareText && (
+                <div className="flex justify-center pt-2">
+                  <WhatsAppShare text={shareText} label={t("Share on WhatsApp", "WhatsApp पर शेयर करें")} />
+                </div>
+              )}
 
-              {/* WhatsApp Share */}
-              <div className="flex justify-center pt-2">
-                <WhatsAppShare
-                  text={shareText}
-                  label={t("Share with Family on WhatsApp", "परिवार को WhatsApp पर भेजें")}
-                />
-              </div>
-
-              <p className="text-xs text-muted-foreground text-center px-4 py-3 rounded-lg bg-muted/50 border border-border">
-                {result.disclaimer}
-              </p>
-
-              {/* Was this helpful? */}
-              <div className="glass-panel rounded-2xl overflow-hidden p-1 mt-2">
-                <iframe
-                  data-tally-src="https://tally.so/embed/LZoLQO?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
-                  loading="lazy"
-                  width="100%"
-                  height="340"
-                  frameBorder="0"
-                  marginHeight={0}
-                  marginWidth={0}
-                  title="Was this useful?"
-                />
+              {/* Disclaimer */}
+              <div className="flex gap-2.5 items-start p-3 rounded-lg bg-muted/40 border border-border/60">
+                <Info className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-muted-foreground">
+                  {t(
+                    "This is not a medical diagnosis. Always consult a qualified doctor for proper evaluation and treatment.",
+                    "यह चिकित्सा निदान नहीं है। उचित मूल्यांकन और उपचार के लिए हमेशा एक योग्य डॉक्टर से परामर्श करें।"
+                  )}
+                </p>
               </div>
             </motion.div>
           )}
@@ -413,4 +416,4 @@ export default function SymptomChecker() {
       </motion.div>
     </div>
   );
-}
+                                          }
