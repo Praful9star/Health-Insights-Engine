@@ -138,11 +138,11 @@ export default function App() {
                 <ServiceWorkerRegistrar />
                 <Analytics />
                 <ScrollToTop />
-                <div className="grain relative min-h-screen flex flex-col">
-                  <PremiumBackground />
-                  <DisclaimerBanner />
-                  <Navbar />
-                  <main className="flex-1 pb-20 lg:pb-0">
+                <div className="grain relative min-h-dvh flex flex-col overflow-x-hidden">
+  <PremiumBackground />
+  <DisclaimerBanner />
+  <Navbar />
+  <main className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
                     <AnimatedRouter />
                   </main>
                   <Footer />
