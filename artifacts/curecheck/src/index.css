@@ -91,6 +91,7 @@
 
 /* ── LIGHT MODE ─────────────────────────────────────────────── */
 :root {
+  /* Design tokens */
   --bg:           #F7F9FC;
   --surface:      #FFFFFF;
   --surface-alt:  #F1F4F9;
@@ -107,6 +108,7 @@
   --alert:        #D64545;
   --alert-tint:   #FBEAEA;
 
+  /* Internal */
   --primary-foreground:            #ffffff;
   --button-outline:                rgba(0,0,0,.10);
   --badge-outline:                 rgba(0,0,0,.05);
@@ -115,6 +117,7 @@
   --elevate-2:                     rgba(0,0,0,.08);
   --primary-border:                hsl(from var(--primary) h s calc(l + var(--opaque-button-border-intensity)));
 
+  /* Font */
   --app-font-sans:  'Inter', system-ui, sans-serif;
   --app-font-serif: 'Inter', system-ui, sans-serif;
   --app-font-mono:  'JetBrains Mono', ui-monospace, monospace;
@@ -178,6 +181,7 @@
 
   ::selection { background: color-mix(in srgb, var(--primary) 28%, transparent); color: var(--text); }
 
+  /* Smooth scrollbar */
   ::-webkit-scrollbar { width: 7px; height: 7px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
@@ -187,6 +191,7 @@
 @layer utilities {
   input[type="search"]::-webkit-search-cancel-button { @apply hidden; }
 
+  /* Glassmorphism */
   .glass {
     background: rgba(255,255,255,0.72);
     backdrop-filter: blur(16px) saturate(1.4);
@@ -199,7 +204,7 @@
     -webkit-backdrop-filter: blur(28px) saturate(1.3);
     border: 1px solid rgba(255,255,255,0.07);
   }
-
+  /* Stronger frosted panel for bento cards */
   .glass-panel {
     background: rgba(255,255,255,0.88);
     backdrop-filter: blur(12px) saturate(1.2);
@@ -214,6 +219,7 @@
     background: rgba(22,33,46,0.7);
   }
 
+  /* Gradient text */
   .gradient-text {
     background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 65%, #7C3AED));
     background-size: 200% auto;
@@ -228,6 +234,7 @@
     100% { background-position: 0% 50%; }
   }
 
+  /* Hero background */
   .hero-gradient {
     background:
       radial-gradient(ellipse 90% 70% at 50% -15%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 70%),
@@ -242,6 +249,7 @@
       radial-gradient(ellipse 30% 30% at 18% 12%, rgba(124,58,237,0.10), transparent 50%);
   }
 
+  /* Floating orb animations */
   .orb {
     position: absolute;
     border-radius: 50%;
@@ -259,24 +267,24 @@
   }
   [data-theme=dark] .orb { opacity: 0.25; }
 
+  /* Glow card hover */
   .glow-card {
     transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
   }
   .glow-card:hover {
     box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--primary) 25%, transparent),
-      0 8px 32px color-mix(in srgb, var(--primary) 12%, transparent),
-      0 2px 8px rgba(0,0,0,0.08);
-    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+      0 0 0 1px color-mix(in srgb, var(--primary) 20%, transparent),
+      0 6px 20px rgba(0,0,0,0.08);
+    border-color: color-mix(in srgb, var(--primary) 25%, transparent);
     transform: translateY(-3px);
   }
   [data-theme=dark] .glow-card:hover {
     box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--primary) 30%, transparent),
-      0 8px 32px color-mix(in srgb, var(--primary) 18%, transparent),
-      0 2px 8px rgba(0,0,0,0.3);
+      0 0 0 1px color-mix(in srgb, var(--primary) 22%, transparent),
+      0 6px 20px rgba(0,0,0,0.25);
   }
 
+  /* Shimmer loading effect */
   .shimmer {
     background: linear-gradient(90deg, var(--surface-alt) 25%, color-mix(in srgb, var(--text-muted) 8%, transparent) 50%, var(--surface-alt) 75%);
     background-size: 200% 100%;
@@ -287,21 +295,32 @@
     100% { background-position: 200% 0; }
   }
 
+  /* Score ring */
   .score-ring {
     stroke-dasharray: 283;
     stroke-linecap: round;
     transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .ticker-wrap { overflow: hidden; white-space: nowrap; }
-  .ticker-track { display: inline-flex; animation: ticker 90s linear infinite; }
+  /* Ticker/marquee */
+  .ticker-wrap {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .ticker-track {
+    display: inline-flex;
+    animation: ticker 90s linear infinite;
+  }
   .ticker-track:hover { animation-play-state: paused; }
   @keyframes ticker {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
   }
 
-  .pulse-dot { position: relative; }
+  /* Pulse badge */
+  .pulse-dot {
+    position: relative;
+  }
   .pulse-dot::before {
     content: '';
     position: absolute;
@@ -316,6 +335,7 @@
     100% { transform: scale(2.5); opacity: 0; }
   }
 
+  /* Gradient border cards */
   .gradient-border {
     position: relative;
     background: var(--surface);
@@ -335,7 +355,11 @@
     pointer-events: none;
   }
 
-  .btn-glow { position: relative; overflow: hidden; }
+  /* Button glow */
+  .btn-glow {
+    position: relative;
+    overflow: hidden;
+  }
   .btn-glow::after {
     content: '';
     position: absolute;
@@ -350,19 +374,27 @@
   }
   .btn-glow:hover::after { transform: scale(1); }
 
+  /* Number counter animation */
   .count-up { animation: count-up 0.6s ease-out forwards; }
   @keyframes count-up {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .icon-ring { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+  /* Feature card icon ring */
+  .icon-ring {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
   .group:hover .icon-ring {
-    transform: scale(1.1) rotate(-5deg);
-    box-shadow: 0 0 20px color-mix(in srgb, var(--primary) 25%, transparent);
+    transform: scale(1.08) rotate(-4deg);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   }
 
-  .spotlight-card { position: relative; overflow: hidden; }
+  /* Spotlight effect on hover */
+  .spotlight-card {
+    position: relative;
+    overflow: hidden;
+  }
   .spotlight-card::after {
     content: '';
     position: absolute;
@@ -374,6 +406,9 @@
   }
   .spotlight-card:hover::after { opacity: 1; }
 
+  /* ============ PREMIUM (Stitch) UTILITIES ============ */
+
+  /* Film grain overlay (inline SVG noise — no external asset) */
   .grain::before {
     content: '';
     position: fixed;
@@ -384,6 +419,7 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
+  /* Animated premium background (CSS, mobile-friendly — no WebGL) */
   .premium-bg {
     position: fixed;
     inset: 0;
@@ -412,8 +448,22 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .premium-bg::after { animation: none; }
+    .ecg-scroll        { animation: none; }
+    .ticker-track      { animation: none; }
+    .particle-float    { animation: none; }
+    .spin-slow         { animation: none; }
+    .skeleton          { animation: none; opacity: 0.7; }
+    .state-badge-item  { animation: none; }
+    .live-ring::after  { animation: none; }
+    .shimmer-btn::before { transition: none; }
+    .shimmer           { animation: none; }
+    .tile:hover        { transform: none; }
+    .glow-card:hover   { transform: none; }
+    .hover-lift:hover  { transform: none; }
+    .pulse-dot::before { animation: none; }
   }
 
+  /* Faint grid texture overlay */
   .grid-overlay {
     background-image:
       linear-gradient(color-mix(in srgb, var(--border) 50%, transparent) 1px, transparent 1px),
@@ -423,6 +473,7 @@
     mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black, transparent 75%);
   }
 
+  /* Bento grid */
   .bento-grid {
     display: grid;
     grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -432,6 +483,7 @@
     .bento-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
   }
 
+  /* Section labels — readable caps */
   .mono-label {
     font-family: var(--app-font-sans);
     text-transform: uppercase;
@@ -440,7 +492,12 @@
     font-weight: 700;
   }
 
-  .shimmer-btn { position: relative; overflow: hidden; isolation: isolate; }
+  /* Shimmer / sweep button */
+  .shimmer-btn {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
   .shimmer-btn::before {
     content: '';
     position: absolute;
@@ -453,39 +510,49 @@
   }
   .shimmer-btn:hover::before { background-position: -150% 0; }
 
-  .glow-cyan { box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 25%, transparent), 0 0 30px color-mix(in srgb, var(--primary) 18%, transparent); }
+  /* Primary glow utilities */
+  .glow-cyan { box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 20%, transparent), 0 4px 16px rgba(0,0,0,0.07); }
   .text-glow { text-shadow: 0 0 24px color-mix(in srgb, var(--primary) 45%, transparent); }
 
+  /* Premium transitions */
   .premium-transition { transition: transform .4s cubic-bezier(.22,1,.36,1), box-shadow .4s ease, border-color .4s ease, background-color .4s ease; }
 
+  /* Glow on focus-within (inputs/cards) */
   .glow-border { transition: border-color .3s ease, box-shadow .3s ease; }
   .glow-border:focus-within {
     border-color: color-mix(in srgb, var(--primary) 60%, transparent);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent);
   }
 
-  .tile { transition: transform .4s cubic-bezier(.22,1,.36,1), border-color .4s ease, box-shadow .4s ease; }
+  /* Hover lift for bento tiles */
+  .tile {
+    transition: transform .4s cubic-bezier(.22,1,.36,1), border-color .4s ease, box-shadow .4s ease;
+  }
   .tile:hover {
     transform: translateY(-4px);
-    border-color: color-mix(in srgb, var(--primary) 35%, transparent);
-    box-shadow: 0 18px 50px -12px color-mix(in srgb, var(--primary) 18%, transparent);
+    border-color: color-mix(in srgb, var(--primary) 28%, transparent);
+    box-shadow: 0 12px 32px -8px rgba(0,0,0,0.1);
   }
 
+  /* 3D flip card (myth buster) */
   .flip-3d { perspective: 1600px; }
   .flip-inner { transform-style: preserve-3d; transition: transform .7s cubic-bezier(.22,1,.36,1); }
   .flip-3d.flipped .flip-inner { transform: rotateY(180deg); }
   .flip-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
   .flip-back { transform: rotateY(180deg); }
 
+  /* Slow spin for accents */
   .spin-slow { animation: spin 14s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  /* ECG scrolling animation */
   .ecg-scroll { animation: ecg-scroll 14s linear infinite; }
   @keyframes ecg-scroll {
     from { transform: translateX(0); }
     to   { transform: translateX(-50%); }
   }
 
+  /* Floating hero particles */
   @keyframes particle-float {
     0%,  100% { transform: translateY(0px)   rotate(0deg);   opacity: 0.12; }
     33%        { transform: translateY(-18px) rotate(10deg);  opacity: 0.22; }
@@ -493,18 +560,21 @@
   }
   .particle-float { animation: particle-float 7s ease-in-out infinite; }
 
+  /* Count-up stat card */
   @keyframes stat-in {
     from { opacity: 0; transform: translateY(20px) scale(0.97); }
     to   { opacity: 1; transform: translateY(0)    scale(1); }
   }
   .stat-card { animation: stat-in 0.6s cubic-bezier(0.22,1,0.36,1) both; }
 
+  /* India state badge pulse */
   @keyframes badge-live {
     0%, 100% { box-shadow: 0 0 0 0   color-mix(in srgb, var(--primary) 0%, transparent); }
     50%       { box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 10%, transparent); }
   }
   .state-badge-item { animation: badge-live 3.5s ease-in-out infinite; }
 
+  /* Myth-of-day reveal */
   @keyframes myth-reveal {
     from { opacity: 0; max-height: 0; }
     to   { opacity: 1; max-height: 200px; }
@@ -514,13 +584,15 @@
     overflow: hidden;
   }
 
+  /* WhatsApp green border */
   .glow-whatsapp {
-    box-shadow: 0 0 0 1px hsl(142 76% 36% / 0.3), 0 0 28px hsl(142 76% 36% / 0.15);
+    box-shadow: 0 0 0 1px hsl(142 76% 36% / 0.25), 0 2px 8px rgba(0,0,0,0.06);
   }
   .glow-whatsapp:hover {
-    box-shadow: 0 0 0 1px hsl(142 76% 36% / 0.5), 0 0 40px hsl(142 76% 36% / 0.25);
+    box-shadow: 0 0 0 1px hsl(142 76% 36% / 0.4), 0 4px 14px rgba(0,0,0,0.08);
   }
 
+  /* Skeleton pulse */
   @keyframes skeleton {
     0%   { opacity: 0.6; }
     50%  { opacity: 1; }
@@ -528,23 +600,29 @@
   }
   .skeleton { animation: skeleton 1.6s ease-in-out infinite; }
 
+  /* Floating ring for fab button */
   @keyframes fab-ring {
     0%   { transform: scale(1); opacity: 0.5; }
     100% { transform: scale(2); opacity: 0; }
   }
 
+  /* Page entry animation */
   @keyframes page-in {
     from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0); }
   }
   .page-enter { animation: page-in 0.25s cubic-bezier(0.22,1,0.36,1) both; }
 
-  .hover-lift { transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease; }
+  /* Card hover — stronger lift */
+  .hover-lift {
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease;
+  }
   .hover-lift:hover {
     transform: translateY(-4px);
-    box-shadow: 0 16px 40px -8px color-mix(in srgb, var(--primary) 14%, transparent), 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 12px 28px -6px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
   }
 
+  /* Pulse ring for live indicators */
   @keyframes live-ring {
     0%   { transform: scale(1); opacity: 0.7; }
     100% { transform: scale(2.5); opacity: 0; }
@@ -559,18 +637,22 @@
     opacity: 0;
   }
 
+  /* Scrollbar hide */
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
 
+  /* Micro button press */
   .btn-press { transition: transform 0.12s ease, box-shadow 0.12s ease; }
   .btn-press:active { transform: scale(0.96); }
 
+  /* Focus ring (accessible) */
   .focus-ring:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
     border-radius: 8px;
   }
 
+  /* Live data indicator badge */
   .badge-live {
     display: inline-flex;
     align-items: center;
@@ -587,6 +669,7 @@
     font-family: var(--app-font-mono);
   }
 
+  /* Blinking cursor */
   .cursor-blink::after {
     content: '|';
     animation: blink 1s step-end infinite;
@@ -598,7 +681,7 @@
   }
 }
 
-/* ── Hydration gate ── */
+/* ── Hydration gate — prevent prerendered opacity:0 from hiding ATF content ── */
 html:not(.js-ready) [style*="opacity:0"],
 html:not(.js-ready) [style*="opacity: 0"] {
   opacity: 1 !important;
@@ -606,7 +689,7 @@ html:not(.js-ready) [style*="opacity: 0"] {
   transition: none !important;
 }
 
-/* ── Respect prefers-reduced-motion ── */
+/* ── Respect prefers-reduced-motion globally ─────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -621,4 +704,4 @@ html:not(.js-ready) [style*="opacity: 0"] {
     opacity: 1 !important;
     transform: none !important;
   }
-                          }
+}
