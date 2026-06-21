@@ -10,6 +10,7 @@ import {
   Activity, FlaskConical, MapPin, Share2,
   Brain, Leaf, Syringe, Baby, Newspaper, Calculator, PhoneCall, Shield, Stethoscope, AlertCircle, AlertTriangle,
 } from "lucide-react";
+import { TOOL_CATEGORIES } from "@/data/tool-catalog";
 import { Button } from "@/components/ui/button";
 import { CureCheckMark } from "@/components/logo";
 import {
@@ -88,23 +89,6 @@ const CORE_FEATURES = [
     desc: { en: "Daily fitness score, streak tracker, AI-powered suggestions, health challenges and Indian gym diet plans — your daily health companion.", hi: "रोज़ का फिटनेस स्कोर, लगातार दिनों का ट्रैकर, AI सुझाव, स्वास्थ्य चुनौतियाँ और भारतीय जिम डाइट प्लान।" },
     preview: null,
   },
-];
-
-const ALL_TOOLS = [
-  { icon: Stethoscope, href: "/symptom-checker",   accent: "text-sky-400",     bg: "bg-sky-500/10",     en: "Symptom Checker",      hi: "लक्षण जांच"          },
-  { icon: Activity,    href: "/disease-journey",   accent: "text-violet-400",  bg: "bg-violet-500/10",  en: "Disease Journey",      hi: "रोग यात्रा"          },
-  { icon: FlaskConical,href: "/claim-checker",     accent: "text-rose-400",    bg: "bg-rose-500/10",    en: "Claim Checker",        hi: "दावा जांच"           },
-  { icon: Pill,        href: "/drug-interaction",  accent: "text-red-400",     bg: "bg-red-500/10",     en: "Drug Interactions",    hi: "दवा इंटरेक्शन"      },
-  { icon: Calculator,  href: "/calculators",       accent: "text-teal-400",    bg: "bg-teal-500/10",    en: "Health Calculators",   hi: "कैलकुलेटर"          },
-  { icon: MapPin,      href: "/hospitals",         accent: "text-emerald-400", bg: "bg-emerald-500/10", en: "Hospital Finder",      hi: "अस्पताल खोजें"      },
-  { icon: PhoneCall,   href: "/emergency",         accent: "text-orange-400",  bg: "bg-orange-500/10",  en: "Emergency & First Aid",hi: "आपातकाल"            },
-  { icon: Brain,       href: "/mental-health",     accent: "text-purple-400",  bg: "bg-purple-500/10",  en: "Mental Health",        hi: "मानसिक स्वास्थ्य"  },
-  { icon: Syringe,     href: "/vaccines",          accent: "text-cyan-400",    bg: "bg-cyan-500/10",    en: "Vaccine Schedule",     hi: "टीकाकरण"            },
-  { icon: Leaf,        href: "/ayurveda",          accent: "text-lime-400",    bg: "bg-lime-500/10",    en: "Ayurveda Guide",       hi: "आयुर्वेद"           },
-  { icon: Shield,      href: "/insurance",         accent: "text-indigo-400",  bg: "bg-indigo-500/10",  en: "Insurance Guide",      hi: "बीमा गाइड"          },
-  { icon: Baby,        href: "/pregnancy",         accent: "text-pink-400",    bg: "bg-pink-500/10",    en: "Pregnancy Tracker",    hi: "गर्भावस्था"         },
-  { icon: Newspaper,   href: "/news",              accent: "text-amber-400",   bg: "bg-amber-500/10",   en: "Health News",          hi: "स्वास्थ्य समाचार"  },
-  { icon: TrendingUp,  href: "/myth-buster",       accent: "text-rose-400",    bg: "bg-rose-500/10",    en: "Myth Buster",          hi: "मिथक बस्टर"         },
 ];
 
 const HOW_IT_WORKS = [
@@ -368,28 +352,42 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══ ALL TOOLS GRID ═══════════════════════════════════════════ */}
-      <section className="py-16 px-4">
+      {/* ══ ALL TOOLS BY CATEGORY ════════════════════════════════════ */}
+      <section className="py-16 px-4" aria-label="All tools">
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
-            <p className="mono-label text-primary/80 mb-3">{t("15+ Free Tools", "15+ मुफ्त उपकरण")}</p>
+            <p className="mono-label text-primary/80 mb-3">{t("All Health Tools", "सभी स्वास्थ्य उपकरण")}</p>
             <h2 className="text-3xl sm:text-4xl font-serif font-800 text-foreground">
-              {t("Explore all health tools", "सभी स्वास्थ्य उपकरण देखें")}
+              {t("Explore by category", "श्रेणी के अनुसार देखें")}
             </h2>
-          </motion.div><div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-4 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 scrollbar-hide">
-            {ALL_TOOLS.map((tool, i) => (
-              <motion.div key={tool.href} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i % 5} className="flex-none w-36 sm:w-auto snap-start">
-                <Link href={tool.href}>
-                  <div className="group glass-panel rounded-2xl p-4 cursor-pointer border border-border/40 hover:border-primary/30 hover:-translate-y-1 transition-all text-center min-h-[110px] flex flex-col justify-center">
-                    <div className={`w-10 h-10 rounded-xl ${tool.bg} flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
-                      <tool.icon className={`w-5 h-5 ${tool.accent}`} />
-                    </div>
-                    <p className="text-xs font-600 text-foreground leading-snug group-hover:text-primary transition-colors">
-                      {language === "hi" ? tool.hi : tool.en}
-                    </p>
-                  </div>
-                </Link>
-              </motion.div>
+          </motion.div>
+          <div className="space-y-10">
+            {TOOL_CATEGORIES.map(cat => (
+              <div key={cat.key}>
+                <div className="flex items-center gap-3 mb-4">
+                  <p className={`mono-label uppercase ${cat.accent}`}>
+                    {language === "hi" ? cat.label.hi : cat.label.en}
+                  </p>
+                  <div className="flex-1 h-px bg-border/30" />
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                  {cat.tools.map(tool => (
+                    <Link key={tool.href} href={tool.href}>
+                      <div className="group flex flex-col gap-1.5 p-3 rounded-xl border border-border/30 hover:border-border/60 bg-background/40 hover:bg-muted/30 transition-all cursor-pointer min-h-[80px]">
+                        <div className={`w-7 h-7 rounded-lg ${tool.bg} ${tool.accent} flex items-center justify-center flex-shrink-0`}>
+                          <tool.icon className="w-3.5 h-3.5" />
+                        </div>
+                        <p className="text-xs font-600 text-foreground leading-snug">
+                          {language === "hi" ? tool.hi : tool.en}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">
+                          {language === "hi" ? tool.desc.hi : tool.desc.en}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>
