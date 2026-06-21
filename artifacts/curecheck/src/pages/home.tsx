@@ -151,106 +151,122 @@ export default function Home() {
       <NewsTicker />
 
       {/* ══ HERO ═════════════════════════════════════════════════════ */}
-      <section className="relative  overflow-hidden pt-16 pb-32 px-4">
+      <section className="relative overflow-hidden pt-12 pb-28 lg:pt-24 lg:pb-36 px-4" aria-label="Hero">
 
-        {/* Big central glow behind content */}
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[420px] rounded-full"
-            style={{
-              background: "transparent",
-              filter: "none",
-            }} />
-          {/* Purple accent blob — top right */}
+            style={{ background: "transparent", filter: "none" }} />
           <div className="absolute -top-20 right-0 w-[380px] h-[380px] rounded-full"
             style={{ background: "transparent", filter: "none" }} />
-          {/* Teal blob — bottom left */}
           <div className="absolute bottom-0 -left-10 w-[300px] h-[300px] rounded-full"
             style={{ background: "transparent", filter: "none" }} />
         </div>
 
-        <div className="max-w-4xl mx-auto text-center relative z-10 flex flex-col items-center">
-          <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0} className="flex justify-center mb-7">
-            <div className="flex items-center gap-3">
+        {/* Desktop: 2-col grid — headline left, demo card right.
+            Mobile: flex-col centered (unchanged). */}
+        <div className="max-w-[1200px] mx-auto relative z-10 flex flex-col items-center text-center lg:grid lg:grid-cols-2 lg:gap-16 lg:items-center lg:text-left">
+
+          {/* ── Left: branding + headline + desktop CTA ── */}
+          <div className="flex flex-col items-center lg:items-start">
+            <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0}
+              className="flex items-center gap-3 mb-7">
               <CureCheckMark size={40} id="hero-logo" />
               <span className="font-serif font-800 text-foreground text-3xl tracking-tight leading-none">
                 Cure<span className="text-primary">Check</span>
               </span>
+            </motion.div>
+
+            <motion.h1
+              variants={fadeUp} initial="hidden" animate="visible" custom={1}
+              className="text-4xl sm:text-5xl lg:text-6xl font-serif font-800 leading-[1.1] text-foreground"
+            >
+              {t("AI Report Explainer You Can Understand", "AI रिपोर्ट व्याख्याकार जिसे आप समझ सकते हैं")}
+            </motion.h1>
+
+            <motion.p
+              variants={fadeUp} initial="hidden" animate="visible" custom={2}
+              className="mt-5 text-muted-foreground text-lg leading-relaxed hidden lg:block"
+            >
+              {t(
+                "Paste any CBC, thyroid panel or lab report. Get plain-language explanations, abnormal values flagged, and the exact questions to ask your doctor.",
+                "कोई भी CBC, थायरॉइड या लैब रिपोर्ट paste करें। सरल भाषा में समझाव और डॉक्टर से पूछने के सही सवाल।"
+              )}
+            </motion.p>
+
+            {/* CTA — desktop only; mobile version sits below the demo card */}
+            <motion.div
+              variants={fadeUp} initial="hidden" animate="visible" custom={3}
+              className="mt-8 hidden lg:flex justify-start"
+            >
+              <Link href="/report-explainer">
+                <Button size="lg"
+                  className="gap-2 rounded-full px-8 h-12 text-base font-700"
+                  data-testid="button-hero-report"
+                >
+                  <FileSearch className="w-5 h-5" />
+                  {t("Analyze My Report", "मेरी रिपोर्ट Analyze करें")}
+                </Button>
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* ── Right: demo card ── */}
+          <motion.div
+            variants={fadeUp} initial="hidden" animate="visible" custom={2}
+            className="mt-8 lg:mt-0 w-full max-w-lg mx-auto lg:max-w-none"
+          >
+            <div className="glass-panel rounded-2xl p-5 border border-border/40 text-left bg-background/50 backdrop-blur-md relative overflow-hidden">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                  <FileSearch className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-serif font-700 text-foreground">
+                    {t("Report Analysis", "रिपोर्ट विश्लेषण")}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">Demo Data</p>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-xl border-l-[3px] border-l-[var(--alert)] bg-[var(--alert-tint)]">
+                  <span className="flex-1 text-xs font-500 text-[var(--text)]">{t("Hemoglobin", "हीमोग्लोबिन")}</span>
+                  <span className="text-sm font-800 tabular-nums text-[var(--text)]">10.2 <span className="text-[11px] font-400 text-[var(--text-muted)]">g/dL</span></span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-700 uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--alert)]/40 text-[var(--alert)] bg-[var(--surface)] flex-shrink-0">
+                    <AlertTriangle className="w-2.5 h-2.5" /> LOW
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-xl border-l-[3px] border-l-[var(--alert)] bg-[var(--alert-tint)]">
+                  <span className="flex-1 text-xs font-500 text-[var(--text)]">{t("Blood Sugar", "रक्त शर्करा")}</span>
+                  <span className="text-sm font-800 tabular-nums text-[var(--text)]">142 <span className="text-[11px] font-400 text-[var(--text-muted)]">mg/dL</span></span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-700 uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--alert)]/40 text-[var(--alert)] bg-[var(--surface)] flex-shrink-0">
+                    <AlertTriangle className="w-2.5 h-2.5" /> HIGH
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl">
+                  <span className="flex-1 text-xs font-500 text-[var(--text)]">{t("Platelets", "प्लेटलेट्स")}</span>
+                  <span className="text-sm font-600 tabular-nums text-[var(--text)]">2,40,000 <span className="text-[11px] font-400 text-[var(--text-muted)]">/mcL</span></span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-700 uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--normal)]/40 text-[var(--normal)] bg-[var(--surface)] flex-shrink-0">
+                    <CheckCircle2 className="w-2.5 h-2.5" /> NORMAL
+                  </span>
+                </div>
+              </div>
+
+              <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+                {t("Plain-English explanation, abnormal values highlighted with why they matter, and exact questions to ask your doctor.", "सरल हिंदी में समझाव, असामान्य मान क्यों मायने रखते हैं, और डॉक्टर से पूछने के सटीक सवाल।")}
+              </p>
             </div>
           </motion.div>
 
-          <motion.h1
-            variants={fadeUp} initial="hidden" animate="visible" custom={1}
-            className="mt-2 text-4xl sm:text-5xl lg:text-6xl font-serif font-800 leading-[1.1] text-foreground max-w-3xl"
-          >
-            {t("AI Report Explainer You Can Understand", "AI रिपोर्ट व्याख्याकार जिसे आप समझ सकते हैं")}
-          </motion.h1>
-
-          <motion.div
-            variants={fadeUp} initial="hidden" animate="visible" custom={2}
-            className="mt-8 w-full max-w-lg mx-auto"
-          >
-             <div className="glass-panel rounded-2xl p-5 border border-border/40 text-left bg-background/50 backdrop-blur-md relative overflow-hidden">
-
-
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                     <FileSearch className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-serif font-700 text-foreground">
-                      {t("Report Analysis", "रिपोर्ट विश्लेषण")}
-                    </h3>
-                    <p className="text-xs text-muted-foreground">Demo Data</p>
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  {/* Hemoglobin — LOW (abnormal) */}
-                  <div className="flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-xl border-l-[3px] border-l-[var(--alert)] bg-[var(--alert-tint)]">
-                    <span className="flex-1 text-xs font-500 text-[var(--text)]">{t("Hemoglobin", "हीमोग्लोबिन")}</span>
-                    <span className="text-sm font-800 tabular-nums text-[var(--text)]">
-                      10.2 <span className="text-[11px] font-400 text-[var(--text-muted)]">g/dL</span>
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-[10px] font-700 uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--alert)]/40 text-[var(--alert)] bg-[var(--surface)] flex-shrink-0">
-                      <AlertTriangle className="w-2.5 h-2.5" /> LOW
-                    </span>
-                  </div>
-                  {/* Blood Sugar — HIGH (abnormal) */}
-                  <div className="flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-xl border-l-[3px] border-l-[var(--alert)] bg-[var(--alert-tint)]">
-                    <span className="flex-1 text-xs font-500 text-[var(--text)]">{t("Blood Sugar", "रक्त शर्करा")}</span>
-                    <span className="text-sm font-800 tabular-nums text-[var(--text)]">
-                      142 <span className="text-[11px] font-400 text-[var(--text-muted)]">mg/dL</span>
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-[10px] font-700 uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--alert)]/40 text-[var(--alert)] bg-[var(--surface)] flex-shrink-0">
-                      <AlertTriangle className="w-2.5 h-2.5" /> HIGH
-                    </span>
-                  </div>
-                  {/* Platelets — NORMAL */}
-                  <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl">
-                    <span className="flex-1 text-xs font-500 text-[var(--text)]">{t("Platelets", "प्लेटलेट्स")}</span>
-                    <span className="text-sm font-600 tabular-nums text-[var(--text)]">
-                      2,40,000 <span className="text-[11px] font-400 text-[var(--text-muted)]">/mcL</span>
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-[10px] font-700 uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--normal)]/40 text-[var(--normal)] bg-[var(--surface)] flex-shrink-0">
-                      <CheckCircle2 className="w-2.5 h-2.5" /> NORMAL
-                    </span>
-                  </div>
-                </div>
-
-                <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-                   {t("Plain-English explanation, abnormal values highlighted with why they matter, and exact questions to ask your doctor.", "सरल हिंदी में समझाव, असामान्य मान क्यों मायने रखते हैं, और डॉक्टर से पूछने के सटीक सवाल।")}
-                </p>
-             </div>
-          </motion.div>
-
+          {/* CTA — mobile only, below demo card to preserve mobile order */}
           <motion.div
             variants={fadeUp} initial="hidden" animate="visible" custom={3}
-            className="mt-8 flex justify-center w-full"
+            className="mt-8 flex justify-center w-full lg:hidden"
           >
             <Link href="/report-explainer">
               <Button size="lg"
                 className="gap-2 rounded-full px-8 h-12 text-base font-700 w-full sm:w-auto"
-                data-testid="button-hero-report"
+                data-testid="button-hero-report-mobile"
               >
                 <FileSearch className="w-5 h-5" />
                 {t("Analyze My Report", "मेरी रिपोर्ट Analyze करें")}
@@ -263,20 +279,14 @@ export default function Home() {
         <EcgDivider />
       </section>
 
-      {/* ══ WEATHER + HEALTH TIPS ════════════════════════════════════ */}
-      <section className="px-4 pt-6 pb-0">
-        <div className="max-w-2xl mx-auto">
+      {/* ══ WEATHER + QUOTE (side-by-side on desktop) ═══════════════ */}
+      <section className="px-4 pt-6 pb-4">
+        <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <WeatherWidget />
           </motion.div>
-        </div>
-      </section>
-
-      {/* ══ QUOTE OF THE DAY ═════════════════════════════════════════ */}
-      <section className="px-4 pt-6 pb-4">
-        <div className="max-w-2xl mx-auto">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <div className="glass-panel rounded-2xl px-6 py-5 border border-primary/15 flex gap-4 items-start"
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1}>
+            <div className="glass-panel rounded-2xl px-6 py-5 border border-primary/15 flex gap-4 items-start h-full"
               style={{ boxShadow: "none" }}>
               <Quote className="w-5 h-5 text-primary/50 flex-shrink-0 mt-0.5" />
               <div>
@@ -294,7 +304,7 @@ export default function Home() {
 
       {/* ══ CORE FEATURES ════════════════════════════════════════════ */}
       <section className="py-20 px-4">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-[1200px] mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
             <p className="mono-label text-primary/80 mb-3">{t("Core Features", "मुख्य सुविधाएं")}</p>
             <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">
@@ -354,7 +364,7 @@ export default function Home() {
 
       {/* ══ ALL TOOLS BY CATEGORY ════════════════════════════════════ */}
       <section className="py-16 px-4" aria-label="All tools">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-[1200px] mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
             <p className="mono-label text-primary/80 mb-3">{t("All Health Tools", "सभी स्वास्थ्य उपकरण")}</p>
             <h2 className="text-3xl sm:text-4xl font-serif font-800 text-foreground">
@@ -370,10 +380,10 @@ export default function Home() {
                   </p>
                   <div className="flex-1 h-px bg-border/30" />
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
                   {cat.tools.map(tool => (
                     <Link key={tool.href} href={tool.href}>
-                      <div className="group flex flex-col gap-1.5 p-3 rounded-xl border border-border/30 hover:border-border/60 bg-background/40 hover:bg-muted/30 transition-all cursor-pointer min-h-[80px]">
+                      <div className="group flex flex-col gap-1.5 p-3 rounded-xl border border-border/30 hover:border-border/60 bg-background/40 hover:bg-muted/30 hover:-translate-y-0.5 hover:shadow-sm transition-all cursor-pointer min-h-[80px]">
                         <div className={`w-7 h-7 rounded-lg ${tool.bg} ${tool.accent} flex items-center justify-center flex-shrink-0`}>
                           <tool.icon className="w-3.5 h-3.5" />
                         </div>
@@ -395,7 +405,7 @@ export default function Home() {
 
       {/* ══ HOW IT WORKS ═════════════════════════════════════════════ */}
       <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-[1200px] mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
             <p className="mono-label text-primary/80 mb-3">{t("How It Works", "कैसे काम करता है")}</p>
             <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">{t("Three simple steps", "तीन आसान कदम")}</h2>
