@@ -49,11 +49,26 @@ const allowedOrigins: string[] = (() => {
   return [];
 })();
 
+if (allowedOrigins.length === 0 && process.env.NODE_ENV === "production") {
+  logger.warn(
+    "REPLIT_DOMAINS is not set in production — all cross-origin requests will be rejected. " +
+      "Set REPLIT_DOMAINS to a comma-separated list of allowed frontend domains.",
+  );
+}
+
 app.use(
   cors({
     origin: (origin, cb) => {
+      // Same-origin / server-to-server requests (no Origin header) are always allowed.
       if (!origin) return cb(null, true);
-      if (allowedOrigins.length === 0) return cb(null, true);
+      // Dev fallback: if no domains are configured allow all origins so local
+      // development works without environment setup. In production we block.
+      if (allowedOrigins.length === 0) {
+        if (process.env.NODE_ENV === "production") {
+          return cb(new Error("Not allowed by CORS: REPLIT_DOMAINS not configured"));
+        }
+        return cb(null, true);
+      }
       if (allowedOrigins.includes(origin)) return cb(null, true);
       cb(new Error("Not allowed by CORS"));
     },

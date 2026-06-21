@@ -6,6 +6,13 @@ import { aiLimiter } from "../middleware/rate-limit";
 
 const router: IRouter = Router();
 
+function sanitizeInput(raw: string): string {
+  return raw
+    .replace(/ /g, "")
+    .replace(/[\x01-\x08\x0b\x0c\x0e-\x1f\x7f]/g, "")
+    .trim();
+}
+
 const SYSTEM_PROMPT = `You are CureCheck's Health Claim Analyzer — a non-diagnostic AI assistant that helps Indian users evaluate health claims circulating on WhatsApp, YouTube, Ayurveda blogs, and social media.
 
 You NEVER diagnose, prescribe, or replace a doctor. You provide EDUCATIONAL information only.
@@ -160,16 +167,21 @@ router.post("/claim-checker", aiLimiter, async (req, res): Promise<void> => {
   const { claim } = parsed.data;
   const hasAi = isAiAvailable();
 
+  const safeClaim = sanitizeInput(claim);
+
   try {
     let result;
 
     if (hasAi) {
-      req.log.info({ claimLength: claim.length }, "Analyzing claim with Groq");
-      const raw = await groqChat(SYSTEM_PROMPT, `Please analyze this health claim: "${claim}"`);
+      req.log.info({ claimLength: safeClaim.length }, "Analyzing claim with Groq");
+      const raw = await groqChat(
+        SYSTEM_PROMPT,
+        `Please analyze this health claim:\n\n[CLAIM START]\n${safeClaim}\n[CLAIM END]`,
+      );
       result = JSON.parse(raw);
     } else {
       req.log.info("GROQ_API_KEY not set, using mock response");
-      result = getMockClaimResult(claim);
+      result = getMockClaimResult(safeClaim);
       await new Promise((r) => setTimeout(r, 1200));
     }
 
@@ -177,9 +189,9 @@ router.post("/claim-checker", aiLimiter, async (req, res): Promise<void> => {
     res.json(validated);
   } catch (err) {
     req.log.error({ err }, "Failed to analyze claim");
-    const mockResult = getMockClaimResult(claim);
+    const mockResult = getMockClaimResult(safeClaim);
     const validated = CheckHealthClaimResponse.parse(mockResult);
-    res.json(validated);
+    res.json({ ...validated, _isMockResponse: true });
   }
 });
 

@@ -9,6 +9,18 @@ export const logger = pino({
     "req.headers.cookie",
     "res.headers['set-cookie']",
   ],
+  serializers: {
+    // In production omit stack traces to avoid leaking file paths and internals.
+    // In development keep the full stack for debugging.
+    err: isProduction
+      ? (err: unknown) => {
+          if (err instanceof Error) {
+            return { type: err.constructor?.name ?? "Error", message: err.message };
+          }
+          return { type: "UnknownError", message: String(err) };
+        }
+      : pino.stdSerializers.err,
+  },
   ...(isProduction
     ? {}
     : {

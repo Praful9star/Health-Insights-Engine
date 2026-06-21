@@ -6,6 +6,13 @@ import { aiLimiter } from "../middleware/rate-limit";
 
 const router: IRouter = Router();
 
+function sanitizeInput(raw: string): string {
+  return raw
+    .replace(/ /g, "")
+    .replace(/[\x01-\x08\x0b\x0c\x0e-\x1f\x7f]/g, "")
+    .trim();
+}
+
 function buildSystemPrompt(language: string) {
   const langInstruction =
     language === "hi"
@@ -150,24 +157,29 @@ router.post("/medicine-explainer", aiLimiter, async (req, res): Promise<void> =>
   const { medicine, language = "en" } = parsed.data;
   const hasAi = isAiAvailable();
 
+  const safeMedicine = sanitizeInput(medicine);
+
   try {
     let result;
     if (hasAi) {
       req.log.info({ language }, "Explaining medicine with Groq");
-      const raw = await groqChat(buildSystemPrompt(language), `Explain this medicine: "${medicine}"`);
+      const raw = await groqChat(
+        buildSystemPrompt(language),
+        `Explain this medicine:\n\n[MEDICINE NAME START]\n${safeMedicine}\n[MEDICINE NAME END]`,
+      );
       result = JSON.parse(raw);
     } else {
       req.log.info("GROQ_API_KEY not set, using mock response");
-      result = getMockMedicineResult(medicine, language ?? "en");
+      result = getMockMedicineResult(safeMedicine, language ?? "en");
       await new Promise((r) => setTimeout(r, 1200));
     }
     const validated = ExplainMedicineResponse.parse(result);
     res.json(validated);
   } catch (err) {
     req.log.error({ err }, "Failed to explain medicine");
-    const mockResult = getMockMedicineResult(medicine, language ?? "en");
+    const mockResult = getMockMedicineResult(safeMedicine, language ?? "en");
     const validated = ExplainMedicineResponse.parse(mockResult);
-    res.json(validated);
+    res.json({ ...validated, _isMockResponse: true });
   }
 });
 
