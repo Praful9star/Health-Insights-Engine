@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   FileSearch, AlertTriangle, CheckCircle, Info, ArrowRight,
   Stethoscope, BookOpen, Save, CheckCircle2, Camera,
-  Upload, FileText, ChevronDown, Sparkles,
+  Upload, FileText, ChevronDown, ChevronUp, Sparkles,
   TrendingUp, TrendingDown, Minus, AlertCircle, Heart,
   Clipboard, X, RotateCcw, ChevronLeft, History,
 } from "lucide-react";
@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/language-context";
 import { WhatsAppShare } from "@/components/whatsapp-share";
 import { useHealthStorage, extractBiomarkers, type TimelineEntry } from "@/hooks/use-health-storage";
+import { ToolModal } from "@/components/tool-modal";
 
 const LS_KEY = "cc_last_report_result_v1";
 
@@ -116,7 +117,6 @@ function ParameterCard({ param, language }: { param: ReportParameter; language: 
       layout
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.18 }}
       className={`rounded-2xl border ${cfg.border} ${cfg.bg} overflow-hidden`}
     >
       <button
@@ -135,7 +135,7 @@ function ParameterCard({ param, language }: { param: ReportParameter; language: 
           </div>
           {(param.userValue || param.normalRange) && (
             <p className="text-xs text-muted-foreground mt-0.5 tabular-nums">
-              {param.userValue && <motion.span initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.16, delay: 0.1 }} className={`font-700 ${cfg.color}`}>{param.userValue}</motion.span>}
+              {param.userValue && <span className={`font-700 ${cfg.color}`}>{param.userValue}</span>}
               {param.userValue && param.normalRange && <span className="mx-1.5 opacity-40">·</span>}
               {param.normalRange && <span className="opacity-70">{language === "en" ? "Ref:" : "सामान्य:"} {param.normalRange}</span>}
             </p>
@@ -143,7 +143,7 @@ function ParameterCard({ param, language }: { param: ReportParameter; language: 
         </div>
         {isAbnormal && (
           <div className="flex-shrink-0 text-muted-foreground">
-            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+            {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </div>
         )}
       </button>
@@ -251,6 +251,12 @@ export default function ReportExplainer() {
   const [isDragging, setIsDragging] = useState(false);
   const [ocrError, setOcrError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  // Re-open modal if OCR fails so user sees the error
+  useEffect(() => {
+    if (ocrError) setModalOpen(true);
+  }, [ocrError]);
 
   const explainReport = useExplainMedicalReport();
   const ocrMutation = useOcrReport();
@@ -319,6 +325,7 @@ export default function ReportExplainer() {
 
   const handleFileSelect = useCallback((file: File | null | undefined) => {
     if (!file) return;
+    setModalOpen(false);
     processFile(file);
   }, [processFile]);
 
@@ -337,6 +344,7 @@ export default function ReportExplainer() {
       toast({ title: t("Please add more report text", "अधिक report text add करें") });
       return;
     }
+    setModalOpen(false);
     setSaved(false);
     explainReport.mutate(
       { data: { reportText: text, language: language as "en" | "hi" } },
@@ -414,142 +422,137 @@ export default function ReportExplainer() {
           )}
         </div>
 
-        <AnimatePresence mode="wait">
+        {/* Modal: input form (upload or paste) */}
+        <ToolModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          title={t("Analyze My Report", "रिपोर्ट Analyze करें")}
+          description={t("Upload a photo/PDF or paste your lab report text", "फ़ोटो/PDF upload करें या lab report text paste करें")}
+        >
+          <div className="space-y-4">
+            {/* Mode tabs */}
+            <div className="flex gap-1 bg-[var(--surface-alt)] rounded-xl p-1">
+              <button
+                onClick={() => setUploadMode("upload")}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-600 transition-all ${uploadMode === "upload" ? "bg-[var(--surface)] text-primary shadow-sm" : "text-[var(--text-muted)] hover:text-[var(--text)]"}`}
+                data-testid="tab-upload"
+              >
+                <Upload className="w-4 h-4" /> {t("Upload / Camera", "Upload / Camera")}
+              </button>
+              <button
+                onClick={() => setUploadMode("text")}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-600 transition-all ${uploadMode === "text" ? "bg-[var(--surface)] text-primary shadow-sm" : "text-[var(--text-muted)] hover:text-[var(--text)]"}`}
+                data-testid="tab-paste"
+              >
+                <FileText className="w-4 h-4" /> {t("Paste Text", "Text Paste करें")}
+              </button>
+            </div>
 
-          {/* ── STEP: INPUT ─────────────────────────────────────────────────── */}
-          {step === "input" && (
-            <motion.div key="input" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.2 }} className="space-y-4">
-
-              {/* Mode tabs */}
-              <div className="flex gap-1 glass-panel rounded-2xl p-1">
-                <button
-                  onClick={() => setUploadMode("upload")}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-600 transition-all ${uploadMode === "upload" ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"}`}
-                  data-testid="tab-upload"
+            {uploadMode === "upload" && (
+              <>
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={handleDrop}
+                  className={`rounded-2xl border-2 border-dashed transition-all ${isDragging ? "border-primary bg-primary/5" : "border-[var(--border)] hover:border-primary/40"}`}
                 >
-                  <Upload className="w-4 h-4" /> {t("Upload / Camera", "Upload / Camera")}
-                </button>
-                <button
-                  onClick={() => setUploadMode("text")}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-600 transition-all ${uploadMode === "text" ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"}`}
-                  data-testid="tab-paste"
-                >
-                  <FileText className="w-4 h-4" /> {t("Paste Text", "Text Paste करें")}
-                </button>
-              </div>
-
-              {uploadMode === "upload" && (
-                <>
-                  {/* Drag-drop zone */}
-                  <div
-                    onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                    onDragLeave={() => setIsDragging(false)}
-                    onDrop={handleDrop}
-                    className={`glass-panel rounded-2xl border-2 border-dashed transition-all ${isDragging ? "border-primary bg-primary/5" : "border-border/50 hover:border-primary/40"}`}
-                  >
-                    <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
-                      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-colors ${isDragging ? "bg-primary/20" : "bg-muted/40"}`}>
-                        <Upload className={`w-7 h-7 ${isDragging ? "text-primary" : "text-muted-foreground"}`} />
-                      </div>
-                      <p className="font-600 text-foreground mb-1">
-                        {isDragging ? t("Drop to upload", "Drop करें") : t("Drag & drop your report here", "Report यहाँ drag & drop करें")}
-                      </p>
-                      <p className="text-sm text-muted-foreground mb-5">
-                        {t("JPG · PNG · HEIC · PDF supported", "JPG · PNG · HEIC · PDF supported")}
-                      </p>
-                      <div className="flex flex-wrap gap-2.5 justify-center">
-                        <Button
-                          onClick={() => cameraInputRef.current?.click()}
-                          className="shimmer-btn gap-2 rounded-full"
-                          data-testid="button-camera"
-                        >
-                          <Camera className="w-4 h-4" />
-                          {t("Take Photo", "फ़ोटो लें")}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="gap-2 rounded-full border-primary/40 text-primary hover:bg-primary/10"
-                          data-testid="button-gallery"
-                        >
-                          <Upload className="w-4 h-4" />
-                          {t("Choose File", "File चुनें")}
-                        </Button>
-                      </div>
+                  <div className="flex flex-col items-center justify-center py-10 px-6 text-center">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-colors ${isDragging ? "bg-primary/20" : "bg-[var(--surface-alt)]"}`}>
+                      <Upload className={`w-6 h-6 ${isDragging ? "text-primary" : "text-[var(--text-muted)]"}`} />
                     </div>
-                    {/* Hidden inputs */}
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept={ACCEPT_TYPES}
-                      className="hidden"
-                      onChange={(e) => handleFileSelect(e.target.files?.[0])}
-                    />
-                    <input
-                      ref={cameraInputRef}
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      className="hidden"
-                      onChange={(e) => handleFileSelect(e.target.files?.[0])}
-                    />
+                    <p className="font-600 text-[var(--text)] mb-1">
+                      {isDragging ? t("Drop to upload", "Drop करें") : t("Drag & drop your report here", "Report यहाँ drag & drop करें")}
+                    </p>
+                    <p className="text-sm text-[var(--text-muted)] mb-4">
+                      {t("JPG · PNG · HEIC · PDF supported", "JPG · PNG · HEIC · PDF supported")}
+                    </p>
+                    <div className="flex flex-wrap gap-2.5 justify-center">
+                      <Button onClick={() => cameraInputRef.current?.click()} className="shimmer-btn gap-2 rounded-full" data-testid="button-camera">
+                        <Camera className="w-4 h-4" /> {t("Take Photo", "फ़ोटो लें")}
+                      </Button>
+                      <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="gap-2 rounded-full border-primary/40 text-primary hover:bg-primary/10" data-testid="button-gallery">
+                        <Upload className="w-4 h-4" /> {t("Choose File", "File चुनें")}
+                      </Button>
+                    </div>
                   </div>
+                  <input ref={fileInputRef} type="file" accept={ACCEPT_TYPES} className="hidden" onChange={(e) => handleFileSelect(e.target.files?.[0])} />
+                  <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => handleFileSelect(e.target.files?.[0])} />
+                </div>
 
-                  {/* Mobile tip */}
-                  <p className="text-xs text-muted-foreground text-center">
-                    📱 {t("Most Indian users share reports via WhatsApp — just download the image and upload above.", "WhatsApp से मिला report? Image download करके ऊपर upload करें।")}
-                  </p>
+                <p className="text-xs text-[var(--text-muted)] text-center">
+                  📱 {t("Most Indian users share reports via WhatsApp — just download the image and upload above.", "WhatsApp से मिला report? Image download करके ऊपर upload करें।")}
+                </p>
 
-                  {ocrError && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-start gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/25">
-                      <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-sm text-amber-400 font-600">{t("Upload issue", "Upload में समस्या")}</p>
-                        <p className="text-sm text-muted-foreground mt-0.5">{ocrError}</p>
-                        <button onClick={() => setUploadMode("text")} className="text-xs text-primary underline mt-1">
-                          {t("Switch to paste text instead →", "Text paste करने पर switch करें →")}
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </>
-              )}
-
-              {uploadMode === "text" && (
-                <div className="glass-panel rounded-2xl p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-600 text-foreground">
-                      {t("Paste your medical report text", "Medical report text paste करें")}
-                    </label>
-                    <Button variant="ghost" size="sm" onClick={() => setReportText(SAMPLE_REPORT)}
-                      className="text-xs gap-1.5 text-muted-foreground hover:text-primary" data-testid="button-load-sample">
-                      <Clipboard className="w-3.5 h-3.5" /> {t("Load sample", "Sample load करें")}
-                    </Button>
+                {ocrError && (
+                  <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/25">
+                    <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-amber-400 font-600">{t("Upload issue", "Upload में समस्या")}</p>
+                      <p className="text-sm text-[var(--text-muted)] mt-0.5">{ocrError}</p>
+                      <button onClick={() => { setUploadMode("text"); setOcrError(null); }} className="text-xs text-primary underline mt-1">
+                        {t("Switch to paste text instead →", "Text paste करने पर switch करें →")}
+                      </button>
+                    </div>
                   </div>
-                  <Textarea
-                    placeholder={t(
-                      "Paste CBC, thyroid, lipid profile, blood glucose, HbA1c or any lab report here...",
-                      "CBC, thyroid, lipid profile, blood glucose, HbA1c या कोई lab report यहाँ paste करें...",
-                    )}
-                    value={reportText} onChange={(e) => setReportText(e.target.value)}
-                    rows={9} className="resize-none text-sm font-mono bg-background/40"
-                    data-testid="input-report"
-                  />
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {t("Tip: Include values and reference ranges for the best analysis.", "Tip: values और reference ranges शामिल करें — बेहतर analysis के लिए।")}
-                  </p>
-                  <Button
-                    onClick={handleAnalyze}
-                    disabled={explainReport.isPending || reportText.trim().length < 20}
-                    className="shimmer-btn mt-4 w-full rounded-xl gap-2 glow-cyan" size="lg"
-                    data-testid="button-explain-report"
-                  >
-                    {explainReport.isPending
-                      ? <span className="animate-pulse">{t("Analyzing report…", "रिपोर्ट analyze हो रही है…")}</span>
-                      : <><FileSearch className="w-4 h-4" /> {t("Explain This Report", "यह Report समझाएं")} <ArrowRight className="w-4 h-4" /></>}
+                )}
+              </>
+            )}
+
+            {uploadMode === "text" && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-600 text-[var(--text)]">
+                    {t("Paste your medical report text", "Medical report text paste करें")}
+                  </label>
+                  <Button variant="ghost" size="sm" onClick={() => setReportText(SAMPLE_REPORT)}
+                    className="text-xs gap-1.5 text-[var(--text-muted)] hover:text-primary" data-testid="button-load-sample">
+                    <Clipboard className="w-3.5 h-3.5" /> {t("Load sample", "Sample load करें")}
                   </Button>
                 </div>
-              )}
+                <Textarea
+                  placeholder={t(
+                    "Paste CBC, thyroid, lipid profile, blood glucose, HbA1c or any lab report here...",
+                    "CBC, thyroid, lipid profile, blood glucose, HbA1c या कोई lab report यहाँ paste करें...",
+                  )}
+                  value={reportText} onChange={(e) => setReportText(e.target.value)}
+                  rows={8} className="resize-none text-sm font-mono"
+                  data-testid="input-report"
+                />
+                <p className="text-xs text-[var(--text-muted)]">
+                  {t("Tip: Include values and reference ranges for the best analysis.", "Tip: values और reference ranges शामिल करें — बेहतर analysis के लिए।")}
+                </p>
+                <Button
+                  onClick={handleAnalyze}
+                  disabled={reportText.trim().length < 20}
+                  className="shimmer-btn w-full rounded-xl gap-2" size="lg"
+                  data-testid="button-explain-report"
+                >
+                  <FileSearch className="w-4 h-4" />
+                  {t("Explain This Report", "यह Report समझाएं")}
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+        </ToolModal>
+
+        <AnimatePresence mode="wait">
+
+          {/* ── STEP: INPUT — trigger button ────────────────────────────────── */}
+          {step === "input" && (
+            <motion.div key="input" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.2 }}>
+              <button
+                onClick={() => { setOcrError(null); setModalOpen(true); }}
+                className="w-full h-14 flex items-center justify-center gap-3 rounded-2xl bg-primary text-primary-foreground font-600 text-lg hover:opacity-90 active:scale-[0.98] transition-all shimmer-btn"
+                data-testid="button-open-report-modal"
+              >
+                <FileSearch className="w-5 h-5" />
+                {t("Analyze My Report", "रिपोर्ट Analyze करें")}
+                <ArrowRight className="w-5 h-5" />
+              </button>
+              <p className="text-center text-xs text-[var(--text-muted)] mt-3">
+                {t("Upload a photo, PDF, or paste your lab report text", "फ़ोटो, PDF, या lab report text paste करें")}
+              </p>
             </motion.div>
           )}
 
@@ -819,4 +822,4 @@ export default function ReportExplainer() {
       </motion.div>
     </div>
   );
-}
+      }
