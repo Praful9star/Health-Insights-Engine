@@ -4,10 +4,13 @@ import PageMeta from "@/components/page-meta";
 import { Link } from "wouter";
 import {
   ChevronLeft, MapPin, Loader2, AlertCircle, Phone,
-  Navigation, Building2, FlaskConical, Clock, RefreshCw,
+  Navigation, Building2, FlaskConical, Clock, RefreshCw, Search, RotateCcw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import "leaflet/dist/leaflet.css";
+import { useLanguage } from "@/contexts/language-context";
+import { useLocationConsent } from "@/hooks/use-location-consent";
+import { LocationConsentModal } from "@/components/location-consent-modal";
 
 /* ─── HTML-escape helper (used in Leaflet innerHTML popups) ───────────── */
 function escHtml(s: string): string {
@@ -123,7 +126,6 @@ function parseOpenStatus(oh?: string): { label: string; isOpen: boolean | null }
   const now = new Date();
   const day = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"][now.getDay()];
   const hm = now.getHours() * 60 + now.getMinutes();
-  // Try to match time ranges like "09:00-21:00"
   const timeRange = s.match(/(\d{2}):(\d{2})-(\d{2}):(\d{2})/);
   if (timeRange) {
     const open = parseInt(timeRange[1]) * 60 + parseInt(timeRange[2]);
@@ -134,7 +136,6 @@ function parseOpenStatus(oh?: string): { label: string; isOpen: boolean | null }
       isOpen,
     };
   }
-  // Check if today is in range like "Mo-Sa"
   const dayNames = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
   const todayIdx = dayNames.indexOf(day);
   const rangeMatch = s.match(/([A-Z][a-z])-([A-Z][a-z])/);
@@ -189,17 +190,21 @@ function applyFilters(data: Hospital[], kind: FilterKind, owner: FilterOwner): H
 
 /* ─── Main component ─────────────────────────────────────────────────── */
 export default function HospitalFinder() {
+  const { language, t } = useLanguage();
+  const { consent, grant, deny, reset } = useLocationConsent();
   const mapEl = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("leaflet").Map | null>(null);
+  const cityInputRef = useRef<HTMLInputElement>(null);
   const [phase, setPhase] = useState<Phase>("idle");
   const [places, setPlaces] = useState<Hospital[]>([]);
   const [errMsg, setErrMsg] = useState("");
   const [filterKind, setFilterKind] = useState<FilterKind>("all");
   const [filterOwner, setFilterOwner] = useState<FilterOwner>("all");
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
+  const [consentModalOpen, setConsentModalOpen] = useState(false);
+  const [cityQuery, setCityQuery] = useState("");
+  const [citySearching, setCitySearching] = useState(false);
 
-  // Refs so buildMap/start always read the latest filter values without needing
-  // to be recreated on every filter change (avoids stale closure issues).
   const filterKindRef = useRef<FilterKind>("all");
   const filterOwnerRef = useRef<FilterOwner>("all");
   filterKindRef.current = filterKind;
@@ -220,7 +225,6 @@ export default function HospitalFinder() {
       maxZoom: 19,
     }).addTo(map);
 
-    // User location marker
     const userIcon = L.divIcon({
       className: "",
       html: `<div style="width:18px;height:18px;border-radius:50%;background:#0d9488;border:3px solid #fff;box-shadow:0 0 0 4px rgba(13,148,136,.25)"></div>`,
@@ -229,7 +233,6 @@ export default function HospitalFinder() {
     });
     L.marker([lat, lon], { icon: userIcon }).addTo(map).bindPopup("<b>📍 You are here</b>");
 
-    // Hospital markers — all OSM field values are escaped before HTML injection
     data.forEach(p => {
       const color = AMENITY_COLOR[p.amenity] ?? "#6b7280";
       const emoji = AMENITY_ICON[p.amenity] ?? "🏨";
@@ -280,7 +283,8 @@ export default function HospitalFinder() {
     });
   }, []);
 
-  const start = useCallback(() => {
+  // Core geo flow — only called after consent is confirmed
+  const doGeoLocate = useCallback(() => {
     setPhase("locating");
     setPlaces([]);
     navigator.geolocation.getCurrentPosition(
@@ -291,27 +295,91 @@ export default function HospitalFinder() {
           const data = await fetchNearby(lat, lon);
           setPlaces(data);
           setPhase("ready");
-          // Apply current filters when building the map so list and markers stay in sync
           const visible = applyFilters(data, filterKindRef.current, filterOwnerRef.current);
           setTimeout(() => buildMap(lat, lon, visible), 80);
         } catch {
-          setErrMsg("Could not load hospital data. The map service may be temporarily busy — try again.");
+          setErrMsg(t(
+            "Could not load hospital data. The map service may be temporarily busy — try again.",
+            "Hospital data load नहीं हो सका। Map service busy हो सकती है — फिर try करें।",
+          ));
           setPhase("error");
         }
       },
       (err) => {
         const msg =
           err.code === 1
-            ? "Location access denied. Please allow it in your browser settings and try again."
+            ? t("Location access denied. Please allow it in your browser settings and try again.", "Location access deny हो गई। Browser settings में allow करें और फिर try करें।")
             : err.code === 3
-            ? "Location request timed out. Please try again."
-            : "Could not determine your location. Try again.";
+            ? t("Location request timed out. Please try again.", "Location request timeout हो गई। फिर try करें।")
+            : t("Could not determine your location. Try again.", "Location determine नहीं हो सकी। फिर try करें।");
         setErrMsg(msg);
         setPhase("error");
       },
       { timeout: 15000, maximumAge: 60000 }
     );
-  }, [buildMap]);
+  }, [buildMap, t]);
+
+  // start — consent gate
+  const start = useCallback(() => {
+    if (consent === "granted") {
+      doGeoLocate();
+    } else if (consent === null) {
+      setConsentModalOpen(true);
+    } else {
+      setTimeout(() => cityInputRef.current?.focus(), 60);
+    }
+  }, [consent, doGeoLocate]);
+
+  const handleAllow = () => {
+    grant();
+    setConsentModalOpen(false);
+    doGeoLocate();
+  };
+
+  const handleDeny = () => {
+    deny();
+    setConsentModalOpen(false);
+    setTimeout(() => cityInputRef.current?.focus(), 120);
+  };
+
+  const handleReset = () => {
+    reset();
+    setPhase("idle");
+    setConsentModalOpen(true);
+  };
+
+  // City search fallback
+  const searchByCity = useCallback(async () => {
+    const q = cityQuery.trim();
+    if (!q) return;
+    setCitySearching(true);
+    setErrMsg("");
+    setPlaces([]);
+    setPhase("loading");
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`
+      );
+      const data = await res.json();
+      const loc = data[0];
+      if (!loc) throw new Error("Not found");
+      const lat = parseFloat(loc.lat);
+      const lon = parseFloat(loc.lon);
+      setCoords({ lat, lon });
+      const nearby = await fetchNearby(lat, lon);
+      setPlaces(nearby);
+      setPhase("ready");
+      const visible = applyFilters(nearby, filterKindRef.current, filterOwnerRef.current);
+      setTimeout(() => buildMap(lat, lon, visible), 80);
+    } catch {
+      setErrMsg(t(
+        "City not found or no healthcare facilities found nearby. Please try a different city name.",
+        "City नहीं मिली या पास में कोई healthcare facility नहीं है। दूसरा नाम try करें।",
+      ));
+      setPhase("error");
+    }
+    setCitySearching(false);
+  }, [cityQuery, buildMap, t]);
 
   // Rebuild map whenever filters change while results are shown
   useEffect(() => {
@@ -335,6 +403,14 @@ export default function HospitalFinder() {
         description="Find hospitals, clinics, and healthcare centres near you across India with ratings, specialties, and contact details. Uses your location."
         path="/hospitals"
       />
+
+      <LocationConsentModal
+        open={consentModalOpen}
+        onAllow={handleAllow}
+        onDeny={handleDeny}
+        language={language as "en" | "hi"}
+      />
+
       {/* Back */}
       <Link href="/">
         <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 cursor-pointer">
@@ -376,17 +452,58 @@ export default function HospitalFinder() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-panel rounded-2xl p-14 text-center"
+          className="glass-panel rounded-2xl p-10 text-center"
         >
           <p className="text-5xl mb-4">🗺️</p>
-          <p className="text-lg font-serif font-700 text-foreground mb-2">Find hospitals near you</p>
-          <p className="text-sm text-muted-foreground mb-8 max-w-sm mx-auto">
-            Shows hospitals, clinics &amp; pharmacies within 5 km using free OpenStreetMap data.
-            Includes Government vs. Private distinction and open/closed status where available.
+          <p className="text-lg font-serif font-700 text-foreground mb-2">
+            {t("Find hospitals near you", "पास के hospitals खोजें")}
           </p>
-          <Button onClick={start} className="rounded-xl px-8">
-            <Navigation className="w-4 h-4 mr-2" /> Allow Location &amp; Find
-          </Button>
+          <p className="text-sm text-muted-foreground mb-8 max-w-sm mx-auto">
+            {t(
+              "Shows hospitals, clinics & pharmacies within 5 km using free OpenStreetMap data. Includes Government vs. Private distinction and open/closed status where available.",
+              "Free OpenStreetMap data से 5 km के अंदर hospitals, clinics और pharmacies दिखाता है। Government vs. Private और open/closed status भी दिखाता है।",
+            )}
+          </p>
+
+          {consent !== "denied" ? (
+            <Button onClick={start} className="rounded-xl px-8">
+              <Navigation className="w-4 h-4 mr-2" />
+              {t("Use My Location & Find", "मेरा Location Use करें")}
+            </Button>
+          ) : (
+            <div className="space-y-3 max-w-sm mx-auto text-left">
+              <p className="text-sm text-center text-muted-foreground mb-1">
+                {t("Location access is off. Search by city instead:", "Location access बंद है। City से खोजें:")}
+              </p>
+              <div className="flex gap-2">
+                <input
+                  ref={cityInputRef}
+                  type="text"
+                  value={cityQuery}
+                  onChange={(e) => setCityQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && searchByCity()}
+                  placeholder={t("e.g. Mumbai, Delhi, Pune", "जैसे Mumbai, Delhi, Pune")}
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] placeholder:text-[var(--text-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+                <Button
+                  onClick={searchByCity}
+                  disabled={citySearching || !cityQuery.trim()}
+                  className="rounded-xl gap-2 px-4"
+                >
+                  {citySearching
+                    ? <RefreshCw className="w-4 h-4 animate-spin" />
+                    : <Search className="w-4 h-4" />}
+                </Button>
+              </div>
+              <button
+                onClick={handleReset}
+                className="flex items-center gap-1.5 text-xs text-primary mx-auto hover:opacity-80"
+              >
+                <RotateCcw className="w-3 h-3" />
+                {t("Re-enable location access", "Location access फिर से enable करें")}
+              </button>
+            </div>
+          )}
         </motion.div>
       )}
 
@@ -401,7 +518,9 @@ export default function HospitalFinder() {
           >
             <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-4" />
             <p className="text-sm text-muted-foreground">
-              {phase === "locating" ? "Getting your location…" : "Loading nearby healthcare from OpenStreetMap…"}
+              {phase === "locating"
+                ? t("Getting your location…", "Location मिल रही है…")
+                : t("Loading nearby healthcare from OpenStreetMap…", "OpenStreetMap से nearby healthcare load हो रही है…")}
             </p>
           </motion.div>
         )}
@@ -417,7 +536,7 @@ export default function HospitalFinder() {
           <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-3" />
           <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">{errMsg}</p>
           <Button variant="outline" onClick={() => setPhase("idle")} className="rounded-xl">
-            <RefreshCw className="w-4 h-4 mr-2" /> Try again
+            <RefreshCw className="w-4 h-4 mr-2" /> {t("Try again", "फिर try करें")}
           </Button>
         </motion.div>
       )}
@@ -439,10 +558,10 @@ export default function HospitalFinder() {
               {privCount > 0 && <span className="ml-2 text-blue-400">· {privCount} Private</span>}
             </p>
             <button
-              onClick={start}
+              onClick={consent === "denied" ? searchByCity : start}
               className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
             >
-              <RefreshCw className="w-3 h-3" /> Refresh
+              <RefreshCw className="w-3 h-3" /> {t("Refresh", "Refresh")}
             </button>
           </div>
 
@@ -567,4 +686,4 @@ export default function HospitalFinder() {
       )}
     </div>
   );
-}
+    }
