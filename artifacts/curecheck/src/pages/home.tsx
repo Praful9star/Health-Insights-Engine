@@ -1,13 +1,14 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { useState, lazy, Suspense, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import PageMeta from "@/components/page-meta";
 import {
-  FileSearch, Pill, ArrowRight,
-  ShieldCheck, TrendingUp,
+  FileSearch, Pill, Clock, Dumbbell, ArrowRight, Sparkles,
+  CheckCircle2, Zap, ShieldCheck, BookOpen, TrendingUp, Flame,
+  BadgeCheck, DatabaseZap, Globe2, HeartPulse, Quote,
   Activity, FlaskConical, MapPin, Share2,
-  Brain, Leaf, Syringe, Baby, Newspaper, Calculator, PhoneCall, Shield, Stethoscope,
+  Brain, Leaf, Syringe, Baby, Newspaper, Calculator, PhoneCall, Shield, Stethoscope, AlertCircle, AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CureCheckMark } from "@/components/logo";
@@ -15,10 +16,11 @@ import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useLanguage } from "@/contexts/language-context";
-import DailyCheckIn from "@/components/daily-checkin";
-const WhatsAppShare = lazy(() => import("@/components/whatsapp-share").then(m => ({ default: m.WhatsAppShare })));
-const NewsTicker = lazy(() => import("@/components/news-ticker"));
-const WeatherWidget = lazy(() => import("@/components/weather-widget"));
+import { useQuoteOfDay } from "@/hooks/use-quote-of-day";
+import { DAILY_MYTHS } from "@/data/myths";
+import { WhatsAppShare } from "@/components/whatsapp-share";
+import NewsTicker from "@/components/news-ticker";
+import WeatherWidget from "@/components/weather-widget";
 
 /* ─── Animation variants ───────────────────────────────────────────── */
 const fadeUp = {
@@ -29,56 +31,62 @@ const fadeUp = {
   }),
 };
 
-/* ─── ECG animation — glowing ────────────────────────────────────────── */
-function EcgAnimation() {
-  const path = "M0,28 L130,28 L145,28 L153,5 L161,51 L168,5 L176,51 L183,28 L313,28 L328,28 L336,5 L344,51 L351,5 L359,51 L366,28 L496,28 L511,28 L519,5 L527,51 L534,5 L542,51 L549,28 L679,28 L694,28 L702,5 L710,51 L717,5 L725,51 L732,28 L862,28 L877,28 L885,5 L893,51 L900,5 L908,51 L915,28 L1045,28 L1060,28 L1068,5 L1076,51 L1083,5 L1091,51 L1098,28 L1228,28 L1243,28 L1251,5 L1259,51 L1266,5 L1274,51 L1281,28 L1440,28";
+/* ─── Static ECG divider — calm, no animation, no glow ──────────────── */
+function EcgDivider() {
+  const path = "M0,28 L130,28 L145,28 L153,5 L161,51 L168,5 L176,51 L183,28 L313,28 L328,28 L336,5 L344,51 L351,5 L359,51 L366,28 L496,28";
   return (
-    <div className="absolute bottom-0 left-0 right-0 h-16 overflow-hidden pointer-events-none" aria-hidden="true">
-      <div className="flex ecg-scroll" style={{ width: "200%" }}>
-        {[0, 1].map((k) => (
-          <svg key={k} viewBox="0 0 1440 56" className="h-16" style={{ width: "50%", flexShrink: 0 }} preserveAspectRatio="none">
-            {/* Glow layer */}
-            <path d={path} fill="none" stroke="hsl(183 100% 60%)" strokeWidth="6"
-              strokeLinecap="round" strokeLinejoin="round" opacity="0.18"
-              style={{ filter: "none" }} />
-            {/* Main line */}
-            <path d={path} fill="none" stroke="hsl(183 100% 55%)" strokeWidth="2.2"
-              strokeLinecap="round" strokeLinejoin="round" opacity="0.85"
-              style={{ filter: "drop-shadow(0 0 6px hsl(183 100% 60% / 0.9))" }} />
-          </svg>
-        ))}
-      </div>
-
-
-
+    <div className="absolute bottom-0 left-0 right-0 h-10 overflow-hidden pointer-events-none" aria-hidden="true">
+      <svg viewBox="0 0 496 56" className="w-full h-10 text-muted-foreground" preserveAspectRatio="xMidYMid meet">
+        <path d={path} fill="none" stroke="currentColor" strokeWidth="1.2"
+          strokeLinecap="round" strokeLinejoin="round" opacity="0.18" />
+      </svg>
     </div>
   );
 }
 
 
 
-/* ─── Primary tools ──────────────────────────────────────────────────── */
-const PRIMARY_TOOLS = [
+/* ─── Core features ──────────────────────────────────────────────────── */
+const CORE_FEATURES = [
   {
-    icon: FileSearch, href: "/report-explainer",
-    accent: "text-primary", bg: "bg-primary/10",
+    icon: FileSearch, href: "/report-explainer", span: "lg:col-span-2",
+    accent: "text-primary", bg: "bg-primary/10", border: "group-hover:border-primary/50",
+    topAccent: "from-primary/60 to-primary/10",
+    badge: { en: "Primary Feature", hi: "मुख्य सुविधा" },
     title: { en: "AI Report Explainer", hi: "AI रिपोर्ट व्याख्याकार" },
     desc: { en: "Paste any blood test, thyroid panel or CBC. Get plain-English (or Hindi) explanation, abnormal values highlighted with why they matter, and exact questions to ask your doctor.", hi: "कोई भी ब्लड टेस्ट, थायरॉइड या CBC पेस्ट करें। सरल हिंदी में समझाव, असामान्य मान क्यों मायने रखते हैं, और डॉक्टर से पूछने के सटीक सवाल।" },
-    primary: true,
+    preview: [
+      { label: { en: "Hemoglobin", hi: "हीमोग्लोबिन" }, value: "10.2", unit: "g/dL", status: "low" },
+      { label: { en: "Blood Sugar", hi: "रक्त शर्करा" }, value: "142", unit: "mg/dL", status: "high" },
+      { label: { en: "Platelets", hi: "प्लेटलेट्स" }, value: "2,40,000", unit: "/mcL", status: "normal" },
+    ],
   },
   {
-    icon: Pill, href: "/medicine-explainer",
-    accent: "text-violet-400", bg: "bg-violet-500/10",
+    icon: Pill, href: "/medicine-explainer", span: "lg:col-span-1",
+    accent: "text-violet-400", bg: "bg-violet-500/10", border: "group-hover:border-violet-500/40",
+    topAccent: "from-violet-500/50 to-violet-500/10",
+    badge: null,
     title: { en: "Medicine Guide", hi: "दवा मार्गदर्शिका" },
-    desc: { en: "Enter any medicine name. Get what it does, side effects, best time to take, and key precautions.", hi: "कोई भी दवा का नाम डालें। वो क्या करती है, दुष्प्रभाव, कब लें, और सावधानियाँ।" },
-    primary: false,
+    desc: { en: "Enter any medicine name. Get what it does, side effects, best time to take, and key precautions — in plain language.", hi: "कोई भी दवा का नाम डालें। वो क्या करती है, दुष्प्रभाव, कब लें, और सावधानियाँ — सरल भाषा में।" },
+    preview: null,
   },
   {
-    icon: Stethoscope, href: "/symptom-checker",
-    accent: "text-sky-400", bg: "bg-sky-500/10",
-    title: { en: "Symptom Checker", hi: "लक्षण जांच" },
-    desc: { en: "Describe your symptoms. Get a plain-language overview of possible causes and when to see a doctor.", hi: "अपने लक्षण बताएं। संभावित कारणों और डॉक्टर से कब मिलें का सरल विवरण पाएं।" },
-    primary: false,
+    icon: Clock, href: "/health-timeline", span: "lg:col-span-1",
+    accent: "text-emerald-400", bg: "bg-emerald-500/10", border: "group-hover:border-emerald-500/40",
+    topAccent: "from-emerald-500/50 to-emerald-500/10",
+    badge: { en: "New", hi: "नया" },
+    title: { en: "Health Timeline", hi: "स्वास्थ्य समयरेखा" },
+    desc: { en: "Save every report analysis. See your Hemoglobin, Blood Sugar and Cholesterol trends over time. Your history stays on your device.", hi: "हर रिपोर्ट विश्लेषण सहेजें। हीमोग्लोबिन, रक्त शर्करा और कोलेस्ट्रॉल के रुझान देखें। आपका इतिहास आपके डिवाइस पर।" },
+    preview: null,
+  },
+  {
+    icon: Dumbbell, href: "/fitness-hub", span: "lg:col-span-2",
+    accent: "text-amber-400", bg: "bg-amber-500/10", border: "group-hover:border-amber-500/40",
+    topAccent: "from-amber-500/50 to-amber-500/10",
+    badge: null,
+    title: { en: "Fitness Hub", hi: "फिटनेस केंद्र" },
+    desc: { en: "Daily fitness score, streak tracker, AI-powered suggestions, health challenges and Indian gym diet plans — your daily health companion.", hi: "रोज़ का फिटनेस स्कोर, लगातार दिनों का ट्रैकर, AI सुझाव, स्वास्थ्य चुनौतियाँ और भारतीय जिम डाइट प्लान।" },
+    preview: null,
   },
 ];
 
@@ -99,36 +107,28 @@ const ALL_TOOLS = [
   { icon: TrendingUp,  href: "/myth-buster",       accent: "text-rose-400",    bg: "bg-rose-500/10",    en: "Myth Buster",          hi: "मिथक बस्टर"         },
 ];
 
+const HOW_IT_WORKS = [
+  { step: "01", icon: Zap,        title: { en: "Paste your report or medicine", hi: "रिपोर्ट या दवा चिपकाएं" },    desc: { en: "No account needed. Works with any Indian lab format.", hi: "कोई खाता नहीं चाहिए। किसी भी भारतीय लैब फॉर्मेट के साथ।" } },
+  { step: "02", icon: ShieldCheck, title: { en: "AI explains in plain language", hi: "AI सरल भाषा में समझाता है" }, desc: { en: "Cross-referenced with medical literature. No jargon.", hi: "चिकित्सा साहित्य से क्रॉस-रेफरेंस। कोई जटिल शब्द नहीं।" } },
+  { step: "03", icon: BookOpen,   title: { en: "Use it with your doctor", hi: "डॉक्टर के साथ उपयोग करें" },           desc: { en: "Better questions, better consultations, better health.", hi: "बेहतर सवाल, बेहतर परामर्श, बेहतर स्वास्थ्य।" } },
+];
 
 const FAQS = [
   { q: { en: "Is CureCheck a replacement for a doctor?", hi: "क्या CureCheck डॉक्टर का विकल्प है?" }, a: { en: "Absolutely not. CureCheck helps you understand your reports so you can have better conversations with your doctor. It never diagnoses or prescribes.", hi: "बिल्कुल नहीं। CureCheck आपको रिपोर्ट समझने में मदद करता है ताकि आप डॉक्टर से बेहतर बात कर सकें। यह कभी निदान या दवा नहीं देता।" } },
   { q: { en: "Is my health data private?", hi: "क्या मेरा डेटा सुरक्षित है?" }, a: { en: "Your queries are never stored on our servers. The Health Timeline saves data locally on your device only — nothing leaves your browser.", hi: "आपके प्रश्न हमारे सर्वर पर कभी संग्रहीत नहीं होते। स्वास्थ्य समयरेखा केवल आपके डिवाइस पर स्थानीय रूप से सहेजी जाती है।" } },
   { q: { en: "Which reports does it support?", hi: "कौन सी रिपोर्ट समझा सकता है?" }, a: { en: "CBC, thyroid panel, lipid profile, blood glucose, HbA1c, liver function, kidney function, Vitamin D, iron studies, and most other Indian lab reports.", hi: "CBC, थायरॉइड, लिपिड प्रोफ़ाइल, ब्लड ग्लूकोज़, HbA1c, लिवर फंक्शन, किडनी फंक्शन, विटामिन D और अधिकतर भारतीय लैब रिपोर्ट।" } },
   { q: { en: "Is the Fitness Hub medically accurate?", hi: "क्या फिटनेस केंद्र चिकित्सकीय रूप से सटीक है?" }, a: { en: "The Fitness Hub provides general nutrition and wellness guidance for healthy adults. It is not medical advice. Always consult a doctor for medical conditions.", hi: "फिटनेस केंद्र स्वस्थ वयस्कों के लिए सामान्य पोषण और स्वास्थ्य मार्गदर्शन देता है। यह चिकित्सा सलाह नहीं है।" } },
-  { q: { en: "Is this service free?", hi: "क्या यह सेवा मुफ्त है?" }, a: { en: "Yes, completely free. No subscription. No account required to analyze a report or check a medicine.", hi: "हाँ, पूरी तरह मुफ्त। कोई subscription नहीं। Report analyze करने या दवा चेक करने के लिए कोई account नहीं चाहिए।" } },
+  { q: { en: "Is this service free?", hi: "क्या यह सेवा मुफ्त है?" }, a: { en: "Yes, completely free. We believe health clarity should never sit behind a paywall.", hi: "हाँ, पूरी तरह मुफ्त। हमारा मानना है कि स्वास्थ्य की स्पष्टता कभी पैसों के पीछे नहीं होनी चाहिए।" } },
 ];
-
-/* ─── useBelowFold — defers below-fold render until sentinel is visible ── */
-function useBelowFold(rootMargin = "300px") {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
-      { rootMargin }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [rootMargin]);
-  return { ref, visible };
-}
 
 /* ════════════════════════════════════════════════════════════════════ */
 export default function Home() {
   const { language, t } = useLanguage();
-  const { ref: belowFoldRef, visible: belowFoldVisible } = useBelowFold("300px");
+  const quote = useQuoteOfDay();
+
+  const todayMythIdx = Math.floor(Date.now() / 86_400_000) % DAILY_MYTHS.length;
+  const todayMyth = DAILY_MYTHS[todayMythIdx];
+  const [mythRevealed, setMythRevealed] = useState(false);
 
   return (
     <div className="relative z-10">
@@ -164,14 +164,10 @@ export default function Home() {
       </Helmet>
 
       {/* ══ NEWS TICKER ══════════════════════════════════════════════ */}
-      <Suspense fallback={null}>
-        <NewsTicker />
-      </Suspense>
-
-      <DailyCheckIn />
+      <NewsTicker />
 
       {/* ══ HERO ═════════════════════════════════════════════════════ */}
-      <section className="relative  overflow-hidden pt-16 pb-32 px-4" aria-label="Hero">
+      <section className="relative  overflow-hidden pt-16 pb-32 px-4">
 
         {/* Big central glow behind content */}
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
@@ -200,7 +196,7 @@ export default function Home() {
 
           <motion.h1
             variants={fadeUp} initial="hidden" animate="visible" custom={1}
-            className="mt-2 text-4xl sm:text-5xl lg:text-6xl font-serif font-800 [letter-spacing:var(--type-tracking-h1)] [line-height:var(--type-leading-display)] text-foreground max-w-3xl"
+            className="mt-2 text-4xl sm:text-5xl lg:text-6xl font-serif font-800 leading-[1.1] text-foreground max-w-3xl"
           >
             {t("AI Report Explainer You Can Understand", "AI रिपोर्ट व्याख्याकार जिसे आप समझ सकते हैं")}
           </motion.h1>
@@ -224,21 +220,36 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div role="list" aria-label="Sample report values" className="space-y-2">
-                  <div role="listitem" aria-label="Hemoglobin 10.2 g/dL — Low" className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                    <span aria-hidden="true">{t("Hemoglobin", "हीमोग्लोबिन")}</span>
-                    <span aria-hidden="true" className="data-value">10.2<span className="data-unit">g/dL</span></span>
-                    <span aria-hidden="true" className="data-status">LOW</span>
+                <div className="space-y-1.5">
+                  {/* Hemoglobin — LOW (abnormal) */}
+                  <div className="flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-xl border-l-[3px] border-l-[var(--alert)] bg-[var(--alert-tint)]">
+                    <span className="flex-1 text-xs font-500 text-[var(--text)]">{t("Hemoglobin", "हीमोग्लोबिन")}</span>
+                    <span className="text-sm font-800 tabular-nums text-[var(--text)]">
+                      10.2 <span className="text-[11px] font-400 text-[var(--text-muted)]">g/dL</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-700 uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--alert)]/40 text-[var(--alert)] bg-[var(--surface)] flex-shrink-0">
+                      <AlertTriangle className="w-2.5 h-2.5" /> LOW
+                    </span>
                   </div>
-                  <div role="listitem" aria-label="Blood Sugar 142 mg/dL — High" className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 bg-red-500/10 text-red-400 border border-red-500/20">
-                    <span aria-hidden="true">{t("Blood Sugar", "रक्त शर्करा")}</span>
-                    <span aria-hidden="true" className="data-value">142<span className="data-unit">mg/dL</span></span>
-                    <span aria-hidden="true" className="data-status">HIGH</span>
+                  {/* Blood Sugar — HIGH (abnormal) */}
+                  <div className="flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-xl border-l-[3px] border-l-[var(--alert)] bg-[var(--alert-tint)]">
+                    <span className="flex-1 text-xs font-500 text-[var(--text)]">{t("Blood Sugar", "रक्त शर्करा")}</span>
+                    <span className="text-sm font-800 tabular-nums text-[var(--text)]">
+                      142 <span className="text-[11px] font-400 text-[var(--text-muted)]">mg/dL</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-700 uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--alert)]/40 text-[var(--alert)] bg-[var(--surface)] flex-shrink-0">
+                      <AlertTriangle className="w-2.5 h-2.5" /> HIGH
+                    </span>
                   </div>
-                  <div role="listitem" aria-label="Platelets 2,40,000 /mcL — Normal" className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <span aria-hidden="true">{t("Platelets", "प्लेटलेट्स")}</span>
-                    <span aria-hidden="true" className="data-value">2,40,000<span className="data-unit">/mcL</span></span>
-                    <span aria-hidden="true" className="data-status">NORMAL</span>
+                  {/* Platelets — NORMAL */}
+                  <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl">
+                    <span className="flex-1 text-xs font-500 text-[var(--text)]">{t("Platelets", "प्लेटलेट्स")}</span>
+                    <span className="text-sm font-600 tabular-nums text-[var(--text)]">
+                      2,40,000 <span className="text-[11px] font-400 text-[var(--text-muted)]">/mcL</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-700 uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--normal)]/40 text-[var(--normal)] bg-[var(--surface)] flex-shrink-0">
+                      <CheckCircle2 className="w-2.5 h-2.5" /> NORMAL
+                    </span>
                   </div>
                 </div>
 
@@ -254,7 +265,7 @@ export default function Home() {
           >
             <Link href="/report-explainer">
               <Button size="lg"
-                className="gap-2 rounded-full px-8 h-12 text-base font-700"
+                className="gap-2 rounded-full px-8 h-12 text-base font-700 w-full sm:w-auto"
                 data-testid="button-hero-report"
               >
                 <FileSearch className="w-5 h-5" />
@@ -264,152 +275,281 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* ECG line — glowing */}
-        <EcgAnimation />
+        {/* ECG motif — static, no glow */}
+        <EcgDivider />
       </section>
 
       {/* ══ WEATHER + HEALTH TIPS ════════════════════════════════════ */}
-      <section className="px-4 pt-6 pb-0" aria-label="Weather and health tips">
+      <section className="px-4 pt-6 pb-0">
         <div className="max-w-2xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <Suspense fallback={<div className="h-20 rounded-2xl bg-muted/20 animate-pulse" />}>
-              <WeatherWidget />
-            </Suspense>
+            <WeatherWidget />
           </motion.div>
         </div>
       </section>
 
-      {/* ══ PRIMARY TOOLS ════════════════════════════════════════════ */}
-      <section className="py-16 px-4" aria-labelledby="primary-tools-heading">
+      {/* ══ QUOTE OF THE DAY ═════════════════════════════════════════ */}
+      <section className="px-4 pt-6 pb-4">
         <div className="max-w-2xl mx-auto">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="mb-8">
-            <p className="mono-label text-primary/80 mb-3">{t("Start here", "यहाँ से शुरू करें")}</p>
-            <h2 id="primary-tools-heading" className="text-3xl sm:text-4xl font-serif font-800 text-foreground">
-              {t("Paste a report. Understand it in minutes.", "रिपोर्ट paste करें। मिनटों में समझें।")}
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+            <div className="glass-panel rounded-2xl px-6 py-5 border border-primary/15 flex gap-4 items-start"
+              style={{ boxShadow: "none" }}>
+              <Quote className="w-5 h-5 text-primary/50 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm sm:text-base text-foreground/85 leading-relaxed italic">
+                  "{language === "hi" ? quote.text.hi : quote.text.en}"
+                </p>
+                <p className="text-xs text-muted-foreground mt-2 mono-label">
+                  — {language === "hi" ? quote.author.hi : quote.author.en}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ══ CORE FEATURES ════════════════════════════════════════════ */}
+      <section className="py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
+            <p className="mono-label text-primary/80 mb-3">{t("Core Features", "मुख्य सुविधाएं")}</p>
+            <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">
+              {t("Everything you actually need", "जो वाकई ज़रूरी है")}
             </h2>
+            <p className="mt-4 text-muted-foreground text-lg max-w-xl mx-auto">
+              {t("AI tools built for real Indian health needs. No clutter, no generic chatbot.", "असली भारतीय स्वास्थ्य ज़रूरतों के लिए बनाए AI उपकरण।")}
+            </p>
           </motion.div>
 
-          <div className="flex flex-col gap-3">
-            {PRIMARY_TOOLS.map((tool, i) => (
-              <motion.div key={tool.href} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}>
-                {tool.primary ? (
-                  <Link href={tool.href}>
-                    <div className="group glass-panel rounded-2xl p-7 border border-primary/40 hover:border-primary/70 transition-all cursor-pointer">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className={`w-10 h-10 rounded-xl ${tool.bg} ${tool.accent} flex items-center justify-center`}>
-                          <tool.icon className="w-5 h-5" />
-                        </div>
-                        <h3 className="text-xl sm:text-2xl font-serif font-700 text-foreground">
-                          {language === "hi" ? tool.title.hi : tool.title.en}
-                        </h3>
-                      </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                        {language === "hi" ? tool.desc.hi : tool.desc.en}
-                      </p>
-                      <Button size="sm" className="gap-2 rounded-full px-5 pointer-events-none" data-testid="button-primary-report">
-                        <FileSearch className="w-4 h-4" /> {t("Analyze My Report", "मेरी रिपोर्ट analyze करें")}
-                      </Button>
+          <div className="grid lg:grid-cols-3 gap-5">
+            {CORE_FEATURES.map((feat, i) => (
+              <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i % 3} className={feat.span}>
+                <Link href={feat.href}>
+                  <div className={`group tile relative h-full glass-panel rounded-[1.5rem] p-7 cursor-pointer overflow-hidden border border-border/40 ${feat.border} transition-all`}>
+                    {/* Colored top accent bar */}
+                    <div className={`absolute top-0 left-0 right-0 h-[3px] bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                    {feat.badge && (
+                      <span className="absolute top-5 right-5 text-[11px] font-700 px-2.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/25">
+                        {language === "hi" ? feat.badge.hi : feat.badge.en}
+                      </span>
+                    )}
+                    <div className={`w-12 h-12 rounded-2xl ${feat.bg} ${feat.accent} flex items-center justify-center mb-5 icon-ring`}>
+                      <feat.icon className="w-6 h-6" />
                     </div>
-                  </Link>
-                ) : (
-                  <Link href={tool.href}>
-                    <div className="group glass-panel rounded-xl p-5 border border-border/30 hover:border-border/60 transition-all cursor-pointer flex items-center gap-4">
-                      <div className={`w-9 h-9 rounded-xl ${tool.bg} ${tool.accent} flex items-center justify-center flex-shrink-0`}>
-                        <tool.icon className="w-4 h-4" />
+                    <h3 className="text-xl sm:text-2xl font-serif font-700 text-foreground mb-2">
+                      {language === "hi" ? feat.title.hi : feat.title.en}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {language === "hi" ? feat.desc.hi : feat.desc.en}
+                    </p>
+                    {feat.preview && (
+                      <div className="mt-5 space-y-2">
+                        {feat.preview.map((item, j) => (
+                          <div key={j} className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 ${
+                            item.status === "high"   ? "bg-red-500/10 text-red-400 border border-red-500/20" :
+                            item.status === "low"    ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
+                            "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                          }`}>
+                            <span>{language === "hi" ? item.label.hi : item.label.en}</span>
+                            <span className="font-700">{item.value} <span className="font-400 opacity-70">{item.unit}</span></span>
+                            <span className="uppercase text-[10px] tracking-wide">{item.status}</span>
+                          </div>
+                        ))}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-base font-serif font-700 text-foreground">
-                          {language === "hi" ? tool.title.hi : tool.title.en}
-                        </h3>
-                        <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">
-                          {language === "hi" ? tool.desc.hi : tool.desc.en}
-                        </p>
-                      </div>
-                      <span className={`text-xs font-600 ${tool.accent} flex-shrink-0`}>Open →</span>
+                    )}
+                    <div className={`mt-5 inline-flex items-center gap-1.5 text-sm font-600 ${feat.accent} group-hover:gap-2.5 transition-all`}>
+                      {t("Open", "खोलें")} <ArrowRight className="w-4 h-4" />
                     </div>
-                  </Link>
-                )}
+                  </div>
+                </Link>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      <div ref={belowFoldRef} aria-hidden="true" />
-      {belowFoldVisible && (
-        <>
-      {/* ══ MORE TOOLS ═══════════════════════════════════════════════ */}
-      <section className="py-10 px-4 border-t border-border/20" aria-label="More tools">
-        <div className="max-w-2xl mx-auto">
-          <p className="mono-label text-muted-foreground/60 mb-4">{t("More tools", "अधिक उपकरण")}</p>
-          <div className="flex flex-wrap gap-2">
-            {ALL_TOOLS.map((tool) => (
-              <Link key={tool.href} href={tool.href}>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/30 hover:border-border/60 transition-colors cursor-pointer">
-                  <tool.icon className={`w-3.5 h-3.5 ${tool.accent}`} />
-                  <span className="text-xs font-500 text-foreground/80">{language === "hi" ? tool.hi : tool.en}</span>
-                </div>
-              </Link>
+      {/* ══ ALL TOOLS GRID ═══════════════════════════════════════════ */}
+      <section className="py-16 px-4">
+        <div className="max-w-5xl mx-auto">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
+            <p className="mono-label text-primary/80 mb-3">{t("15+ Free Tools", "15+ मुफ्त उपकरण")}</p>
+            <h2 className="text-3xl sm:text-4xl font-serif font-800 text-foreground">
+              {t("Explore all health tools", "सभी स्वास्थ्य उपकरण देखें")}
+            </h2>
+          </motion.div><div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-4 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 scrollbar-hide">
+            {ALL_TOOLS.map((tool, i) => (
+              <motion.div key={tool.href} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i % 5} className="flex-none w-36 sm:w-auto snap-start">
+                <Link href={tool.href}>
+                  <div className="group glass-panel rounded-2xl p-4 cursor-pointer border border-border/40 hover:border-primary/30 hover:-translate-y-1 transition-all text-center min-h-[110px] flex flex-col justify-center">
+                    <div className={`w-10 h-10 rounded-xl ${tool.bg} flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
+                      <tool.icon className={`w-5 h-5 ${tool.accent}`} />
+                    </div>
+                    <p className="text-xs font-600 text-foreground leading-snug group-hover:text-primary transition-colors">
+                      {language === "hi" ? tool.hi : tool.en}
+                    </p>
+                  </div>
+                </Link>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* ══ HOW IT WORKS ═════════════════════════════════════════════ */}
-      <section className="py-16 px-4" aria-labelledby="how-it-works-heading">
-        <div className="max-w-2xl mx-auto">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="mb-10">
+      <section className="py-16 px-4">
+        <div className="max-w-4xl mx-auto">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
             <p className="mono-label text-primary/80 mb-3">{t("How It Works", "कैसे काम करता है")}</p>
-            <h2 id="how-it-works-heading" className="text-3xl sm:text-5xl font-serif font-800 text-foreground">{t("Paste, read, ask.", "Paste करें, पढ़ें, पूछें।")}</h2>
+            <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">{t("Three simple steps", "तीन आसान कदम")}</h2>
           </motion.div>
-          <div className="divide-y divide-border/30">
-            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0}
-              className="py-6 grid sm:grid-cols-[1fr_1.5fr] gap-3 sm:gap-8 items-baseline">
-              <p className="font-serif font-700 text-foreground text-lg">Paste your CBC or blood test</p>
-              <p className="text-muted-foreground text-sm leading-relaxed">We flag values outside Indian reference ranges and explain each one in plain language — no jargon.</p>
-            </motion.div>
-            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1}
-              className="py-6 grid sm:grid-cols-[1fr_1.5fr] gap-3 sm:gap-8 items-baseline">
-              <p className="font-serif font-700 text-foreground text-lg">Type a medicine name</p>
-              <p className="text-muted-foreground text-sm leading-relaxed">You get what it treats, when to take it, common side effects, and interactions to watch — in one page.</p>
-            </motion.div>
-            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2}
-              className="py-6 grid sm:grid-cols-[1fr_1.5fr] gap-3 sm:gap-8 items-baseline">
-              <p className="font-serif font-700 text-foreground text-lg">Show the output to your doctor</p>
-              <p className="text-muted-foreground text-sm leading-relaxed">We generate the exact questions to ask at your appointment, based on your specific values. Most consultations run under 10 minutes — arriving prepared makes them count.</p>
-            </motion.div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {HOW_IT_WORKS.map((step, i) => (
+              <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}
+                className="glass-panel rounded-2xl p-7 text-center border border-border/40 relative overflow-hidden group hover:border-primary/30 transition-colors">
+
+                <p className="text-6xl font-serif font-800 leading-none mb-4  opacity-60">{step.step}</p>
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
+                  <step.icon className="w-5 h-5" />
+                </div>
+                <h3 className="font-serif font-700 text-foreground mb-2">{language === "hi" ? step.title.hi : step.title.en}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{language === "hi" ? step.desc.hi : step.desc.en}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
+      {/* ══ MYTH OF THE DAY ══════════════════════════════════════════ */}
+      <section className="py-10 px-4">
+        <div className="max-w-3xl mx-auto">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+            <div className="rounded-2xl p-7 border border-rose-500/30 relative overflow-hidden"
+              style={{
+                background: "transparent",
+                backdropFilter: "blur(20px)",
+                boxShadow: "none",
+              }}>
+              {/* Glow blobs */}
+              <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full pointer-events-none"
+                style={{ background: "transparent", filter: "none" }} />
+              <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full pointer-events-none"
+                style={{ background: "transparent", filter: "none" }} />
+
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-rose-500/15 flex items-center justify-center">
+                      <Flame className="w-4 h-4 text-rose-400" />
+                    </div>
+                    <p className="mono-label text-rose-400">
+                      {t("Myth of the Day", "आज का मिथक")}
+                    </p>
+                  </div>
+                  <span className="text-[11px] mono-label text-muted-foreground/60 border border-border/40 rounded-full px-2.5 py-1">
+                    #{todayMythIdx + 1} / {DAILY_MYTHS.length}
+                  </span>
+                </div>
+
+                {/* Myth label */}
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[11px] font-700 mono-label mb-4">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400 flex-shrink-0" />
+                  {t("MYTH", "मिथक")}
+                </div>
+
+                <p className="text-lg sm:text-xl font-serif font-700 text-foreground/90 leading-snug mb-5">
+                  "{language === "hi" ? todayMyth.myth.hi : todayMyth.myth.en}"
+                </p>
+
+                {!mythRevealed ? (
+                  <Button size="sm" variant="outline"
+                    className="rounded-full border-rose-500/40 text-rose-400 hover:bg-rose-500/10 gap-2 h-9 px-5"
+                    onClick={() => setMythRevealed(true)}>
+                    <FlaskConical className="w-3.5 h-3.5" />
+                    {t("Reveal the Science", "विज्ञान जानें")}
+                  </Button>
+                ) : (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+                    <div className="rounded-xl px-5 py-4 mb-4 border border-emerald-500/25"
+                      style={{ background: "transparent" }}>
+                      <p className="text-xs mono-label text-emerald-400 mb-2 flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        {t("The Truth", "सच्चाई")}
+                      </p>
+                      <p className="text-sm text-foreground/85 leading-relaxed">
+                        {language === "hi" ? todayMyth.truth.hi : todayMyth.truth.en}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <Link href="/myth-buster">
+                        <Button size="sm" variant="outline" className="rounded-full gap-2 text-xs h-8">
+                          {t("See all myths", "सभी मिथक देखें")} <ArrowRight className="w-3 h-3" />
+                        </Button>
+                      </Link>
+                      <WhatsAppShare
+                        text={`🧪 Health Myth:\n\n"${language === "hi" ? todayMyth.myth.hi : todayMyth.myth.en}"\n\n✅ Truth: ${language === "hi" ? todayMyth.truth.hi : todayMyth.truth.en}\n\nvia CureCheck — curecheck.in`}
+                        label={t("Share on WhatsApp", "WhatsApp पर शेयर करें")}
+                        className="rounded-full text-xs h-8 px-3"
+                      />
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ══ VERIFIABLE TRUST & PRIVACY ═════════════════════════════════════ */}
-      <section className="py-16 px-4 relative overflow-hidden" aria-labelledby="privacy-heading">
+      <section className="py-16 px-4 relative overflow-hidden">
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mono-label text-primary mb-4">
-              <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
+              <ShieldCheck className="w-3.5 h-3.5" />
               {t("Privacy & Accuracy", "गोपनीयता और सटीकता")}
             </div>
-            <h2 id="privacy-heading" className="text-2xl sm:text-3xl font-serif font-800 text-foreground">
+            <h2 className="text-2xl sm:text-3xl font-serif font-800 text-foreground">
               {t("How we protect you and your data", "हम आपकी और आपके डेटा की सुरक्षा कैसे करते हैं")}
             </h2>
           </motion.div>
 
-          <div className="max-w-2xl mx-auto divide-y divide-border/30">
-            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0}
-              className="py-6">
-              <h3 className="font-serif font-700 text-foreground text-lg mb-2">We never store your report.</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">Queries go to the AI model and return immediately — nothing is logged to a database. Your report text is discarded after the response is sent.</p>
+          <div className="grid sm:grid-cols-3 gap-6">
+            <motion.div
+              variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
+              className="glass-panel p-6 rounded-2xl border border-border/50 bg-background/50 flex flex-col items-center text-center gap-3"
+            >
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <Shield className="w-6 h-6" />
+              </div>
+              <h3 className="font-700 text-foreground">{t("100% Privacy First", "100% गोपनीयता")}</h3>
+              <p className="text-sm text-muted-foreground">
+                {t("We never sell your data. Your uploaded reports are processed securely and deleted automatically.", "हम आपका डेटा कभी नहीं बेचते। आपकी अपलोड की गई रिपोर्ट सुरक्षित रूप से प्रोसेस की जाती हैं और स्वचालित रूप से हटा दी जाती हैं।")}
+              </p>
             </motion.div>
-            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1}
-              className="py-6">
-              <h3 className="font-serif font-700 text-foreground text-lg mb-2">Indian lab ranges, not US averages.</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">Haemoglobin reference ranges differ for Indian women. HbA1c cut-offs follow ICMR and RSSDI guidelines. We use Indian population norms, not default Western values.</p>
+
+            <motion.div
+              variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: 0.1 }}
+              className="glass-panel p-6 rounded-2xl border border-border/50 bg-background/50 flex flex-col items-center text-center gap-3"
+            >
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <BookOpen className="w-6 h-6" />
+              </div>
+              <h3 className="font-700 text-foreground">{t("Evidence-Based", "प्रमाण-आधारित")}</h3>
+              <p className="text-sm text-muted-foreground">
+                {t("Our AI cross-references standard medical literature and established health guidelines to provide context.", "हमारा AI संदर्भ प्रदान करने के लिए मानक चिकित्सा साहित्य और स्थापित स्वास्थ्य दिशानिर्देशों का संदर्भ देता है।")}
+              </p>
             </motion.div>
-            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2}
-              className="py-6">
-              <h3 className="font-serif font-700 text-foreground text-lg mb-2">This is not a diagnosis.</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">CureCheck translates numbers into plain language. It cannot examine you, order tests, or replace a consultation. The output is a preparation tool — not a verdict.</p>
+
+            <motion.div
+              variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: 0.2 }}
+              className="glass-panel p-6 rounded-2xl border border-border/50 bg-background/50 flex flex-col items-center text-center gap-3"
+            >
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <h3 className="font-700 text-foreground">{t("Educational Only", "केवल शिक्षा के लिए")}</h3>
+              <p className="text-sm text-muted-foreground">
+                {t("CureCheck is not a doctor. We help you understand complex terms so you can have better conversations with your physician.", "CureCheck डॉक्टर नहीं है। हम जटिल शब्दों को समझने में आपकी मदद करते हैं ताकि आप अपने डॉक्टर से बेहतर बातचीत कर सकें।")}
+              </p>
             </motion.div>
           </div>
         </div>
@@ -427,15 +567,21 @@ export default function Home() {
             <div className="absolute inset-0  opacity-40 pointer-events-none" />
             <div className="relative z-10">
               <p className="mono-label text-primary/80 mb-3">{t("Why CureCheck?", "CureCheck क्यों?")}</p>
-              <div className="space-y-8 text-left">
-                <div>
-                  <h2 className="text-2xl sm:text-3xl font-serif font-800 text-foreground mb-2">14 tools. One page. No account.</h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Symptom checker, CBC explainer, drug interactions, ayurveda guide, pregnancy tracker — all free, all in Hindi and English. Open any tool in under 3 taps.</p>
-                </div>
-                <div>
-                  <h2 className="text-2xl sm:text-3xl font-serif font-800 text-foreground mb-2">Your data never leaves your device.</h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed">The Health Timeline stores every report analysis in your browser's localStorage — not on our servers. We see no queries, no names, no reports.</p>
-                </div>
+              <h2 className="text-2xl sm:text-4xl font-serif font-800 text-foreground mb-8">
+                {t("Built for how India actually uses healthcare", "भारत की असली healthcare आदतों के लिए")}
+              </h2>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                  { icon: TrendingUp,   label: { en: "Track reports over time", hi: "रिपोर्ट्स को ट्रैक करें" }, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
+                  { icon: Globe2,       label: { en: "Full Hindi support",       hi: "पूर्ण हिंदी समर्थन" }, color: "text-sky-400",     bg: "bg-sky-500/10",     border: "border-sky-500/20"     },
+                  { icon: ShieldCheck,  label: { en: "Privacy first",            hi: "गोपनीयता पहले"      }, color: "text-primary",     bg: "bg-primary/10",     border: "border-primary/20"     },
+                  { icon: CheckCircle2, label: { en: "Evidence-based AI",        hi: "प्रमाण-आधारित AI"   }, color: "text-violet-400",  bg: "bg-violet-500/10",  border: "border-violet-500/20"  },
+                ].map((item, i) => (
+                  <div key={i} className={`rounded-2xl ${item.bg} border ${item.border} p-5 flex flex-col items-center gap-3`}>
+                    <item.icon className={`w-7 h-7 ${item.color}`} />
+                    <p className="text-sm font-600 text-foreground/85 text-center">{language === "hi" ? item.label.hi : item.label.en}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </motion.div>
@@ -443,11 +589,11 @@ export default function Home() {
       </section>
 
       {/* ══ FAQ ══════════════════════════════════════════════════════ */}
-      <section className="py-16 px-4" aria-labelledby="faq-heading">
+      <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
             <p className="mono-label text-primary/80 mb-3">FAQ</p>
-            <h2 id="faq-heading" className="text-3xl sm:text-4xl font-serif font-800 text-foreground">{t("Questions, answered", "सवालों के जवाब")}</h2>
+            <h2 className="text-3xl sm:text-4xl font-serif font-800 text-foreground">{t("Questions, answered", "सवालों के जवाब")}</h2>
           </motion.div>
           <Accordion type="single" collapsible className="space-y-3">
             {FAQS.map((f, i) => (
@@ -485,20 +631,18 @@ export default function Home() {
                 </h3>
                 <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
                   {t(
-                    "Share CureCheck with your family and friends. They can analyze a report without downloading an app or creating an account.",
-                    "CureCheck को परिवार और दोस्तों के साथ शेयर करें। कोई app download या account नहीं — सीधे report analyze करें।",
+                    "Share CureCheck with your family and friends. Free health clarity for every Indian.",
+                    "CureCheck को अपने परिवार और दोस्तों के साथ शेयर करें। हर भारतीय के लिए मुफ्त।",
                   )}
                 </p>
-                <Suspense fallback={null}>
-                  <WhatsAppShare
-                    text={t(
-                      `🏥 CureCheck — India's free AI health platform!\n\n✅ Analyze your medical reports in plain language\n✅ Check any medicine — uses, side effects & timing\n✅ Track fitness, steps & streaks\n✅ Bust health myths with science\n\n100% Free. No signup needed.\n👉 curecheck.in`,
-                      `🏥 CureCheck — भारत का मुफ्त AI health platform!\n\n✅ Medical reports को सरल भाषा में समझें\n✅ किसी भी दवा के बारे में जानें\n✅ Fitness, steps और streaks track करें\n✅ Science से health myths तोड़ें\n\n100% मुफ्त। कोई signup नहीं।\n👉 curecheck.in`,
-                    )}
-                    label={t("Share CureCheck on WhatsApp", "WhatsApp पर शेयर करें")}
-                    className=" rounded-full px-8 h-12 text-base"
-                  />
-                </Suspense>
+                <WhatsAppShare
+                  text={t(
+                    `🏥 CureCheck — India's free AI health platform!\n\n✅ Analyze your medical reports in plain language\n✅ Check any medicine — uses, side effects & timing\n✅ Track fitness, steps & streaks\n✅ Bust health myths with science\n\n100% Free. No signup needed.\n👉 curecheck.in`,
+                    `🏥 CureCheck — भारत का मुफ्त AI health platform!\n\n✅ Medical reports को सरल भाषा में समझें\n✅ किसी भी दवा के बारे में जानें\n✅ Fitness, steps और streaks track करें\n✅ Science से health myths तोड़ें\n\n100% मुफ्त। कोई signup नहीं।\n👉 curecheck.in`,
+                  )}
+                  label={t("Share CureCheck on WhatsApp", "WhatsApp पर शेयर करें")}
+                  className=" rounded-full px-8 h-12 text-base"
+                />
               </div>
             </div>
           </motion.div>
@@ -524,14 +668,19 @@ export default function Home() {
               <p className="mt-4 text-muted-foreground text-lg max-w-xl mx-auto">
                 {t("Paste it in. Understand it in minutes.", "Paste करें। मिनटों में समझें।")}
               </p>
-              <div className="mt-8 flex justify-center">
+              <div className="mt-8 flex flex-wrap gap-3 justify-center">
                 <Link href="/report-explainer">
                   <Button size="lg"
-                    className="gap-2 rounded-full px-8 h-12 font-700"
+                    className=" gap-2 rounded-full px-8 h-12 font-700"
                     style={{ boxShadow: "none" }}
                     data-testid="button-cta-report"
                   >
                     <FileSearch className="w-5 h-5" /> {t("Analyze My Report", "मेरी रिपोर्ट analyze करें")}
+                  </Button>
+                </Link>
+                <Link href="/fitness-hub">
+                  <Button size="lg" variant="outline" className="gap-2 rounded-full px-8 h-12 border-border/60 hover:border-primary/40" data-testid="button-cta-fitness">
+                    <Dumbbell className="w-5 h-5" /> {t("Open Fitness Hub", "Fitness Hub खोलें")}
                   </Button>
                 </Link>
               </div>
@@ -540,9 +689,9 @@ export default function Home() {
         </div>
       </section>
 
-        </>
-      )}
+
+
+
     </div>
   );
 }
-
