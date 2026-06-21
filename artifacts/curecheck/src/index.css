@@ -171,6 +171,7 @@
 
 @layer base {
   * { @apply border-border; }
+  html, body { min-height: 100dvh; overflow-x: hidden; }
   body { @apply font-sans antialiased bg-background text-foreground; font-weight: 500; font-size: 1rem; line-height: 1.65; }
   p { font-weight: 500; color: color-mix(in srgb, var(--text) 88%, transparent); }
   h1, h2, h3, h4 { font-family: var(--app-font-sans); letter-spacing: -0.025em; font-weight: 700; }
