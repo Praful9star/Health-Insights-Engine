@@ -130,17 +130,27 @@ export interface DiseaseJourneyResult {
   disclaimer: string;
 }
 
+/**
+ * MIME type of the image (image/jpeg, image/png, etc.)
+ */
+export type OcrInputMimeType = typeof OcrInputMimeType[keyof typeof OcrInputMimeType];
+
+
+export const OcrInputMimeType = {
+  'image/jpeg': 'image/jpeg',
+  'image/png': 'image/png',
+  'image/gif': 'image/gif',
+  'image/webp': 'image/webp',
+} as const;
+
 export interface OcrInput {
   /**
      * Base64-encoded image data (no data URI prefix)
      * @maxLength 5500000
      */
   imageData: string;
-  /**
-     * MIME type of the image (image/jpeg, image/png, etc.)
-     * @maxLength 50
-     */
-  mimeType: string;
+  /** MIME type of the image (image/jpeg, image/png, etc.) */
+  mimeType: OcrInputMimeType;
 }
 
 export type OcrResultConfidence = typeof OcrResultConfidence[keyof typeof OcrResultConfidence];

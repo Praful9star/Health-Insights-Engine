@@ -10,6 +10,7 @@ import { LanguageProvider } from "@/contexts/language-context";
 import { AuthProvider } from "@/contexts/auth-context";
 import Analytics from "@/components/analytics";
 import Navbar from "@/components/navbar";
+import { SearchController } from "@/components/search-palette";
 import DisclaimerBanner from "@/components/disclaimer-banner";
 import ScrollToTop from "@/components/scroll-to-top";
 import PremiumBackground from "@/components/premium-background";
@@ -142,7 +143,8 @@ export default function App() {
                   <PremiumBackground />
                   <DisclaimerBanner />
                   <Navbar />
-                  <main className="flex-1 pb-20 lg:pb-0">
+                  <SearchController />
+                  <main id="main-content" className="flex-1 pb-20 lg:pb-0">
                     <AnimatedRouter />
                   </main>
                   <Footer />

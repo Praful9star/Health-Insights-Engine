@@ -1,4 +1,5 @@
 import { Router, type IRouter } from "express";
+import { LITERACY_SYSTEM_ADDENDUM } from "../lib/health-literacy";
 import { ExplainMedicalReportBody, ExplainMedicalReportResponse } from "@workspace/api-zod";
 import { groqChat, isAiAvailable } from "../lib/groq";
 import { aiLimiter } from "../middleware/rate-limit";
@@ -58,7 +59,7 @@ GUIDELINES:
 - "positiveFindings" = list of parameters/aspects that are normal and healthy
 - "areasOfAttention" = concise list of what needs follow-up
 - Generate 5-7 personalized "doctorQuestions" based on the specific findings
-- severity: "high_concern" only for critical values or multiple abnormals; "moderate_concern" for 1-3 mildly abnormal; "low_concern" for all normal/minor`;
+- severity: "high_concern" only for critical values or multiple abnormals; "moderate_concern" for 1-3 mildly abnormal; "low_concern" for all normal/minor${LITERACY_SYSTEM_ADDENDUM}`;
 
 function getMockReportResult(reportText: string) {
   const textLower = reportText.toLowerCase();
@@ -69,17 +70,17 @@ function getMockReportResult(reportText: string) {
 
   if (hasCBC) {
     return {
-      simpleSummary: "This is a Complete Blood Count (CBC) report — one of the most common blood tests in India. It checks the health of your red blood cells (which carry oxygen), white blood cells (which fight infection), and platelets (which help blood clot). Your report shows some values outside the normal range that your doctor will want to discuss with you.",
+      simpleSummary: "This is a CBC (Complete Blood Count) — a test that checks the three main types of cells in your blood. Red blood cells carry oxygen to your body. White blood cells fight infections. Platelets help stop bleeding. Your report shows that your red blood cell levels are lower than normal. This is most likely due to low iron (a mineral your body needs to make red blood cells). The good news: this is very common in India and very treatable.",
       severity: "moderate_concern" as const,
-      severityReason: "The hemoglobin and related values (MCV, MCH) are below the normal range, suggesting iron deficiency anaemia — a very common and treatable condition in India.",
+      severityReason: "Your haemoglobin (the protein in red blood cells that carries oxygen) is 10.2 g/dL — the normal range for men is 13–17 g/dL, so it is below normal. This is not an emergency, but you should see a doctor and discuss iron testing.",
       parameters: [
         {
           name: "Haemoglobin (Hb)",
           userValue: "10.2 g/dL",
           normalRange: "13.0–17.0 g/dL",
           status: "low" as const,
-          whatItMeans: "Haemoglobin is the protein in red blood cells that carries oxygen from your lungs to every part of your body.",
-          whyItMatters: "Low haemoglobin means your body may not be getting enough oxygen, causing fatigue, weakness, and breathlessness.",
+          whatItMeans: "Haemoglobin (Hb) is the protein inside red blood cells that picks up oxygen in your lungs and carries it to every part of your body. Think of it as the oxygen delivery truck.",
+          whyItMatters: "Your Hb is 10.2 g/dL. The normal range is 13–17 g/dL, so it is below normal. When Hb is low, your body gets less oxygen. This makes you feel tired, weak, and short of breath — even with small tasks.",
           causes: ["Iron deficiency (most common in India)", "Poor diet low in iron-rich foods", "Heavy menstrual bleeding", "Chronic blood loss", "B12 or folate deficiency"],
           symptoms: ["Fatigue and weakness", "Shortness of breath", "Dizziness or headaches", "Pale skin", "Cold hands and feet"],
           lifestyle: ["Eat iron-rich foods: spinach, lentils, rajma, pomegranate, jaggery", "Pair iron foods with Vitamin C (lemon juice) for better absorption", "Avoid tea/coffee with meals as they block iron absorption", "Cook in iron cookware"],
@@ -137,12 +138,12 @@ function getMockReportResult(reportText: string) {
       positiveFindings: ["WBC count is normal — no sign of active infection", "Platelet count is normal — no bleeding risk", "No critical or emergency values present"],
       areasOfAttention: ["Low haemoglobin needs iron status investigation (serum ferritin, serum iron)", "Rule out ongoing blood loss as a cause", "Dietary iron intake needs improvement"],
       doctorQuestions: [
-        "Should I get a serum ferritin test to confirm iron deficiency?",
-        "Do I need iron supplements and if so, what dose and for how long?",
-        "Is there a cause of blood loss I should investigate (e.g. heavy periods, stomach bleeding)?",
-        "Should I be tested for thalassemia trait given my low MCV?",
-        "When should I repeat this CBC to check improvement?",
-        "Are there any dietary changes that would help my haemoglobin improve?",
+        "Ask your doctor: My haemoglobin is 10.2 — do I have iron deficiency anaemia (low iron stores)?",
+        "Ask your doctor: Should I take iron tablets, and if yes, for how long?",
+        "Ask your doctor: Is there a reason I am losing blood — like heavy periods or a stomach problem?",
+        "Ask your doctor: My MCV (red cell size) is also low — should I be tested for thalassemia trait?",
+        "Ask your doctor: When should I repeat this blood test to check if my levels have improved?",
+        "Ask your doctor: What foods should I eat more of to help my haemoglobin go up?",
       ],
       overallAssessment: "needs_follow_up" as const,
       disclaimer: "This explanation is for educational purposes only and does not replace professional medical advice. Please discuss your results with a qualified doctor who can interpret them in the context of your full medical history.",

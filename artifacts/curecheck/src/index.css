@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./styles/tokens.css";
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
@@ -157,6 +158,17 @@
 
   --tracking-normal: 0em;
   --spacing: 0.25rem;
+  /* ── Typography semantic tokens ─────────────────────────── */
+  --type-tracking-display: -0.035em;
+  --type-tracking-h1:      -0.03em;
+  --type-tracking-h2:      -0.025em;
+  --type-tracking-h3:      -0.018em;
+  --type-leading-display:   1.08;
+  --type-leading-heading:   1.18;
+  --type-tracking-label:    0.09em;
+  --type-size-label:        0.6875rem;
+  --type-size-data:         1rem;
+  --type-size-unit:         0.82em;
 
   --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
   --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
@@ -240,7 +252,11 @@
   * { @apply border-border; }
   body { @apply font-sans antialiased bg-background text-foreground; font-weight: 500; font-size: 1rem; line-height: 1.65; }
   p { font-weight: 500; color: hsl(var(--foreground) / 0.88); }
-  h1, h2, h3, h4 { font-family: var(--app-font-serif); letter-spacing: -0.025em; font-weight: 700; }
+  h1, h2, h3, h4 { font-family: var(--app-font-serif); font-weight: 700; }
+  h1 { letter-spacing: var(--type-tracking-h1);  line-height: var(--type-leading-display); }
+  h2 { letter-spacing: var(--type-tracking-h2);  line-height: var(--type-leading-heading); }
+  h3 { letter-spacing: var(--type-tracking-h3);  line-height: var(--type-leading-heading); }
+  h4 { letter-spacing: var(--type-tracking-h3);  line-height: var(--type-leading-heading); }
 
   ::selection { background: hsl(var(--primary) / 0.28); color: hsl(var(--foreground)); }
 
@@ -277,6 +293,91 @@
   }
   .glass-panel:hover {
     box-shadow: 0 0 20px rgba(0,229,255,0.08);
+  }
+
+  /* ── Tool page utilities ──────────────────────────────────────────── */
+  .tool-page {
+    max-width: var(--tool-max-w);
+    margin-inline: auto;
+    padding: var(--tool-py) var(--tool-px);
+  }
+  .tool-card {
+    background: var(--elev-1);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-panel);
+    padding: var(--sp-4);
+  }
+  .tool-panel {
+    background: var(--elev-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-panel);
+    padding: var(--sp-3);
+  }
+  .tool-info-banner {
+    display: flex;
+    gap: var(--sp-2);
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--radius-card);
+    background: hsl(var(--primary) / 0.06);
+    border: 1px solid hsl(var(--primary) / 0.2);
+  }
+  .tool-section {
+    margin-top: var(--tool-gap);
+  }
+  .tool-section-label {
+    text-transform: uppercase;
+    font-weight: 700;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+  }
+  .tool-chip {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-badge);
+    background: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
+    border: 1px solid var(--border-default);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    cursor: pointer;
+  }
+  .tool-chip:hover {
+    background: hsl(var(--primary) / 0.12);
+    color: hsl(var(--primary));
+    border-color: hsl(var(--primary) / 0.3);
+  }
+  .tool-badge {
+    display: inline-flex;
+    align-items: center;
+    text-transform: uppercase;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-badge);
+    border: 1px solid currentColor;
+  }
+  .tool-header {
+    display: flex;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-2);
+  }
+  .tool-header-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: hsl(var(--primary) / 0.12);
+    color: hsl(var(--primary));
+  }
+  .tool-header-icon[data-accent] {
+    background: color-mix(in srgb, var(--tool-accent) 15%, transparent);
+    color: var(--tool-accent);
   }
 
   /* Gradient text */
@@ -529,9 +630,36 @@
   .mono-label {
     font-family: var(--app-font-sans);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.72rem;
+    letter-spacing: var(--type-tracking-label);
+    font-size: var(--type-size-label);
     font-weight: 700;
+  }
+  .data-value {
+    font-family: var(--app-font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1, "zero" 1;
+    font-weight: 500;
+    font-size: var(--type-size-data);
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .data-unit {
+    font-family: var(--app-font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    font-weight: 400;
+    font-size: var(--type-size-unit);
+    opacity: 0.65;
+    margin-left: 0.18em;
+    letter-spacing: 0;
+  }
+  .data-status {
+    font-family: var(--app-font-sans);
+    font-size: var(--type-size-label);
+    font-weight: 700;
+    letter-spacing: var(--type-tracking-label);
+    text-transform: uppercase;
+    line-height: 1;
   }
 
   /* Shimmer / sweep button */
@@ -730,6 +858,44 @@
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
   }
+}
+
+/* Skip link — keyboard-only, slides down on focus */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  padding: .5rem 1rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: 0 0 8px 8px;
+  font-weight: 700;
+  font-size: .875rem;
+  text-decoration: none;
+  transition: top .1s;
+}
+.skip-link:focus { top: 0; }
+
+/* Global focus ring — composited, WCAG 2.1 AA compliant */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Accordion — composited open/close using grid-template-rows, avoids height layout thrash */
+.accordion-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 180ms cubic-bezier(0.25, 0.1, 0.25, 1), opacity 140ms ease;
+  opacity: 0;
+}
+.accordion-content > div { overflow: hidden; }
+.accordion-content[data-state="open"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
 }
 
 /* ── Hydration gate — prevent prerendered opacity:0 from hiding ATF content ── */

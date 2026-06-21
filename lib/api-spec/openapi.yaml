@@ -402,7 +402,7 @@ components:
           description: Base64-encoded image data (no data URI prefix)
         mimeType:
           type: string
-          maxLength: 50
+          enum: [image/jpeg, image/png, image/gif, image/webp]
           description: MIME type of the image (image/jpeg, image/png, etc.)
 
     OcrResult:
