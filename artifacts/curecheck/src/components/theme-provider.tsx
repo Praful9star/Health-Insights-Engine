@@ -11,11 +11,11 @@ interface ThemeProviderProps {
 export function ThemeProvider({ children, defaultTheme = "light", storageKey = "theme", forcedTheme }: ThemeProviderProps) {
   return (
     <NextThemesProvider
-      attribute="class"
+      attribute="data-theme"
       defaultTheme={defaultTheme}
       forcedTheme={forcedTheme}
       storageKey={storageKey}
-      enableSystem={false}
+      enableSystem={true}
     >
       {children}
     </NextThemesProvider>
@@ -23,6 +23,6 @@ export function ThemeProvider({ children, defaultTheme = "light", storageKey = "
 }
 
 export function useTheme() {
-  const { theme, setTheme } = useNextTheme();
-  return { theme: theme ?? "light", setTheme };
+  const { theme, setTheme, resolvedTheme } = useNextTheme();
+  return { theme: resolvedTheme ?? theme ?? "light", setTheme };
 }
