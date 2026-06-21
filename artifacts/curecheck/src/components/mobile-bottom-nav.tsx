@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Home, FileSearch, Stethoscope, Dumbbell, Menu } from "lucide-react";
-import { useState } from "react";
+import { Home, FileSearch, Stethoscope, Dumbbell, Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const NAV_TABS = [
   { href: "/",                  icon: Home,         label: "Home"     },
@@ -14,6 +14,15 @@ const NAV_TABS = [
 export default function MobileBottomNav() {
   const [location] = useLocation();
   const [pressed, setPressed] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const h = (e: Event) => {
+      setMenuOpen((e as CustomEvent<{ open: boolean }>).detail?.open ?? false);
+    };
+    window.addEventListener("cc-menu-changed", h);
+    return () => window.removeEventListener("cc-menu-changed", h);
+  }, []);
 
   const isActive = (href: string) => {
     if (href === "/") return location === "/";
@@ -28,18 +37,24 @@ export default function MobileBottomNav() {
           {NAV_TABS.map((tab) => {
             const active = tab.href !== null && isActive(tab.href);
             const isMenu = tab.href === null;
+            const Icon = isMenu ? (menuOpen ? X : Menu) : tab.icon;
+            const label = isMenu ? (menuOpen ? "Close" : "Menu") : tab.label;
             const button = (
               <motion.button
                 key={tab.label}
                 onTapStart={() => setPressed(tab.label)}
                 onTap={() => {
                   setPressed(null);
-                  if (isMenu) window.dispatchEvent(new Event("cc-open-menu"));
+                  if (isMenu) {
+                    const next = !menuOpen;
+                    setMenuOpen(next);
+                    window.dispatchEvent(new Event(next ? "cc-open-menu" : "cc-close-menu"));
+                  }
                 }}
                 onTapCancel={() => setPressed(null)}
                 whileTap={{ scale: 0.88 }}
                 className="flex-1 flex flex-col items-center justify-center gap-1 py-3 px-1 relative cursor-pointer"
-                aria-label={tab.label}
+                aria-label={label}
               >
                 {active && (
                   <motion.div
@@ -48,12 +63,12 @@ export default function MobileBottomNav() {
                     transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
                   />
                 )}
-                <tab.icon
-                  className={`w-5 h-5 transition-colors relative z-10 ${active ? "text-primary" : "text-muted-foreground"}`}
-                  strokeWidth={active ? 2.2 : 1.8}
+                <Icon
+                  className={`w-5 h-5 transition-colors relative z-10 ${(active || (isMenu && menuOpen)) ? "text-primary" : "text-muted-foreground"}`}
+                  strokeWidth={(active || (isMenu && menuOpen)) ? 2.2 : 1.8}
                 />
-                <span className={`text-[10px] font-semibold tracking-wide relative z-10 transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}>
-                  {tab.label}
+                <span className={`text-[10px] font-semibold tracking-wide relative z-10 transition-colors ${(active || (isMenu && menuOpen)) ? "text-primary" : "text-muted-foreground"}`}>
+                  {label}
                 </span>
               </motion.button>
             );
