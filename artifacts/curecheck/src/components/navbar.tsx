@@ -211,8 +211,10 @@ export default function Navbar() {
             className="inline-flex items-center rounded-full border border-border/70 bg-muted/40 hover:border-primary/40 transition-colors"
             aria-label={language === "en" ? "Switch to Hindi" : "Switch to English"}
           >
-            <span className="lg:hidden px-2.5 py-1 text-xs font-600 text-foreground">
-              {language === "en" ? "हि" : "EN"}
+            {/* Mobile: Languages icon + short label — avoids raw Devanagari rendering as a broken glyph */}
+            <span className="lg:hidden flex items-center gap-1 px-2.5 py-1 text-xs font-600 text-foreground">
+              <Languages className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+              {language === "en" ? "हिं" : "EN"}
             </span>
             <span className="hidden lg:flex items-center text-xs font-600">
               <Languages className="w-3.5 h-3.5 ml-2 mr-1 text-muted-foreground" />

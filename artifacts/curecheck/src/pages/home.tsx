@@ -5,11 +5,11 @@ import type { ReactNode } from "react";
 import { Helmet } from "react-helmet-async";
 import PageMeta from "@/components/page-meta";
 import {
-  FileSearch, Pill, Clock, Dumbbell, ArrowRight, Sparkles,
+  FileSearch, Dumbbell, ArrowRight,
   CheckCircle2, Zap, ShieldCheck, BookOpen, TrendingUp, Flame,
-  BadgeCheck, DatabaseZap, Globe2, HeartPulse, Quote,
-  Activity, FlaskConical, MapPin, Share2,
-  Brain, Leaf, Syringe, Baby, Newspaper, Calculator, PhoneCall, Shield, Stethoscope, AlertCircle, AlertTriangle,
+  Globe2, HeartPulse, Quote,
+  FlaskConical, MapPin, Share2,
+  Shield, AlertCircle, AlertTriangle,
 } from "lucide-react";
 import { TOOL_CATEGORIES } from "@/data/tool-catalog";
 import { Button } from "@/components/ui/button";
@@ -64,52 +64,6 @@ function EcgDivider() {
   );
 }
 
-
-
-/* ─── Core features ──────────────────────────────────────────────────── */
-const CORE_FEATURES = [
-  {
-    icon: FileSearch, href: "/report-explainer", span: "lg:col-span-2",
-    accent: "text-primary", bg: "bg-primary/10", border: "group-hover:border-primary/50",
-    topAccent: "from-primary/60 to-primary/10",
-    badge: { en: "Primary Feature", hi: "मुख्य सुविधा" },
-    title: { en: "AI Report Explainer", hi: "AI रिपोर्ट व्याख्याकार" },
-    desc: { en: "Paste any blood test, thyroid panel or CBC. Get plain-English (or Hindi) explanation, abnormal values highlighted with why they matter, and exact questions to ask your doctor.", hi: "कोई भी ब्लड टेस्ट, थायरॉइड या CBC पेस्ट करें। सरल हिंदी में समझाव, असामान्य मान क्यों मायने रखते हैं, और डॉक्टर से पूछने के सटीक सवाल।" },
-    preview: [
-      { label: { en: "Hemoglobin", hi: "हीमोग्लोबिन" }, value: "10.2", unit: "g/dL", status: "low" },
-      { label: { en: "Blood Sugar", hi: "रक्त शर्करा" }, value: "142", unit: "mg/dL", status: "high" },
-      { label: { en: "Platelets", hi: "प्लेटलेट्स" }, value: "2,40,000", unit: "/mcL", status: "normal" },
-    ],
-  },
-  {
-    icon: Pill, href: "/medicine-explainer", span: "lg:col-span-1",
-    accent: "text-violet-400", bg: "bg-violet-500/10", border: "group-hover:border-violet-500/40",
-    topAccent: "from-violet-500/50 to-violet-500/10",
-    badge: null,
-    title: { en: "Medicine Guide", hi: "दवा मार्गदर्शिका" },
-    desc: { en: "Enter any medicine name. Get what it does, side effects, best time to take, and key precautions — in plain language.", hi: "कोई भी दवा का नाम डालें। वो क्या करती है, दुष्प्रभाव, कब लें, और सावधानियाँ — सरल भाषा में।" },
-    preview: null,
-  },
-  {
-    icon: Clock, href: "/health-timeline", span: "lg:col-span-1",
-    accent: "text-emerald-400", bg: "bg-emerald-500/10", border: "group-hover:border-emerald-500/40",
-    topAccent: "from-emerald-500/50 to-emerald-500/10",
-    badge: { en: "New", hi: "नया" },
-    title: { en: "Health Timeline", hi: "स्वास्थ्य समयरेखा" },
-    desc: { en: "Save every report analysis. See your Hemoglobin, Blood Sugar and Cholesterol trends over time. Your history stays on your device.", hi: "हर रिपोर्ट विश्लेषण सहेजें। हीमोग्लोबिन, रक्त शर्करा और कोलेस्ट्रॉल के रुझान देखें। आपका इतिहास आपके डिवाइस पर।" },
-    preview: null,
-  },
-  {
-    icon: Dumbbell, href: "/fitness-hub", span: "lg:col-span-2",
-    accent: "text-amber-400", bg: "bg-amber-500/10", border: "group-hover:border-amber-500/40",
-    topAccent: "from-amber-500/50 to-amber-500/10",
-    badge: null,
-    title: { en: "Fitness Hub", hi: "फिटनेस केंद्र" },
-    desc: { en: "Daily fitness score, streak tracker, AI-powered suggestions, health challenges and Indian gym diet plans — your daily health companion.", hi: "रोज़ का फिटनेस स्कोर, लगातार दिनों का ट्रैकर, AI सुझाव, स्वास्थ्य चुनौतियाँ और भारतीय जिम डाइट प्लान।" },
-    preview: null,
-  },
-];
-
 const HOW_IT_WORKS = [
   { step: "01", icon: Zap,        title: { en: "Paste your report or medicine", hi: "रिपोर्ट या दवा चिपकाएं" },    desc: { en: "No account needed. Works with any Indian lab format.", hi: "कोई खाता नहीं चाहिए। किसी भी भारतीय लैब फॉर्मेट के साथ।" } },
   { step: "02", icon: ShieldCheck, title: { en: "AI explains in plain language", hi: "AI सरल भाषा में समझाता है" }, desc: { en: "Cross-referenced with medical literature. No jargon.", hi: "चिकित्सा साहित्य से क्रॉस-रेफरेंस। कोई जटिल शब्द नहीं।" } },
@@ -132,6 +86,9 @@ export default function Home() {
   const todayMythIdx = Math.floor(Date.now() / 86_400_000) % DAILY_MYTHS.length;
   const todayMyth = DAILY_MYTHS[todayMythIdx];
   const [mythRevealed, setMythRevealed] = useState(false);
+
+  /* Toggle for hero demo card — false = abstract state (no fake numbers) */
+  const [exampleShown, setExampleShown] = useState(false);
 
   return (
     <div className="relative z-10">
@@ -235,45 +192,91 @@ export default function Home() {
             className="mt-8 lg:mt-0 w-full max-w-lg mx-auto lg:max-w-none"
           >
             <div className="glass-panel rounded-2xl p-5 border border-border/40 text-left bg-background/50 backdrop-blur-md relative overflow-hidden">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                  <FileSearch className="w-5 h-5" />
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                    <FileSearch className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-serif font-700 text-foreground">
+                      {t("Report Analysis", "रिपोर्ट विश्लेषण")}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">{t("AI-powered · plain language", "AI-संचालित · सरल भाषा")}</p>
+                  </div>
                 </div>
+                {exampleShown && (
+                  <span className="text-[10px] font-700 uppercase tracking-wide px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/25 flex-shrink-0">
+                    {t("Example", "उदाहरण")}
+                  </span>
+                )}
+              </div>
+
+              {exampleShown ? (
+                /* ── Revealed: example analysis with clearly-labeled badge ── */
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-xl border-l-[3px] border-l-[var(--alert)] bg-[var(--alert-tint)]">
+                      <span className="flex-1 text-xs font-500 text-[var(--text)]">{t("Hemoglobin", "हीमोग्लोबिन")}</span>
+                      <span className="text-sm font-800 tabular-nums text-[var(--text)]">10.2 <span className="text-[11px] font-400 text-[var(--text-muted)]">g/dL</span></span>
+                      <span className="inline-flex items-center gap-1 text-[10px] font-700 uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--alert)]/40 text-[var(--alert)] bg-[var(--surface)] flex-shrink-0">
+                        <AlertTriangle className="w-2.5 h-2.5" /> LOW
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-xl border-l-[3px] border-l-[var(--alert)] bg-[var(--alert-tint)]">
+                      <span className="flex-1 text-xs font-500 text-[var(--text)]">{t("Blood Sugar", "रक्त शर्करा")}</span>
+                      <span className="text-sm font-800 tabular-nums text-[var(--text)]">142 <span className="text-[11px] font-400 text-[var(--text-muted)]">mg/dL</span></span>
+                      <span className="inline-flex items-center gap-1 text-[10px] font-700 uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--alert)]/40 text-[var(--alert)] bg-[var(--surface)] flex-shrink-0">
+                        <AlertTriangle className="w-2.5 h-2.5" /> HIGH
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl">
+                      <span className="flex-1 text-xs font-500 text-[var(--text)]">{t("Platelets", "प्लेटलेट्स")}</span>
+                      <span className="text-sm font-600 tabular-nums text-[var(--text)]">2,40,000 <span className="text-[11px] font-400 text-[var(--text-muted)]">/mcL</span></span>
+                      <span className="inline-flex items-center gap-1 text-[10px] font-700 uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--normal)]/40 text-[var(--normal)] bg-[var(--surface)] flex-shrink-0">
+                        <CheckCircle2 className="w-2.5 h-2.5" /> NORMAL
+                      </span>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+                    {t("Plain-English explanation, abnormal values highlighted with why they matter, and exact questions to ask your doctor.", "सरल हिंदी में समझाव, असामान्य मान क्यों मायने रखते हैं, और डॉक्टर से पूछने के सटीक सवाल।")}
+                  </p>
+                  <button onClick={() => setExampleShown(false)} className="mt-3 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors">
+                    {t("Hide example", "उदाहरण छुपाएं")}
+                  </button>
+                </motion.div>
+              ) : (
+                /* ── Default: abstract value-proposition view, no fake numbers ── */
                 <div>
-                  <h3 className="font-serif font-700 text-foreground">
-                    {t("Report Analysis", "रिपोर्ट विश्लेषण")}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">Demo Data</p>
+                  <div className="space-y-2">
+                    {[
+                      { label: { en: "Parameters analysed", hi: "पैरामीटर विश्लेषित" }, pct: "w-4/5" },
+                      { label: { en: "Abnormal values flagged", hi: "असामान्य मान चिह्नित" }, pct: "w-3/5" },
+                      { label: { en: "Doctor questions generated", hi: "डॉक्टर सवाल तैयार" }, pct: "w-2/3" },
+                    ].map((row, i) => (
+                      <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-muted/20">
+                        <span className="flex-1 text-xs font-500 text-foreground/70">
+                          {language === "hi" ? row.label.hi : row.label.en}
+                        </span>
+                        <div className="w-24 h-1.5 rounded-full bg-muted/50 overflow-hidden flex-shrink-0">
+                          <div className={`h-full rounded-full bg-primary/40 ${row.pct}`} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+                    {t(
+                      "Paste any blood test, CBC, thyroid or lab report — get instant plain-language explanations tailored for India.",
+                      "कोई भी ब्लड टेस्ट, CBC, थायरॉइड या लैब रिपोर्ट पेस्ट करें — भारत के लिए सरल भाषा में तुरंत व्याख्या पाएं।"
+                    )}
+                  </p>
+                  <button
+                    onClick={() => setExampleShown(true)}
+                    className="mt-4 inline-flex items-center gap-1.5 text-xs font-600 text-primary hover:text-primary/80 transition-colors"
+                  >
+                    {t("See an example analysis", "उदाहरण विश्लेषण देखें")} <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-xl border-l-[3px] border-l-[var(--alert)] bg-[var(--alert-tint)]">
-                  <span className="flex-1 text-xs font-500 text-[var(--text)]">{t("Hemoglobin", "हीमोग्लोबिन")}</span>
-                  <span className="text-sm font-800 tabular-nums text-[var(--text)]">10.2 <span className="text-[11px] font-400 text-[var(--text-muted)]">g/dL</span></span>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-700 uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--alert)]/40 text-[var(--alert)] bg-[var(--surface)] flex-shrink-0">
-                    <AlertTriangle className="w-2.5 h-2.5" /> LOW
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-xl border-l-[3px] border-l-[var(--alert)] bg-[var(--alert-tint)]">
-                  <span className="flex-1 text-xs font-500 text-[var(--text)]">{t("Blood Sugar", "रक्त शर्करा")}</span>
-                  <span className="text-sm font-800 tabular-nums text-[var(--text)]">142 <span className="text-[11px] font-400 text-[var(--text-muted)]">mg/dL</span></span>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-700 uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--alert)]/40 text-[var(--alert)] bg-[var(--surface)] flex-shrink-0">
-                    <AlertTriangle className="w-2.5 h-2.5" /> HIGH
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl">
-                  <span className="flex-1 text-xs font-500 text-[var(--text)]">{t("Platelets", "प्लेटलेट्स")}</span>
-                  <span className="text-sm font-600 tabular-nums text-[var(--text)]">2,40,000 <span className="text-[11px] font-400 text-[var(--text-muted)]">/mcL</span></span>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-700 uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--normal)]/40 text-[var(--normal)] bg-[var(--surface)] flex-shrink-0">
-                    <CheckCircle2 className="w-2.5 h-2.5" /> NORMAL
-                  </span>
-                </div>
-              </div>
-
-              <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-                {t("Plain-English explanation, abnormal values highlighted with why they matter, and exact questions to ask your doctor.", "सरल हिंदी में समझाव, असामान्य मान क्यों मायने रखते हैं, और डॉक्टर से पूछने के सटीक सवाल।")}
-              </p>
+              )}
             </div>
           </motion.div>
 
@@ -333,60 +336,24 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══ CORE FEATURES ════════════════════════════════════════════ */}
-      <section className="py-20 px-4">
+      {/* ══ HOW IT WORKS ═════════════════════════════════════════════ */}
+      <section className="py-16 px-4">
         <div className="max-w-[1200px] mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
-            <p className="mono-label text-primary/80 mb-3">{t("Core Features", "मुख्य सुविधाएं")}</p>
-            <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">
-              {t("Everything you actually need", "जो वाकई ज़रूरी है")}
-            </h2>
-            <p className="mt-4 text-muted-foreground text-lg max-w-xl mx-auto">
-              {t("AI tools built for real Indian health needs. No clutter, no generic chatbot.", "असली भारतीय स्वास्थ्य ज़रूरतों के लिए बनाए AI उपकरण।")}
-            </p>
+            <p className="mono-label text-primary/80 mb-3">{t("How It Works", "कैसे काम करता है")}</p>
+            <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">{t("Three simple steps", "तीन आसान कदम")}</h2>
           </motion.div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {HOW_IT_WORKS.map((step, i) => (
+              <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}
+                className="glass-panel rounded-2xl p-7 text-center border border-border/40 relative overflow-hidden group hover:border-primary/30 transition-colors">
 
-          <div className="grid lg:grid-cols-3 gap-5">
-            {CORE_FEATURES.map((feat, i) => (
-              <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i % 3} className={feat.span}>
-                <Link href={feat.href}>
-                  <div className={`group tile relative h-full glass-panel rounded-[1.5rem] p-7 cursor-pointer overflow-hidden border border-border/40 ${feat.border} transition-all`}>
-                    {/* Colored top accent bar */}
-                    <div className={`absolute top-0 left-0 right-0 h-[3px] bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-                    {feat.badge && (
-                      <span className="absolute top-5 right-5 text-[11px] font-700 px-2.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/25">
-                        {language === "hi" ? feat.badge.hi : feat.badge.en}
-                      </span>
-                    )}
-                    <div className={`w-12 h-12 rounded-2xl ${feat.bg} ${feat.accent} flex items-center justify-center mb-5 icon-ring`}>
-                      <feat.icon className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-xl sm:text-2xl font-serif font-700 text-foreground mb-2">
-                      {language === "hi" ? feat.title.hi : feat.title.en}
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {language === "hi" ? feat.desc.hi : feat.desc.en}
-                    </p>
-                    {feat.preview && (
-                      <div className="mt-5 space-y-2">
-                        {feat.preview.map((item, j) => (
-                          <div key={j} className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-600 ${
-                            item.status === "high"   ? "bg-red-500/10 text-red-400 border border-red-500/20" :
-                            item.status === "low"    ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
-                            "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                          }`}>
-                            <span>{language === "hi" ? item.label.hi : item.label.en}</span>
-                            <span className="font-700">{item.value} <span className="font-400 opacity-70">{item.unit}</span></span>
-                            <span className="uppercase text-[10px] tracking-wide">{item.status}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <div className={`mt-5 inline-flex items-center gap-1.5 text-sm font-600 ${feat.accent} group-hover:gap-2.5 transition-all`}>
-                      {t("Open", "खोलें")} <ArrowRight className="w-4 h-4" />
-                    </div>
-                  </div>
-                </Link>
+                <p className="text-6xl font-serif font-800 leading-none mb-4 opacity-60">{step.step}</p>
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
+                  <step.icon className="w-5 h-5" />
+                </div>
+                <h3 className="font-serif font-700 text-foreground mb-2">{language === "hi" ? step.title.hi : step.title.en}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{language === "hi" ? step.desc.hi : step.desc.en}</p>
               </motion.div>
             ))}
           </div>
@@ -429,30 +396,6 @@ export default function Home() {
                   ))}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══ HOW IT WORKS ═════════════════════════════════════════════ */}
-      <section className="py-16 px-4">
-        <div className="max-w-[1200px] mx-auto">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
-            <p className="mono-label text-primary/80 mb-3">{t("How It Works", "कैसे काम करता है")}</p>
-            <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">{t("Three simple steps", "तीन आसान कदम")}</h2>
-          </motion.div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {HOW_IT_WORKS.map((step, i) => (
-              <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}
-                className="glass-panel rounded-2xl p-7 text-center border border-border/40 relative overflow-hidden group hover:border-primary/30 transition-colors">
-
-                <p className="text-6xl font-serif font-800 leading-none mb-4  opacity-60">{step.step}</p>
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
-                  <step.icon className="w-5 h-5" />
-                </div>
-                <h3 className="font-serif font-700 text-foreground mb-2">{language === "hi" ? step.title.hi : step.title.en}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{language === "hi" ? step.desc.hi : step.desc.en}</p>
-              </motion.div>
             ))}
           </div>
         </div>
@@ -603,7 +546,7 @@ export default function Home() {
               background: "transparent",
               backdropFilter: "blur(24px)",
             }}>
-            <div className="absolute inset-0  opacity-40 pointer-events-none" />
+            <div className="absolute inset-0 opacity-40 pointer-events-none" />
             <div className="relative z-10">
               <p className="mono-label text-primary/80 mb-3">{t("Why CureCheck?", "CureCheck क्यों?")}</p>
               <h2 className="text-2xl sm:text-4xl font-serif font-800 text-foreground mb-8">
@@ -680,7 +623,7 @@ export default function Home() {
                     `🏥 CureCheck — भारत का मुफ्त AI health platform!\n\n✅ Medical reports को सरल भाषा में समझें\n✅ किसी भी दवा के बारे में जानें\n✅ Fitness, steps और streaks track करें\n✅ Science से health myths तोड़ें\n\n100% मुफ्त। कोई signup नहीं।\n👉 curecheck.in`,
                   )}
                   label={t("Share CureCheck on WhatsApp", "WhatsApp पर शेयर करें")}
-                  className=" rounded-full px-8 h-12 text-base"
+                  className="rounded-full px-8 h-12 text-base"
                 />
               </div>
             </div>
@@ -698,7 +641,7 @@ export default function Home() {
               backdropFilter: "blur(24px)",
               boxShadow: "none",
             }}>
-            <div className="absolute inset-0  opacity-50 pointer-events-none" />
+            <div className="absolute inset-0 opacity-50 pointer-events-none" />
 
             <div className="relative z-10">
               <h2 className="text-3xl sm:text-5xl font-serif font-800 text-foreground">
@@ -710,7 +653,7 @@ export default function Home() {
               <div className="mt-8 flex flex-wrap gap-3 justify-center">
                 <Link href="/report-explainer">
                   <Button size="lg"
-                    className=" gap-2 rounded-full px-8 h-12 font-700"
+                    className="gap-2 rounded-full px-8 h-12 font-700"
                     style={{ boxShadow: "none" }}
                     data-testid="button-cta-report"
                   >
@@ -727,9 +670,6 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-
-
-
 
     </div>
   );
