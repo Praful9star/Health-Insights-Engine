@@ -52,7 +52,7 @@ function formatDate(iso: string): string {
 }
 
 export default function Premium() {
-  const { user, session, isPremium, premiumExpiresAt, profileLoading } = useAuth();
+  const { user, session, isPremium, premiumExpiresAt, profileLoading, refreshProfile } = useAuth();
   const [, navigate] = useLocation();
 
   // Detect post-payment redirect params
@@ -62,14 +62,14 @@ export default function Premium() {
   const [creating, setCreating] = useState<"monthly" | "annual" | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
 
-  // Clear payment query params after reading (avoids re-display on refresh)
+  // After payment redirect: refresh profile so isPremium reflects the new DB state
   useEffect(() => {
-    if (paymentResult) {
-      const url = new URL(window.location.href);
-      url.searchParams.delete("payment");
-      url.searchParams.delete("reason");
-      window.history.replaceState({}, "", url.toString());
-    }
+    if (!paymentResult) return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete("payment");
+    url.searchParams.delete("reason");
+    window.history.replaceState({}, "", url.toString());
+    if (paymentResult === "success") refreshProfile();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleGetPremium(plan: "monthly" | "annual") {
