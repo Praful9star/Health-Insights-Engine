@@ -26,33 +26,33 @@ create table if not exists public.bug_reports (
 alter table public.feedback    enable row level security;
 alter table public.bug_reports enable row level security;
 
-do $ begin
+do $$ begin
   create policy "Anyone can insert feedback"
     on public.feedback for insert
     with check (true);
 exception when duplicate_object then null;
-end $;
+end $$;
 
-do $ begin
+do $$ begin
   create policy "Users view own feedback"
     on public.feedback for select
     using (auth.uid() = user_id);
 exception when duplicate_object then null;
-end $;
+end $$;
 
-do $ begin
+do $$ begin
   create policy "Anyone can insert bug_reports"
     on public.bug_reports for insert
     with check (true);
 exception when duplicate_object then null;
-end $;
+end $$;
 
-do $ begin
+do $$ begin
   create policy "Users view own bug_reports"
     on public.bug_reports for select
     using (auth.uid() = user_id);
 exception when duplicate_object then null;
-end $;
+end $$;
 
 -- Indexes for admin queries
 create index if not exists idx_feedback_created_at    on public.feedback(created_at desc);
