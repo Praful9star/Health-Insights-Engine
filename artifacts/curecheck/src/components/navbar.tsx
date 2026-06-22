@@ -27,7 +27,7 @@ export default function Navbar() {
   const [searchResults, setSearchResults] = useState<Tool[]>([]);
   const searchVersionRef = useRef(0);
   const { language, setLanguage, t } = useLanguage();
-  const { user, profile } = useAuth();
+  const { user, profile, isPremium } = useAuth();
   const { theme, setTheme } = useTheme();
   const moreRef = useRef<HTMLDivElement>(null);
   const desktopSearchRef = useRef<HTMLDivElement>(null);
@@ -227,13 +227,23 @@ export default function Navbar() {
 
           {/* Premium */}
           <Link href="/premium">
-            <button
-              className="flex items-center justify-center rounded-full bg-primary/10 border border-primary/30 hover:bg-primary/20 text-primary transition-all w-8 h-8 lg:w-auto lg:h-auto lg:px-3 lg:py-1.5 lg:gap-1.5"
-              aria-label="Premium"
-            >
-              <Star className="w-3.5 h-3.5 lg:w-3 lg:h-3" />
-              <span className="hidden lg:inline text-xs font-700">Premium</span>
-            </button>
+            {isPremium ? (
+              <button
+                className="flex items-center justify-center rounded-full bg-amber-500/15 border border-amber-500/40 hover:bg-amber-500/25 text-amber-500 transition-all w-8 h-8 lg:w-auto lg:h-auto lg:px-3 lg:py-1.5 lg:gap-1.5"
+                aria-label="Premium active"
+              >
+                <Star className="w-3.5 h-3.5 lg:w-3 lg:h-3 fill-amber-500" />
+                <span className="hidden lg:inline text-xs font-700">Premium ✓</span>
+              </button>
+            ) : (
+              <button
+                className="flex items-center justify-center rounded-full bg-primary/10 border border-primary/30 hover:bg-primary/20 text-primary transition-all w-8 h-8 lg:w-auto lg:h-auto lg:px-3 lg:py-1.5 lg:gap-1.5"
+                aria-label="Upgrade to Premium"
+              >
+                <Star className="w-3.5 h-3.5 lg:w-3 lg:h-3" />
+                <span className="hidden lg:inline text-xs font-700">Premium</span>
+              </button>
+            )}
           </Link>
 
           {/* Theme toggle */}
