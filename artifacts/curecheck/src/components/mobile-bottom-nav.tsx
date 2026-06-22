@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Home, Compass, Search, Clock, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
@@ -12,7 +12,6 @@ export default function MobileBottomNav() {
   const [exploreOpen, setExploreOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // Close sheets on route change
   useEffect(() => {
     setExploreOpen(false);
     setSearchOpen(false);
@@ -32,67 +31,70 @@ export default function MobileBottomNav() {
         className="lg:hidden fixed bottom-0 left-0 right-0 z-50"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        <div className="mx-2 mb-2 bg-background/85 backdrop-blur-2xl border border-border/50 rounded-2xl shadow-2xl overflow-visible">
-          <div className="flex items-end h-[58px]">
+        {/* Outer wrapper gives room for the raised Search button to breathe above */}
+        <div className="mx-2 mb-2">
+          <div
+            className="relative bg-background/88 backdrop-blur-2xl border border-border/50 rounded-2xl shadow-2xl"
+            style={{ overflow: "visible" }}
+          >
+            {/* 5-column grid — perfectly equal widths */}
+            <div className="grid grid-cols-5 h-[58px]">
 
-            {/* Home */}
-            <NavTab href="/" label="Home" icon={Home} active={isActive("/")} />
+              {/* 1 — Home */}
+              <NavTab href="/" label="Home" icon={Home} active={isActive("/")} />
 
-            {/* Explore */}
-            <button
-              onClick={() => setExploreOpen(v => !v)}
-              className="flex-1 flex flex-col items-center justify-center gap-1 py-3 px-1 relative cursor-pointer"
-              aria-label="Explore"
-            >
-              <AnimatePresence>
+              {/* 2 — Explore */}
+              <button
+                onClick={() => setExploreOpen(v => !v)}
+                className="flex flex-col items-center justify-center gap-[3px] relative"
+              >
                 {exploreOpen && (
                   <motion.div
-                    layoutId="bottom-tab-indicator"
-                    className="absolute inset-x-1 inset-y-1 rounded-xl bg-primary/12"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
+                    layoutId="nav-pill"
+                    className="absolute inset-x-2 inset-y-2 rounded-xl bg-primary/12"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.35 }}
                   />
                 )}
-              </AnimatePresence>
-              <Compass
-                className={`w-5 h-5 transition-colors relative z-10 ${exploreOpen ? "text-primary" : "text-muted-foreground"}`}
-                strokeWidth={exploreOpen ? 2.2 : 1.8}
+                <Compass
+                  className={`w-[19px] h-[19px] relative z-10 transition-colors ${exploreOpen ? "text-primary" : "text-muted-foreground"}`}
+                  strokeWidth={exploreOpen ? 2.2 : 1.8}
+                />
+                <span className={`text-[10px] font-600 relative z-10 transition-colors leading-none ${exploreOpen ? "text-primary" : "text-muted-foreground"}`}>
+                  Explore
+                </span>
+              </button>
+
+              {/* 3 — Search (center, raised) */}
+              <div className="flex flex-col items-center justify-end pb-[7px] relative">
+                <motion.button
+                  onClick={() => setSearchOpen(v => !v)}
+                  whileTap={{ scale: 0.88 }}
+                  aria-label="Search"
+                  className="absolute w-[50px] h-[50px] rounded-full bg-primary text-primary-foreground flex items-center justify-center"
+                  style={{
+                    top: "-16px",
+                    boxShadow: "0 4px 20px rgba(0,106,255,0.4), 0 2px 8px rgba(0,0,0,0.18)",
+                  }}
+                >
+                  <Search className="w-[20px] h-[20px]" strokeWidth={2.2} />
+                </motion.button>
+                <span className={`text-[10px] font-600 leading-none transition-colors ${searchOpen ? "text-primary" : "text-muted-foreground"}`}>
+                  Search
+                </span>
+              </div>
+
+              {/* 4 — History */}
+              <NavTab href="/history" label="History" icon={Clock} active={isActive("/history")} />
+
+              {/* 5 — Profile */}
+              <NavTab
+                href={user ? "/profile" : "/login"}
+                label="Profile"
+                icon={User}
+                active={isActive("/profile") || isActive("/login")}
               />
-              <span className={`text-[10px] font-semibold tracking-wide relative z-10 transition-colors ${exploreOpen ? "text-primary" : "text-muted-foreground"}`}>
-                Explore
-              </span>
-            </button>
 
-            {/* Search — center, raised circular button */}
-            <div className="flex-1 flex flex-col items-center justify-end pb-2 relative">
-              <motion.button
-                onClick={() => setSearchOpen(v => !v)}
-                whileTap={{ scale: 0.9 }}
-                aria-label="Search"
-                className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-colors mb-[-2px] ${
-                  searchOpen
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-primary text-primary-foreground"
-                }`}
-                style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.25)" }}
-              >
-                <Search className="w-5 h-5" strokeWidth={2} />
-              </motion.button>
-              <span className={`text-[10px] font-semibold tracking-wide mt-0.5 transition-colors ${searchOpen ? "text-primary" : "text-muted-foreground"}`}>
-                Search
-              </span>
             </div>
-
-            {/* History */}
-            <NavTab href="/history" label="History" icon={Clock} active={isActive("/history")} />
-
-            {/* Profile */}
-            <NavTab
-              href={user ? "/profile" : "/login"}
-              label="Profile"
-              icon={User}
-              active={isActive("/profile") || isActive("/login")}
-            />
-
           </div>
         </div>
       </nav>
@@ -115,21 +117,21 @@ function NavTab({
     <Link href={href}>
       <motion.div
         whileTap={{ scale: 0.88 }}
-        className="flex-1 flex flex-col items-center justify-center gap-1 py-3 px-1 relative cursor-pointer"
+        className="flex flex-col items-center justify-center gap-[3px] h-full relative cursor-pointer"
         aria-label={label}
       >
         {active && (
           <motion.div
-            layoutId="bottom-tab-indicator"
-            className="absolute inset-x-1 inset-y-1 rounded-xl bg-primary/12"
-            transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
+            layoutId="nav-pill"
+            className="absolute inset-x-2 inset-y-2 rounded-xl bg-primary/12"
+            transition={{ type: "spring", bounce: 0.2, duration: 0.35 }}
           />
         )}
         <Icon
-          className={`w-5 h-5 transition-colors relative z-10 ${active ? "text-primary" : "text-muted-foreground"}`}
+          className={`w-[19px] h-[19px] relative z-10 transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}
           strokeWidth={active ? 2.2 : 1.8}
         />
-        <span className={`text-[10px] font-semibold tracking-wide relative z-10 transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}>
+        <span className={`text-[10px] font-600 relative z-10 leading-none transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}>
           {label}
         </span>
       </motion.div>
