@@ -42,7 +42,7 @@ router.get("/profile", async (req: Request, res: Response): Promise<void> => {
 
   const { data, error } = await supabase
     .from("user_profiles")
-    .select("name,age,gender,blood_group,city,allergies")
+    .select("name,age,gender,blood_group,city,allergies,is_premium,premium_expires_at")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -52,7 +52,20 @@ router.get("/profile", async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  res.json(data ?? { name: "", age: "", gender: "", blood_group: "", city: "", allergies: "" });
+  const now = new Date();
+  const expiresAt = data?.premium_expires_at ? new Date(data.premium_expires_at) : null;
+  const isPremiumActive = !!(data?.is_premium && expiresAt && expiresAt > now);
+
+  res.json({
+    name:               data?.name         ?? "",
+    age:                data?.age          ?? "",
+    gender:             data?.gender       ?? "",
+    blood_group:        data?.blood_group  ?? "",
+    city:               data?.city         ?? "",
+    allergies:          data?.allergies    ?? "",
+    isPremium:          isPremiumActive,
+    premiumExpiresAt:   isPremiumActive ? data!.premium_expires_at : null,
+  });
 });
 
 router.put("/profile", async (req: Request, res: Response): Promise<void> => {
