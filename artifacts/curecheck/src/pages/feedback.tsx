@@ -74,12 +74,15 @@ function RatingForm({ session }: { session: { access_token: string } | null }) {
         headers,
         body: JSON.stringify({ type: "rating", rating, message, email, page_url: location }),
       });
-      const data = await res.json();
-      if (!res.ok) { setState({ status: "error", message: data.error ?? "Submission failed." }); return; }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        setState({ status: "error", message: data.error ?? `Error ${res.status}. Please try again.` });
+        return;
+      }
       setState({ status: "success", message: "Thank you! Your rating has been saved." });
       setRating(0); setMessage(""); setEmail("");
     } catch {
-      setState({ status: "error", message: "Network error. Please try again." });
+      setState({ status: "error", message: "Could not reach server. Check your connection and try again." });
     }
   };
 
@@ -143,12 +146,15 @@ function FeatureForm({ session }: { session: { access_token: string } | null }) 
         headers,
         body: JSON.stringify({ type: "feature", message, email, page_url: location }),
       });
-      const data = await res.json();
-      if (!res.ok) { setState({ status: "error", message: data.error ?? "Submission failed." }); return; }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        setState({ status: "error", message: data.error ?? `Error ${res.status}. Please try again.` });
+        return;
+      }
       setState({ status: "success", message: "Feature idea received! We review all suggestions." });
       setMessage(""); setEmail("");
     } catch {
-      setState({ status: "error", message: "Network error. Please try again." });
+      setState({ status: "error", message: "Could not reach server. Check your connection and try again." });
     }
   };
 
@@ -213,12 +219,15 @@ function BugForm({ session }: { session: { access_token: string } | null }) {
           device: `${window.screen.width}x${window.screen.height} · ${navigator.platform}`,
         }),
       });
-      const data = await res.json();
-      if (!res.ok) { setState({ status: "error", message: data.error ?? "Submission failed." }); return; }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        setState({ status: "error", message: data.error ?? `Error ${res.status}. Please try again.` });
+        return;
+      }
       setState({ status: "success", message: "Bug report sent! We'll investigate shortly." });
       setDescription(""); setEmail("");
     } catch {
-      setState({ status: "error", message: "Network error. Please try again." });
+      setState({ status: "error", message: "Could not reach server. Check your connection and try again." });
     }
   };
 
