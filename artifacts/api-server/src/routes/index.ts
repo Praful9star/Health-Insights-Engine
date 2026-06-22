@@ -11,6 +11,7 @@ import drugInteractionRouter from "./drug-interaction";
 import doctorPrepRouter from "./doctor-prep";
 import profileRouter from "./profile";
 import notificationsRouter from "./notifications";
+import paymentsRouter from "./payments";
 
 const router: IRouter = Router();
 
@@ -26,5 +27,6 @@ router.use(drugInteractionRouter);
 router.use(doctorPrepRouter);
 router.use(profileRouter);
 router.use(notificationsRouter);
+router.use(paymentsRouter);
 
 export default router;

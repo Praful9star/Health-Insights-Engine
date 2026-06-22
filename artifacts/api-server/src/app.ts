@@ -78,6 +78,15 @@ app.use(
   }),
 );
 
+// Capture raw body for Razorpay webhook HMAC verification before JSON parsing
+app.use("/api/payments/webhook", express.raw({ type: "application/json" }), (req, _res, next) => {
+  if (Buffer.isBuffer(req.body)) {
+    (req as express.Request & { rawBody: string }).rawBody = req.body.toString("utf8");
+    try { req.body = JSON.parse((req as express.Request & { rawBody: string }).rawBody); } catch { req.body = {}; }
+  }
+  next();
+});
+
 app.use("/api/ocr-report", express.json({ limit: "4mb" }));
 app.use(express.json({ limit: "100kb" }));
 app.use(express.urlencoded({ extended: true, limit: "100kb" }));
