@@ -596,7 +596,7 @@ export default function Home() {
       <section className="py-10 px-4">
         <div className="max-w-3xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <div className="rounded-2xl p-8 border border-emerald-500/25 relative overflow-hidden text-center"
+            <div className="rounded-2xl p-5 sm:p-8 border border-emerald-500/25 relative overflow-hidden text-center"
               style={{
                 background: "transparent",
                 backdropFilter: "blur(20px)",
@@ -623,7 +623,7 @@ export default function Home() {
                     `🏥 CureCheck — भारत का मुफ्त AI health platform!\n\n✅ Medical reports को सरल भाषा में समझें\n✅ किसी भी दवा के बारे में जानें\n✅ Fitness, steps और streaks track करें\n✅ Science से health myths तोड़ें\n\n100% मुफ्त। कोई signup नहीं।\n👉 curecheck.in`,
                   )}
                   label={t("Share CureCheck on WhatsApp", "WhatsApp पर शेयर करें")}
-                  className="rounded-full px-8 h-12 text-base"
+                  className="rounded-full w-full sm:w-auto px-5 sm:px-8 h-11 sm:h-12 text-sm sm:text-base"
                 />
               </div>
             </div>
