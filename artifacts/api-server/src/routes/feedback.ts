@@ -47,7 +47,7 @@ const BugReportSchema = z.object({
   email:       z.string().email().optional().or(z.literal("")),
 });
 
-router.post("/api/feedback", feedbackLimiter, async (req: Request, res: Response) => {
+router.post("/feedback", feedbackLimiter, async (req: Request, res: Response) => {
   const parsed = FeedbackSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Invalid input", details: parsed.error.flatten() });
@@ -78,7 +78,7 @@ router.post("/api/feedback", feedbackLimiter, async (req: Request, res: Response
   res.json({ ok: true });
 });
 
-router.post("/api/bug-report", feedbackLimiter, async (req: Request, res: Response) => {
+router.post("/bug-report", feedbackLimiter, async (req: Request, res: Response) => {
   const parsed = BugReportSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Invalid input", details: parsed.error.flatten() });
