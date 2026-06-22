@@ -43,3 +43,8 @@ create policy "Users view own bug_reports"
 
 create index if not exists idx_feedback_created_at    on public.feedback(created_at desc);
 create index if not exists idx_bug_reports_created_at on public.bug_reports(created_at desc);
+
+grant insert on public.feedback    to anon, authenticated;
+grant insert on public.bug_reports to anon, authenticated;
+grant select on public.feedback    to authenticated;
+grant select on public.bug_reports to authenticated;
