@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { GetDiseaseJourneyBody, GetDiseaseJourneyResponse } from "@workspace/api-zod";
 import { groqChat, isAiAvailable } from "../lib/groq";
 import { aiLimiter } from "../middleware/rate-limit";
+import { diseaseCache, TTL } from "../lib/cache";
 
 const router: IRouter = Router();
 
@@ -429,6 +430,14 @@ router.post("/disease-journey", aiLimiter, async (req, res): Promise<void> => {
   const { disease, ageGroup } = parsed.data;
   const hasAi = isAiAvailable();
 
+  const cacheKey = `${disease.toLowerCase().trim()}|${ageGroup.toLowerCase().trim()}`;
+  const cached = diseaseCache.get(cacheKey);
+  if (cached) {
+    req.log.info({ cacheKey }, "disease-journey cache hit");
+    res.json(cached);
+    return;
+  }
+
   try {
     let result;
 
@@ -446,12 +455,14 @@ router.post("/disease-journey", aiLimiter, async (req, res): Promise<void> => {
     }
 
     const validated = GetDiseaseJourneyResponse.parse(result);
+    diseaseCache.set(cacheKey, validated, TTL.DISEASE_JOURNEY);
     res.json(validated);
   } catch (err) {
     req.log.error({ err }, "Failed to generate disease journey");
     const mockResult = getMockDiseaseJourney(disease, ageGroup);
     const validated = GetDiseaseJourneyResponse.parse(mockResult);
-    res.json(validated);
+    // Add _isMockResponse flag that was previously missing on error fallbacks
+    res.json({ ...validated, _isMockResponse: true });
   }
 });
 

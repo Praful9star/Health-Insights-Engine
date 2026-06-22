@@ -3,6 +3,7 @@ import { CheckHealthClaimBody, CheckHealthClaimResponse } from "@workspace/api-z
 import { groqChat, isAiAvailable } from "../lib/groq";
 import { logger } from "../lib/logger";
 import { aiLimiter } from "../middleware/rate-limit";
+import { claimCache, TTL } from "../lib/cache";
 
 const router: IRouter = Router();
 
@@ -166,8 +167,17 @@ router.post("/claim-checker", aiLimiter, async (req, res): Promise<void> => {
 
   const { claim } = parsed.data;
   const hasAi = isAiAvailable();
-
   const safeClaim = sanitizeInput(claim);
+
+  // Cache key: first 120 normalized chars is sufficient for deduplication of
+  // identical WhatsApp-style claims without hashing overhead
+  const cacheKey = safeClaim.toLowerCase().slice(0, 120);
+  const cached = claimCache.get(cacheKey);
+  if (cached) {
+    req.log.info({ keyLen: cacheKey.length }, "claim-checker cache hit");
+    res.json(cached);
+    return;
+  }
 
   try {
     let result;
@@ -186,6 +196,7 @@ router.post("/claim-checker", aiLimiter, async (req, res): Promise<void> => {
     }
 
     const validated = CheckHealthClaimResponse.parse(result);
+    claimCache.set(cacheKey, validated, TTL.CLAIM);
     res.json(validated);
   } catch (err) {
     req.log.error({ err }, "Failed to analyze claim");
