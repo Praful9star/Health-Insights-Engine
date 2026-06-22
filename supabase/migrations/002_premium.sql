@@ -19,15 +19,19 @@ CREATE TABLE IF NOT EXISTS payments (
   updated_at            TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
--- RLS: users can only see their own payment records
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "users_own_payments" ON payments
-  FOR SELECT USING (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "users_own_payments" ON payments
+    FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- Service-role can insert/update (used by API server via service key)
-CREATE POLICY "service_manage_payments" ON payments
-  FOR ALL USING (true) WITH CHECK (true);
+DO $$ BEGIN
+  CREATE POLICY "service_manage_payments" ON payments
+    FOR ALL USING (true) WITH CHECK (true);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Index for quick lookups
 CREATE INDEX IF NOT EXISTS payments_user_id_idx        ON payments(user_id);
