@@ -549,15 +549,38 @@ export default function Home() {
             <div className="absolute inset-0 opacity-40 pointer-events-none" />
             <div className="relative z-10">
               <p className="mono-label text-primary/80 mb-3">{t("Why CureCheck?", "CureCheck क्यों?")}</p>
-              <h2 className="text-2xl sm:text-4xl font-serif font-800 text-foreground mb-8">
-                {t("Built for how India actually uses healthcare", "भारत की असली healthcare आदतों के लिए")}
+              <h2 className="text-2xl sm:text-4xl font-serif font-800 text-foreground mb-3">
+                {t("The only health platform that remembers your reports", "एकमात्र platform जो आपकी reports याद रखता है")}
               </h2>
+              <p className="text-sm text-muted-foreground mb-8 max-w-xl mx-auto">
+                {t(
+                  "Practo books appointments. 1mg sells medicines. CureCheck builds your longitudinal health record and preps you for every doctor visit.",
+                  "Practo appointments book करता है। 1mg दवाएं बेचता है। CureCheck आपका health record बनाता है और हर doctor visit के लिए तैयार करता है।"
+                )}
+              </p>
+              {/* Continuity differentiator — the core loop competitors don't offer */}
+              <div className="mb-6 rounded-2xl bg-primary/6 border border-primary/20 p-5 flex items-start gap-4 text-left">
+                <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-700 text-foreground text-sm mb-1">
+                    {t("Analyze → Save → Track → Prep", "Analyze → Save → Track → Prep")}
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {t(
+                      "Every report you analyze gets saved to your Health Timeline. See whether your Haemoglobin or Vitamin D is improving across visits. Then walk into your next appointment with AI-generated questions based on your own data.",
+                      "आपकी हर analyzed report Health Timeline में save होती है। देखें Haemoglobin या Vitamin D improve हो रहा है या नहीं। फिर अपने data के आधार पर AI-generated questions के साथ doctor के पास जाएं।"
+                    )}
+                  </p>
+                </div>
+              </div>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                  { icon: TrendingUp,   label: { en: "Track reports over time", hi: "रिपोर्ट्स को ट्रैक करें" }, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
-                  { icon: Globe2,       label: { en: "Full Hindi support",       hi: "पूर्ण हिंदी समर्थन" }, color: "text-sky-400",     bg: "bg-sky-500/10",     border: "border-sky-500/20"     },
-                  { icon: ShieldCheck,  label: { en: "Privacy first",            hi: "गोपनीयता पहले"      }, color: "text-primary",     bg: "bg-primary/10",     border: "border-primary/20"     },
-                  { icon: CheckCircle2, label: { en: "Evidence-based AI",        hi: "प्रमाण-आधारित AI"   }, color: "text-violet-400",  bg: "bg-violet-500/10",  border: "border-violet-500/20"  },
+                  { icon: TrendingUp,   label: { en: "Track trends across visits", hi: "visits में trends track करें" }, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
+                  { icon: Globe2,       label: { en: "Full Hindi support",          hi: "पूर्ण हिंदी समर्थन" },           color: "text-sky-400",     bg: "bg-sky-500/10",     border: "border-sky-500/20"     },
+                  { icon: ShieldCheck,  label: { en: "Privacy first",               hi: "गोपनीयता पहले"      },            color: "text-primary",     bg: "bg-primary/10",     border: "border-primary/20"     },
+                  { icon: CheckCircle2, label: { en: "Evidence-based AI",           hi: "प्रमाण-आधारित AI"   },            color: "text-violet-400",  bg: "bg-violet-500/10",  border: "border-violet-500/20"  },
                 ].map((item, i) => (
                   <div key={i} className={`rounded-2xl ${item.bg} border ${item.border} p-5 flex flex-col items-center gap-3`}>
                     <item.icon className={`w-7 h-7 ${item.color}`} />

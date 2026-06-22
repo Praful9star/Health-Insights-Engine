@@ -98,7 +98,7 @@ export function extractBiomarkers(reportText: string): BiomarkerValue[] {
     regex: RegExp;
     low: number; high: number;
   }> = [
-    { name: "Hemoglobin", unit: "g/dL", regex: /(?:Hb|Hemoglobin|Haemoglobin)[^\d\n]{0,20}([\d.]+)\s*g\/d[Ll]/i, low: 12, high: 17 },
+    { name: "Haemoglobin", unit: "g/dL", regex: /(?:Hb|Hemoglobin|Haemoglobin)[^\d\n]{0,20}([\d.]+)\s*g\/d[Ll]/i, low: 12, high: 17 },
     { name: "Blood Sugar", unit: "mg/dL", regex: /(?:Blood\s*Sugar|Fasting\s*Glucose|FBS|RBS|Random\s*Glucose)[^\d\n]{0,20}([\d.]+)\s*mg\/d[Ll]/i, low: 70, high: 100 },
     { name: "Cholesterol", unit: "mg/dL", regex: /(?:Total\s*Cholesterol|Cholesterol)[^\d\n]{0,20}([\d.]+)\s*mg\/d[Ll]/i, low: 100, high: 200 },
     { name: "Vitamin D", unit: "ng/mL", regex: /(?:Vitamin\s*D|25-OH|25\s*Hydroxy)[^\d\n]{0,20}([\d.]+)\s*ng\/m[Ll]/i, low: 20, high: 100 },

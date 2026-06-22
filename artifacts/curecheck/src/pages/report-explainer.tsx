@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import PageMeta from "@/components/page-meta";
 import { useExplainMedicalReport, useOcrReport } from "@workspace/api-client-react";
 import type { ReportParameter, ReportResult } from "@workspace/api-client-react";
@@ -21,6 +21,8 @@ import { useHealthStorage, extractBiomarkers, type TimelineEntry } from "@/hooks
 import { ToolModal } from "@/components/tool-modal";
 
 const LS_KEY = "cc_last_report_result_v1";
+// Shared key: report-explainer writes, doctor-prep reads and clears on mount
+const DOCTOR_PREP_PREFILL_KEY = "cc_doctor_prep_prefill_v1";
 
 // ─── Types & Config ───────────────────────────────────────────────────────────
 
@@ -232,6 +234,7 @@ export default function ReportExplainer() {
   const { language, t } = useLanguage();
   const { toast } = useToast();
   const { saveToTimeline } = useHealthStorage();
+  const [, navigate] = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -368,6 +371,28 @@ export default function ReportExplainer() {
     saveToTimeline(entry);
     setSaved(true);
     toast({ title: t("Saved to Health Timeline!", "Health Timeline में save हो गया!") });
+  };
+
+  const handleOpenDoctorPrep = () => {
+    const result = explainReport.data;
+    if (!result) return;
+    // Pre-fill doctor-prep with context from this report so the user doesn't start from scratch
+    const abnormal = (result.parameters ?? []).filter(p => p.status !== "normal");
+    const concern = [
+      result.simpleSummary,
+      abnormal.length > 0
+        ? `Abnormal values: ${abnormal.slice(0, 4).map(p => `${p.name} (${p.userValue ?? p.status})`).join(", ")}`
+        : "",
+    ].filter(Boolean).join(" — ");
+    try {
+      localStorage.setItem(DOCTOR_PREP_PREFILL_KEY, JSON.stringify({
+        concern: concern.slice(0, 400),
+        visitType: result.overallAssessment === "requires_urgent_attention" ? "emergency"
+          : result.overallAssessment === "needs_follow_up" ? "followup"
+          : "general",
+      }));
+    } catch {}
+    navigate("/doctor-prep");
   };
 
   const reset = () => {
@@ -666,6 +691,60 @@ export default function ReportExplainer() {
                 );
               })()}
 
+              {/* ── Connected Actions: Save + Doctor Prep ───────────────────── */}
+              <div className="glass-panel rounded-2xl p-5 border border-primary/15">
+                <p className="text-xs font-700 text-primary/70 uppercase tracking-wider mb-3">
+                  {t("What would you like to do with this report?", "इस रिपोर्ट के साथ क्या करना चाहेंगे?")}
+                </p>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {/* Save to Timeline */}
+                  <button
+                    onClick={handleSaveToTimeline}
+                    disabled={saved}
+                    className={`flex items-start gap-3 p-4 rounded-2xl border text-left transition-all ${
+                      saved
+                        ? "border-emerald-500/30 bg-emerald-500/8"
+                        : "border-border/50 hover:border-primary/40 hover:bg-primary/5 bg-muted/10"
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 ${saved ? "bg-emerald-500/15" : "bg-primary/12"}`}>
+                      {saved ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Save className="w-4 h-4 text-primary" />}
+                    </div>
+                    <div>
+                      <p className={`text-sm font-700 ${saved ? "text-emerald-400" : "text-foreground"}`}>
+                        {saved ? t("Saved to Timeline ✓", "Timeline में save हो गया ✓") : t("Save to Health Timeline", "Health Timeline में save करें")}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5 leading-snug">
+                        {saved
+                          ? t("Track Haemoglobin & other values over time →", "Haemoglobin और अन्य values track करें →")
+                          : t("Track how your values change across visits", "अलग visits में values का बदलाव देखें")}
+                      </p>
+                      {saved && (
+                        <Link href="/health-timeline">
+                          <span className="text-xs text-primary font-600 hover:underline">{t("View Health Timeline →", "Health Timeline देखें →")}</span>
+                        </Link>
+                      )}
+                    </div>
+                  </button>
+
+                  {/* Doctor Prep */}
+                  <button
+                    onClick={handleOpenDoctorPrep}
+                    className="flex items-start gap-3 p-4 rounded-2xl border border-sky-500/20 hover:border-sky-500/40 hover:bg-sky-500/5 bg-muted/10 text-left transition-all"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-sky-500/12 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Stethoscope className="w-4 h-4 text-sky-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-700 text-foreground">{t("Prep for Doctor Visit", "Doctor Visit की तैयारी करें")}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 leading-snug">
+                        {t("Get questions to ask based on these findings", "इन findings के आधार पर doctor से पूछने के सवाल पाएं")}
+                      </p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
               {/* Simple Summary */}
               <div className="glass-panel rounded-2xl p-6">
                 <div className="flex items-center gap-2 mb-3">
@@ -783,19 +862,9 @@ export default function ReportExplainer() {
                 </ul>
               </div>
 
-              {/* Save + Share */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  onClick={handleSaveToTimeline}
-                  disabled={saved}
-                  variant="outline"
-                  className={`flex-1 rounded-xl gap-2 ${saved ? "border-emerald-500/40 text-emerald-400" : "border-primary/40 text-primary hover:bg-primary/10"}`}
-                  data-testid="button-save-timeline"
-                >
-                  {saved ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
-                  {saved ? t("Saved to Timeline ✓", "Timeline में save हो गया ✓") : t("Save to Health Timeline", "Health Timeline में save करें")}
-                </Button>
-                <WhatsAppShare text={shareText} label={t("Share on WhatsApp", "WhatsApp पर share करें")} />
+              {/* Share */}
+              <div className="flex gap-3">
+                <WhatsAppShare text={shareText} label={t("Share on WhatsApp", "WhatsApp पर share करें")} className="flex-1" />
               </div>
 
               <p className="text-xs text-muted-foreground text-center px-4 py-3 rounded-xl glass-panel">

@@ -17,49 +17,103 @@ const ASSESSMENT_CONFIG: Record<string, { label: string; color: string; bg: stri
   all_clear: { label: "All Clear", color: "text-emerald-400", bg: "bg-emerald-500/15", icon: CheckCircle2 },
 };
 
-const BIOMARKER_RANGES: Record<string, { low: number; high: number; unit: string }> = {
-  Hemoglobin: { low: 12, high: 17, unit: "g/dL" },
-  "Blood Sugar": { low: 70, high: 100, unit: "mg/dL" },
-  Cholesterol: { low: 100, high: 200, unit: "mg/dL" },
-  "Vitamin D": { low: 20, high: 50, unit: "ng/mL" },
-  HbA1c: { low: 0, high: 5.7, unit: "%" },
-  Triglycerides: { low: 0, high: 150, unit: "mg/dL" },
+// FUTURE PREMIUM CENTERPIECE: Health Timeline + Doctor Visit Prep + trend tracking form the
+// core retention loop that no competitor (Practo, 1mg) offers. Every report save deepens the
+// longitudinal health record. Richer trend analytics, cross-visit comparisons, and auto-
+// generated Doctor Prep questions from trends should be gated behind Premium long-term.
+
+const BIOMARKER_RANGES: Record<string, { low: number; high: number; unit: string; higherIsBetter?: boolean }> = {
+  Haemoglobin: { low: 12, high: 17, unit: "g/dL", higherIsBetter: true },
+  "Blood Sugar": { low: 70, high: 100, unit: "mg/dL", higherIsBetter: false },
+  Cholesterol: { low: 100, high: 200, unit: "mg/dL", higherIsBetter: false },
+  "Vitamin D": { low: 20, high: 50, unit: "ng/mL", higherIsBetter: true },
+  HbA1c: { low: 0, high: 5.7, unit: "%", higherIsBetter: false },
+  Triglycerides: { low: 0, high: 150, unit: "mg/dL", higherIsBetter: false },
 };
 
-const TRACKED_BIOMARKERS = ["Hemoglobin", "Blood Sugar", "Cholesterol", "Vitamin D"];
+const TRACKED_BIOMARKERS = ["Haemoglobin", "Blood Sugar", "Cholesterol", "Vitamin D"];
+
+// Determines whether a change is "improving" based on direction relative to normal range.
+// e.g. Haemoglobin rising toward normal = improving; Cholesterol dropping toward normal = improving.
+function getTrendLabel(last: number, prev: number, range: { low: number; high: number; higherIsBetter?: boolean } | undefined): {
+  label: string; color: string; icon: typeof TrendingUp;
+} {
+  const delta = last - prev;
+  const STABLE_THRESHOLD = 0.02; // 2% change is "stable"
+  if (Math.abs(delta) / (Math.abs(prev) || 1) < STABLE_THRESHOLD) {
+    return { label: "Stable", color: "text-sky-400", icon: Minus };
+  }
+  if (!range) {
+    // No range info — just show direction
+    return delta > 0
+      ? { label: "Rising", color: "text-amber-400", icon: TrendingUp }
+      : { label: "Falling", color: "text-amber-400", icon: TrendingDown };
+  }
+  // Is last value within normal range?
+  const lastNormal = last >= range.low && last <= range.high;
+  const prevNormal = prev >= range.low && prev <= range.high;
+  if (lastNormal) {
+    return { label: "Improving", color: "text-emerald-400", icon: TrendingUp };
+  }
+  // Both abnormal: check if moving toward range midpoint
+  const mid = (range.low + range.high) / 2;
+  const closerNow = Math.abs(last - mid) < Math.abs(prev - mid);
+  if (closerNow) return { label: "Improving", color: "text-emerald-400", icon: TrendingUp };
+  if (!prevNormal && Math.abs(last - mid) > Math.abs(prev - mid)) {
+    return { label: "Worsening", color: "text-red-400", icon: TrendingDown };
+  }
+  return { label: "Stable", color: "text-sky-400", icon: Minus };
+}
 
 // Simple SVG sparkline
-function Sparkline({ values, color }: { values: number[]; color: string }) {
+function Sparkline({ values, color, range }: {
+  values: number[];
+  color: string;
+  range?: { low: number; high: number; higherIsBetter?: boolean };
+}) {
   if (values.length < 2) return (
     <span className="text-xs text-muted-foreground">Not enough data</span>
   );
   const min = Math.min(...values) * 0.95;
   const max = Math.max(...values) * 1.05;
-  const range = max - min || 1;
+  const r = max - min || 1;
   const w = 100, h = 36;
   const pts = values.map((v, i) => {
     const x = (i / (values.length - 1)) * w;
-    const y = h - ((v - min) / range) * (h - 8) - 2;
+    const y = h - ((v - min) / r) * (h - 8) - 2;
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   }).join(" ");
   const last = values[values.length - 1];
   const prev = values[values.length - 2];
-  const trend = last > prev ? "up" : last < prev ? "down" : "flat";
+  const trend = getTrendLabel(last, prev, range);
+  const TrendIcon = trend.icon;
+  const delta = last - prev;
   return (
-    <div className="flex items-center gap-3">
-      <svg width={w} height={h} className="overflow-visible flex-shrink-0">
-        <polyline points={pts} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
-        {values.map((v, i) => {
-          const x = (i / (values.length - 1)) * w;
-          const y = h - ((v - min) / range) * (h - 8) - 2;
-          return <circle key={i} cx={x} cy={y} r={i === values.length - 1 ? 3.5 : 2} fill={color} />;
-        })}
-      </svg>
-      <div className="flex items-center gap-1">
-        {trend === "up" ? <TrendingUp className="w-3.5 h-3.5 text-red-400" /> :
-          trend === "down" ? <TrendingDown className="w-3.5 h-3.5 text-emerald-400" /> :
-            <Minus className="w-3.5 h-3.5 text-muted-foreground" />}
-        <span className="text-xs font-700 tabular-nums" style={{ color }}>{last}</span>
+    <div className="space-y-2">
+      <div className="flex items-center gap-3">
+        <svg width={w} height={h} className="overflow-visible flex-shrink-0">
+          <polyline points={pts} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
+          {values.map((v, i) => {
+            const x = (i / (values.length - 1)) * w;
+            const y = h - ((v - min) / r) * (h - 8) - 2;
+            return <circle key={i} cx={x} cy={y} r={i === values.length - 1 ? 3.5 : 2} fill={color} />;
+          })}
+        </svg>
+        <div>
+          <span className="text-base font-800 tabular-nums" style={{ color }}>{last}</span>
+        </div>
+      </div>
+      {/* Trend badge — only shown with 2+ readings */}
+      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-700 border ${
+        trend.label === "Improving" ? "bg-emerald-500/10 border-emerald-500/25 text-emerald-400" :
+        trend.label === "Worsening" ? "bg-red-500/10 border-red-500/25 text-red-400" :
+        "bg-sky-500/10 border-sky-500/25 text-sky-400"
+      }`}>
+        <TrendIcon className="w-3 h-3" />
+        {trend.label}
+        <span className="opacity-70 font-500">
+          ({delta > 0 ? "+" : ""}{delta.toFixed(1)} from last)
+        </span>
       </div>
     </div>
   );
@@ -212,7 +266,7 @@ function TrendChart({ name, entries }: { name: string; entries: TimelineEntry[] 
         </div>
         <span className="mono-label text-xs text-muted-foreground">{dataPoints.length} {t("readings", "readings")}</span>
       </div>
-      <Sparkline values={dataPoints.map(d => d.value)} color={color} />
+      <Sparkline values={dataPoints.map(d => d.value)} color={color} range={range} />
     </div>
   );
 }
