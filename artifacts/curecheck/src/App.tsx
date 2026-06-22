@@ -55,6 +55,7 @@ const Privacy = lazy(() => import("@/pages/privacy"));
 const Terms = lazy(() => import("@/pages/terms"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const History = lazy(() => import("@/pages/history"));
+const Vault = lazy(() => import("@/pages/vault"));
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
@@ -96,6 +97,7 @@ function Routes() {
         <Route path="/privacy" component={Privacy} />
         <Route path="/terms" component={Terms} />
         <Route path="/history" component={History} />
+        <Route path="/vault" component={() => <ProtectedRoute component={Vault} />} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

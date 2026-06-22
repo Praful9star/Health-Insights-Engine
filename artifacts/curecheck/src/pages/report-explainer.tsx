@@ -12,13 +12,14 @@ import {
   Stethoscope, BookOpen, Save, CheckCircle2, Camera,
   Upload, FileText, ChevronDown, ChevronUp, Sparkles,
   TrendingUp, TrendingDown, Minus, AlertCircle, Heart,
-  Clipboard, X, RotateCcw, ChevronLeft, History,
+  Clipboard, X, RotateCcw, ChevronLeft, History, Archive,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/language-context";
 import { WhatsAppShare } from "@/components/whatsapp-share";
 import { useHealthStorage, extractBiomarkers, type TimelineEntry } from "@/hooks/use-health-storage";
 import { ToolModal } from "@/components/tool-modal";
+import { useAuth } from "@/contexts/auth-context";
 
 const LS_KEY = "cc_last_report_result_v1";
 // Shared key: report-explainer writes, doctor-prep reads and clears on mount
@@ -234,6 +235,7 @@ export default function ReportExplainer() {
   const { language, t } = useLanguage();
   const { toast } = useToast();
   const { saveToTimeline } = useHealthStorage();
+  const { user, session } = useAuth();
   const [, navigate] = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -255,6 +257,7 @@ export default function ReportExplainer() {
   const [ocrError, setOcrError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [vaultSaved, setVaultSaved] = useState(false);
 
   // Re-open modal if OCR fails so user sees the error
   useEffect(() => {
@@ -271,8 +274,23 @@ export default function ReportExplainer() {
         localStorage.setItem(LS_KEY, JSON.stringify(entry));
         setStoredResult(entry);
       } catch {}
+
+      // Auto-save to Health Vault for logged-in users (anonymous: no change)
+      if (user && session?.access_token) {
+        fetch("/api/vault/save", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ reportResult: explainReport.data }),
+        })
+          .then(r => r.ok ? r.json() : null)
+          .then(d => { if (d?.vaultSaved) setVaultSaved(true); })
+          .catch(() => {/* non-critical: vault save failure never blocks the user */});
+      }
     }
-  }, [explainReport.data]);
+  }, [explainReport.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const clearStoredResult = () => {
     try { localStorage.removeItem(LS_KEY); } catch {}
@@ -693,9 +711,25 @@ export default function ReportExplainer() {
 
               {/* ── Connected Actions: Save + Doctor Prep ───────────────────── */}
               <div className="glass-panel rounded-2xl p-5 border border-primary/15">
-                <p className="text-xs font-700 text-primary/70 uppercase tracking-wider mb-3">
-                  {t("What would you like to do with this report?", "इस रिपोर्ट के साथ क्या करना चाहेंगे?")}
-                </p>
+                <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+                  <p className="text-xs font-700 text-primary/70 uppercase tracking-wider">
+                    {t("What would you like to do with this report?", "इस रिपोर्ट के साथ क्या करना चाहेंगे?")}
+                  </p>
+                  {/* Vault save indicator (logged-in users only) */}
+                  {user && (
+                    vaultSaved ? (
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-700 text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-1 rounded-full">
+                        <Archive className="w-3 h-3" />
+                        {t("Saved to Health Vault ✓", "Health Vault में save हुआ ✓")}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-600 text-muted-foreground/70 px-2.5 py-1 rounded-full bg-muted/20 border border-border/30">
+                        <Archive className="w-3 h-3" />
+                        {t("Saving to Vault…", "Vault में save हो रहा है…")}
+                      </span>
+                    )
+                  )}
+                </div>
                 <div className="grid sm:grid-cols-2 gap-3">
                   {/* Save to Timeline */}
                   <button
@@ -742,6 +776,23 @@ export default function ReportExplainer() {
                       </p>
                     </div>
                   </button>
+
+                  {/* View Health Vault (only shows when vault save confirmed) */}
+                  {vaultSaved && (
+                    <Link href="/vault">
+                      <button className="flex items-start gap-3 p-4 rounded-2xl border border-primary/20 hover:border-primary/40 hover:bg-primary/5 bg-muted/10 text-left transition-all w-full">
+                        <div className="w-8 h-8 rounded-xl bg-primary/12 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Archive className="w-4 h-4 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-700 text-foreground">{t("View Health Vault →", "Health Vault देखें →")}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5 leading-snug">
+                            {t("See all saved reports & track trends over time", "सभी saved reports देखें और trends track करें")}
+                          </p>
+                        </div>
+                      </button>
+                    </Link>
+                  )}
                 </div>
               </div>
 
