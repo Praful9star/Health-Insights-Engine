@@ -77,7 +77,8 @@ function RatingForm({ userId }: { userId: string | null }) {
       page_url: location,
     });
     if (error) {
-      setState({ status: "error", message: "Submission failed. Please try again." });
+      console.error("[feedback:rating]", error);
+      setState({ status: "error", message: error.message || "Submission failed. Please try again." });
       return;
     }
     setState({ status: "success", message: "Thank you! Your rating has been saved." });
@@ -145,7 +146,8 @@ function FeatureForm({ userId }: { userId: string | null }) {
       page_url: location,
     });
     if (error) {
-      setState({ status: "error", message: "Submission failed. Please try again." });
+      console.error("[feedback:feature]", error);
+      setState({ status: "error", message: error.message || "Submission failed. Please try again." });
       return;
     }
     setState({ status: "success", message: "Feature idea received! We review all suggestions." });
@@ -209,7 +211,8 @@ function BugForm({ userId }: { userId: string | null }) {
       device: `${window.screen.width}x${window.screen.height} · ${navigator.platform}`,
     });
     if (error) {
-      setState({ status: "error", message: "Submission failed. Please try again." });
+      console.error("[feedback:bug]", error);
+      setState({ status: "error", message: error.message || "Submission failed. Please try again." });
       return;
     }
     setState({ status: "success", message: "Bug report sent! We'll investigate shortly." });
