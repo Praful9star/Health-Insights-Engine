@@ -4,6 +4,7 @@ import { MessageSquare, Star, Bug, Lightbulb, CheckCircle2, AlertCircle, Send, L
 import PageHeader from "@/components/page-header";
 import { useAuth } from "@/contexts/auth-context";
 import { useLocation } from "wouter";
+import { supabase } from "@/lib/supabase";
 
 type FormType = "rating" | "bug" | "feature";
 
@@ -54,7 +55,7 @@ function ErrorBanner({ message }: { message: string }) {
   );
 }
 
-function RatingForm({ session }: { session: { access_token: string } | null }) {
+function RatingForm({ userId }: { userId: string | null }) {
   const [rating, setRating] = useState(0);
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
@@ -65,25 +66,22 @@ function RatingForm({ session }: { session: { access_token: string } | null }) {
     e.preventDefault();
     if (rating === 0) { setState({ status: "error", message: "Please select a star rating." }); return; }
     if (!message.trim()) { setState({ status: "error", message: "Please write a short message." }); return; }
+    if (!supabase) { setState({ status: "error", message: "Not configured. Please try again later." }); return; }
     setState({ status: "loading" });
-    try {
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (session?.access_token) headers["Authorization"] = `Bearer ${session.access_token}`;
-      const res = await fetch("/api/feedback", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ type: "rating", rating, message, email, page_url: location }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({})) as { error?: string };
-        setState({ status: "error", message: data.error ?? `Error ${res.status}. Please try again.` });
-        return;
-      }
-      setState({ status: "success", message: "Thank you! Your rating has been saved." });
-      setRating(0); setMessage(""); setEmail("");
-    } catch {
-      setState({ status: "error", message: "Could not reach server. Check your connection and try again." });
+    const { error } = await supabase.from("feedback").insert({
+      user_id: userId,
+      type: "rating",
+      rating,
+      message: message.trim(),
+      email: email.trim() || null,
+      page_url: location,
+    });
+    if (error) {
+      setState({ status: "error", message: "Submission failed. Please try again." });
+      return;
     }
+    setState({ status: "success", message: "Thank you! Your rating has been saved." });
+    setRating(0); setMessage(""); setEmail("");
   };
 
   if (state.status === "success") return <SuccessBanner message={state.message!} />;
@@ -128,7 +126,7 @@ function RatingForm({ session }: { session: { access_token: string } | null }) {
   );
 }
 
-function FeatureForm({ session }: { session: { access_token: string } | null }) {
+function FeatureForm({ userId }: { userId: string | null }) {
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
   const [state, setState] = useState<SubmitState>({ status: "idle" });
@@ -137,25 +135,21 @@ function FeatureForm({ session }: { session: { access_token: string } | null }) 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) { setState({ status: "error", message: "Please describe the feature." }); return; }
+    if (!supabase) { setState({ status: "error", message: "Not configured. Please try again later." }); return; }
     setState({ status: "loading" });
-    try {
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (session?.access_token) headers["Authorization"] = `Bearer ${session.access_token}`;
-      const res = await fetch("/api/feedback", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ type: "feature", message, email, page_url: location }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({})) as { error?: string };
-        setState({ status: "error", message: data.error ?? `Error ${res.status}. Please try again.` });
-        return;
-      }
-      setState({ status: "success", message: "Feature idea received! We review all suggestions." });
-      setMessage(""); setEmail("");
-    } catch {
-      setState({ status: "error", message: "Could not reach server. Check your connection and try again." });
+    const { error } = await supabase.from("feedback").insert({
+      user_id: userId,
+      type: "feature",
+      message: message.trim(),
+      email: email.trim() || null,
+      page_url: location,
+    });
+    if (error) {
+      setState({ status: "error", message: "Submission failed. Please try again." });
+      return;
     }
+    setState({ status: "success", message: "Feature idea received! We review all suggestions." });
+    setMessage(""); setEmail("");
   };
 
   if (state.status === "success") return <SuccessBanner message={state.message!} />;
@@ -196,7 +190,7 @@ function FeatureForm({ session }: { session: { access_token: string } | null }) 
   );
 }
 
-function BugForm({ session }: { session: { access_token: string } | null }) {
+function BugForm({ userId }: { userId: string | null }) {
   const [description, setDescription] = useState("");
   const [email, setEmail] = useState("");
   const [state, setState] = useState<SubmitState>({ status: "idle" });
@@ -204,31 +198,22 @@ function BugForm({ session }: { session: { access_token: string } | null }) {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!description.trim()) { setState({ status: "error", message: "Please describe the bug." }); return; }
+    if (!supabase) { setState({ status: "error", message: "Not configured. Please try again later." }); return; }
     setState({ status: "loading" });
-    try {
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (session?.access_token) headers["Authorization"] = `Bearer ${session.access_token}`;
-      const res = await fetch("/api/bug-report", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          description,
-          email,
-          page_url: window.location.href,
-          browser: navigator.userAgent,
-          device: `${window.screen.width}x${window.screen.height} · ${navigator.platform}`,
-        }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({})) as { error?: string };
-        setState({ status: "error", message: data.error ?? `Error ${res.status}. Please try again.` });
-        return;
-      }
-      setState({ status: "success", message: "Bug report sent! We'll investigate shortly." });
-      setDescription(""); setEmail("");
-    } catch {
-      setState({ status: "error", message: "Could not reach server. Check your connection and try again." });
+    const { error } = await supabase.from("bug_reports").insert({
+      user_id: userId,
+      description: description.trim(),
+      email: email.trim() || null,
+      page_url: window.location.href,
+      browser: navigator.userAgent,
+      device: `${window.screen.width}x${window.screen.height} · ${navigator.platform}`,
+    });
+    if (error) {
+      setState({ status: "error", message: "Submission failed. Please try again." });
+      return;
     }
+    setState({ status: "success", message: "Bug report sent! We'll investigate shortly." });
+    setDescription(""); setEmail("");
   };
 
   if (state.status === "success") return <SuccessBanner message={state.message!} />;
@@ -275,15 +260,15 @@ function BugForm({ session }: { session: { access_token: string } | null }) {
   );
 }
 
-const TABS: { id: FormType; icon: typeof Star; color: string; bg: string; label: string; desc: string }[] = [
-  { id: "rating",  icon: Star,      color: "text-amber-400",  bg: "bg-amber-500/10",  label: "Rate Experience",  desc: "Tell us how we're doing"           },
-  { id: "bug",     icon: Bug,       color: "text-red-400",    bg: "bg-red-500/10",    label: "Report a Bug",     desc: "Something not working?"            },
-  { id: "feature", icon: Lightbulb, color: "text-primary",    bg: "bg-primary/10",    label: "Suggest Feature",  desc: "Ideas to make us better"           },
+const TABS: { id: FormType; icon: typeof Star; color: string; bg: string; label: string }[] = [
+  { id: "rating",  icon: Star,      color: "text-amber-400", bg: "bg-amber-500/10", label: "Rate Experience"  },
+  { id: "bug",     icon: Bug,       color: "text-red-400",   bg: "bg-red-500/10",   label: "Report a Bug"    },
+  { id: "feature", icon: Lightbulb, color: "text-primary",   bg: "bg-primary/10",   label: "Suggest Feature" },
 ];
 
 export default function FeedbackPage() {
   const [active, setActive] = useState<FormType>("rating");
-  const { session } = useAuth();
+  const { user } = useAuth();
 
   return (
     <div className="relative z-10 max-w-2xl mx-auto px-4 py-10 pb-24 lg:pb-10">
@@ -294,7 +279,6 @@ export default function FeedbackPage() {
         badge="Always Listening"
       />
 
-      {/* Tab selector */}
       <div className="grid grid-cols-3 gap-2 mb-6">
         {TABS.map(tab => (
           <button
@@ -314,7 +298,6 @@ export default function FeedbackPage() {
         ))}
       </div>
 
-      {/* Form card */}
       <motion.div
         key={active}
         initial={{ opacity: 0, y: 8 }}
@@ -322,13 +305,13 @@ export default function FeedbackPage() {
         transition={{ duration: 0.2 }}
         className="glass-panel rounded-2xl p-5"
       >
-        {active === "rating"  && <RatingForm  session={session} />}
-        {active === "bug"     && <BugForm     session={session} />}
-        {active === "feature" && <FeatureForm session={session} />}
+        {active === "rating"  && <RatingForm  userId={user?.id ?? null} />}
+        {active === "bug"     && <BugForm     userId={user?.id ?? null} />}
+        {active === "feature" && <FeatureForm userId={user?.id ?? null} />}
       </motion.div>
 
       <p className="text-xs text-muted-foreground text-center mt-6 px-4">
-        Responses go directly to the CureCheck team · Max 5 submissions per 15 minutes
+        Responses go directly to the CureCheck team
       </p>
     </div>
   );
