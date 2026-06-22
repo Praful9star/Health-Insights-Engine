@@ -1,18 +1,29 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import type { ElementType } from "react";
 import PageMeta from "@/components/page-meta";
-import { ChevronLeft, Phone, AlertTriangle, Heart, Zap, Wind, Droplets } from "lucide-react";
+import { ChevronLeft, Phone, AlertTriangle, Heart, Zap, Wind, Droplets, Stethoscope, Shield, Baby, Brain, FlaskConical, PhoneCall } from "lucide-react";
 
-const NATIONAL = [
-  { id: "amb",     name: "Ambulance",             number: "108",          desc: "Free ambulance — all states",  color: "text-red-400",    bg: "bg-red-500/10"    },
-  { id: "health",  name: "Medical Helpline",       number: "104",          desc: "Health advice & ambulance",    color: "text-primary",    bg: "bg-primary/10"    },
-  { id: "women",   name: "Women Helpline",         number: "181",          desc: "Women in distress",            color: "text-pink-400",   bg: "bg-pink-500/10"   },
-  { id: "child",   name: "Child Helpline",         number: "1098",         desc: "Children in distress",         color: "text-violet-400", bg: "bg-violet-500/10" },
-  { id: "icall",   name: "Mental Health iCall",    number: "9152987821",   desc: "Mon–Sat 8am–10pm",             color: "text-emerald-400",bg: "bg-emerald-500/10"},
-  { id: "vandre",  name: "Vandrevala Foundation",  number: "1860-2662-345",desc: "24/7 mental health support",  color: "text-emerald-400",bg: "bg-emerald-500/10"},
-  { id: "poison",  name: "Poison Control",         number: "1800-116-117", desc: "National poison helpline",     color: "text-amber-400",  bg: "bg-amber-500/10"  },
-  { id: "blood",   name: "Blood Bank",             number: "104 (Opt 2)",  desc: "Press 2 after IVR",            color: "text-rose-400",   bg: "bg-rose-500/10"   },
+interface Contact {
+  id: string;
+  name: string;
+  number: string;
+  desc: string;
+  color: string;
+  bg: string;
+  icon: ElementType;
+}
+
+const NATIONAL: Contact[] = [
+  { id: "amb",    name: "Ambulance",            number: "108",           desc: "Free · all states",           color: "text-red-400",    bg: "bg-red-500/12",     icon: PhoneCall     },
+  { id: "health", name: "Medical Helpline",     number: "104",           desc: "Health advice & ambulance",   color: "text-primary",    bg: "bg-primary/12",     icon: Stethoscope   },
+  { id: "women",  name: "Women Helpline",       number: "181",           desc: "Women in distress",           color: "text-pink-400",   bg: "bg-pink-500/12",    icon: Shield        },
+  { id: "child",  name: "Child Helpline",       number: "1098",          desc: "Children in distress",        color: "text-violet-400", bg: "bg-violet-500/12",  icon: Baby          },
+  { id: "icall",  name: "iCall Mental Health",  number: "9152987821",    desc: "Mon–Sat · 8am–10pm",          color: "text-emerald-400",bg: "bg-emerald-500/12", icon: Brain         },
+  { id: "vandre", name: "Vandrevala Foundation",number: "18602662345",   desc: "24/7 mental health support",  color: "text-teal-400",   bg: "bg-teal-500/12",    icon: Heart         },
+  { id: "poison", name: "Poison Control",       number: "1800116117",    desc: "National poison helpline",    color: "text-amber-400",  bg: "bg-amber-500/12",   icon: FlaskConical  },
+  { id: "blood",  name: "Blood Bank",           number: "104",           desc: "Call 104 · press 2 for blood",color: "text-rose-400",   bg: "bg-rose-500/12",    icon: Droplets      },
 ];
 
 const FIRST_AID = [
@@ -86,15 +97,33 @@ export default function Emergency() {
         </div>
       </div>
 
-      {/* Emergency numbers grid */}
-      <h2 className="text-base font-serif font-700 text-foreground mb-3 flex items-center gap-2"><Phone className="w-4 h-4 text-red-400" /> Emergency Numbers</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-8">
+      {/* Emergency numbers list */}
+      <h2 className="text-base font-serif font-700 text-foreground mb-3 flex items-center gap-2">
+        <Phone className="w-4 h-4 text-red-400" /> Emergency Numbers
+      </h2>
+      <div className="space-y-2 mb-8">
         {NATIONAL.map(n => (
-          <a key={n.id} href={`tel:${n.number.replace(/\D/g, "")}`}
-            className={`${n.bg} rounded-xl p-3.5 flex flex-col gap-1 hover:scale-[1.03] transition-transform`}>
-            <span className={`text-xs font-600 text-muted-foreground`}>{n.name}</span>
-            <span className={`text-lg font-800 tabular-nums ${n.color}`}>{n.number}</span>
-            <span className="text-[10px] text-muted-foreground leading-tight">{n.desc}</span>
+          <a
+            key={n.id}
+            href={`tel:${n.number.replace(/\D/g, "")}`}
+            className={`flex items-center gap-3 ${n.bg} rounded-2xl px-4 py-3.5 hover:opacity-90 active:scale-[0.99] transition-all`}
+          >
+            {/* Icon */}
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-black/10 dark:bg-white/8`}>
+              <n.icon className={`w-5 h-5 ${n.color}`} />
+            </div>
+            {/* Name + description */}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-700 text-foreground truncate leading-tight">{n.name}</p>
+              <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{n.desc}</p>
+            </div>
+            {/* Number — scales with length so short codes stay prominent */}
+            <span className={`
+              flex-shrink-0 font-800 tabular-nums leading-tight ${n.color}
+              ${n.number.replace(/\D/g, "").length <= 3 ? "text-2xl" : n.number.replace(/\D/g, "").length <= 6 ? "text-xl" : "text-base"}
+            `}>
+              {n.number}
+            </span>
           </a>
         ))}
       </div>
