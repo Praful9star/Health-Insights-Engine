@@ -3,6 +3,7 @@ import { LITERACY_SYSTEM_ADDENDUM } from "../lib/health-literacy";
 import { ExplainMedicineBody, ExplainMedicineResponse } from "@workspace/api-zod";
 import { groqChat, isAiAvailable } from "../lib/groq";
 import { aiLimiter } from "../middleware/rate-limit";
+import { medicineCache, TTL } from "../lib/cache";
 
 const router: IRouter = Router();
 
@@ -156,29 +157,40 @@ router.post("/medicine-explainer", aiLimiter, async (req, res): Promise<void> =>
 
   const { medicine, language = "en" } = parsed.data;
   const hasAi = isAiAvailable();
-
   const safeMedicine = sanitizeInput(medicine);
+  const lang = language ?? "en";
+
+  // Cache key: language-scoped so EN and HI responses are stored separately
+  const cacheKey = `${lang}:${safeMedicine.toLowerCase()}`;
+  const cached = medicineCache.get(cacheKey);
+  if (cached) {
+    req.log.info({ cacheKey }, "medicine-explainer cache hit");
+    res.json(cached);
+    return;
+  }
 
   try {
     let result;
     if (hasAi) {
       req.log.info({ language }, "Explaining medicine with Groq");
       const raw = await groqChat(
-        buildSystemPrompt(language),
+        buildSystemPrompt(lang),
         `Explain this medicine:\n\n[MEDICINE NAME START]\n${safeMedicine}\n[MEDICINE NAME END]`,
       );
       result = JSON.parse(raw);
     } else {
       req.log.info("GROQ_API_KEY not set, using mock response");
-      result = getMockMedicineResult(safeMedicine, language ?? "en");
+      result = getMockMedicineResult(safeMedicine, lang);
       await new Promise((r) => setTimeout(r, 1200));
     }
     const validated = ExplainMedicineResponse.parse(result);
+    medicineCache.set(cacheKey, validated, TTL.MEDICINE);
     res.json(validated);
   } catch (err) {
     req.log.error({ err }, "Failed to explain medicine");
-    const mockResult = getMockMedicineResult(safeMedicine, language ?? "en");
+    const mockResult = getMockMedicineResult(safeMedicine, lang);
     const validated = ExplainMedicineResponse.parse(mockResult);
+    // Error fallbacks are NOT cached — they may be transient
     res.json({ ...validated, _isMockResponse: true });
   }
 });

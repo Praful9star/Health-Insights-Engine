@@ -60,9 +60,32 @@ function getHealthTip(w: WeatherData): string {
   return "Stay hydrated, take your medicines on time, and enjoy the day.";
 }
 
+const WEATHER_CACHE_KEY = "cc_weather_v1";
+const WEATHER_CACHE_TTL_MS = 15 * 60 * 1000; // 15 min
+
+function loadCachedWeather(): WeatherData | null {
+  try {
+    const raw = localStorage.getItem(WEATHER_CACHE_KEY);
+    if (!raw) return null;
+    const { data, cachedAt } = JSON.parse(raw) as { data: WeatherData; cachedAt: number };
+    if (Date.now() - cachedAt > WEATHER_CACHE_TTL_MS) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function saveCachedWeather(data: WeatherData): void {
+  try {
+    localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({ data, cachedAt: Date.now() }));
+  } catch {
+    // localStorage quota exceeded — silently skip
+  }
+}
+
 export default function WeatherWidget() {
   const { consent, grant, deny } = useLocationConsent();
-  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [weather, setWeather] = useState<WeatherData | null>(() => loadCachedWeather());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [consentModalOpen, setConsentModalOpen] = useState(false);
@@ -86,8 +109,9 @@ export default function WeatherWidget() {
             fetch(
               `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=european_aqi`
             ),
+            // email param identifies the app per Nominatim usage policy
             fetch(
-              `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+              `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&email=noreply@curecheck.in`
             ),
           ]);
 
@@ -107,7 +131,7 @@ export default function WeatherWidget() {
             aqi = aqiData.current?.european_aqi ?? null;
           }
 
-          setWeather({
+          const freshData: WeatherData = {
             city,
             temp: Math.round(c.temperature_2m),
             feelsLike: Math.round(c.apparent_temperature),
@@ -115,7 +139,9 @@ export default function WeatherWidget() {
             windSpeed: Math.round(c.wind_speed_10m),
             code: c.weather_code,
             aqi,
-          });
+          };
+          saveCachedWeather(freshData);
+          setWeather(freshData);
         } catch {
           setError("Could not load weather data");
         }
@@ -129,10 +155,11 @@ export default function WeatherWidget() {
     );
   }, []);
 
-  // Auto-fetch if user has already granted consent, but defer until the
-  // page is interactive so geolocation + 3 API calls don't compete with LCP.
+  // Auto-fetch on mount if consent already granted, but skip when a fresh
+  // cache is already loaded — avoids 3 external API calls per page view.
   useEffect(() => {
     if (consent !== "granted") return;
+    if (loadCachedWeather()) return; // cache still fresh — no network needed
     const t = setTimeout(fetchWeather, 2000);
     return () => clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps

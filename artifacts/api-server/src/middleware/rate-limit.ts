@@ -17,7 +17,10 @@ export const globalLimiter = rateLimit({
   limit: 120,
   standardHeaders: "draft-8",
   legacyHeaders: false,
-  message: { error: "Too many requests. Please try again later." },
+  message: {
+    error: "Too many requests from your connection. Please wait a moment and try again.",
+    code: "RATE_LIMITED",
+  },
 });
 
 export const aiLimiter = rateLimit({
@@ -25,7 +28,11 @@ export const aiLimiter = rateLimit({
   limit: 30,
   standardHeaders: "draft-8",
   legacyHeaders: false,
-  message: { error: "Too many AI requests. Please slow down and try again shortly." },
+  message: {
+    error: "You've sent too many requests. Please wait a moment before trying again — our AI needs a short break!",
+    code: "AI_RATE_LIMITED",
+    retryAfterMinutes: 15,
+  },
 });
 
 export const ocrLimiter = rateLimit({
@@ -33,7 +40,11 @@ export const ocrLimiter = rateLimit({
   limit: 10,
   standardHeaders: "draft-8",
   legacyHeaders: false,
-  message: { error: "Too many image analysis requests. Please try again later." },
+  message: {
+    error: "Too many image uploads in a short time. Please wait a few minutes and try again.",
+    code: "OCR_RATE_LIMITED",
+    retryAfterMinutes: 15,
+  },
 });
 
 export const newsLimiter = rateLimit({
@@ -41,5 +52,8 @@ export const newsLimiter = rateLimit({
   limit: 60,
   standardHeaders: "draft-8",
   legacyHeaders: false,
-  message: { error: "Too many news requests. Please try again later." },
+  message: {
+    error: "Too many news requests. Please wait a moment and try again.",
+    code: "NEWS_RATE_LIMITED",
+  },
 });

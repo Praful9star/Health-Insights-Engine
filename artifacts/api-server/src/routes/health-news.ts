@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { newsLimiter } from "../middleware/rate-limit";
+import { TTL } from "../lib/cache";
 
 interface NewsArticle {
   title: string;
@@ -13,7 +14,7 @@ interface NewsArticle {
 
 interface CacheEntry { articles: NewsArticle[]; ts: number }
 const cache = new Map<string, CacheEntry>();
-const CACHE_TTL = 15 * 60 * 1000;
+const CACHE_TTL = TTL.NEWS; // 1 hour — was 15 min
 const MAX_CACHE_ENTRIES = 50;
 
 const FALLBACK: NewsArticle[] = [

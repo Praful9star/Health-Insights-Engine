@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { CheckDrugInteractionBody } from "@workspace/api-zod";
 import { groqChat } from "../lib/groq";
 import { aiLimiter } from "../middleware/rate-limit";
+import { drugCache, TTL } from "../lib/cache";
 
 const router: IRouter = Router();
 
@@ -39,6 +40,15 @@ router.post("/drug-interaction", aiLimiter, async (req, res): Promise<void> => {
     .filter((m) => typeof m === "string" && m.trim().length > 1)
     .slice(0, 5);
 
+  // Sort so "aspirin,ibuprofen" and "ibuprofen,aspirin" share one cache entry
+  const cacheKey = medList.map((m) => m.toLowerCase().trim()).sort().join(",");
+  const cached = drugCache.get(cacheKey);
+  if (cached) {
+    req.log.info({ cacheKey }, "drug-interaction cache hit");
+    res.json(cached);
+    return;
+  }
+
   const systemPrompt = `You are CureCheck's Drug Interaction Checker — an educational AI assistant for Indian patients.
 You NEVER prescribe or advise dosage changes. You provide EDUCATIONAL information only.
 Respond ONLY with valid JSON matching the exact schema requested. Be medically accurate and practical for Indian patients. Include Indian brand name equivalents where helpful.`;
@@ -71,14 +81,15 @@ Respond ONLY with a JSON object:
       result = JSON.parse(content);
     } catch {
       req.log.warn("Drug interaction JSON parse failed — returning mock");
-      res.json(MOCK);
+      res.json({ ...MOCK, _isMockResponse: true });
       return;
     }
 
+    drugCache.set(cacheKey, result, TTL.DRUG_INTERACTION);
     res.json(result);
   } catch (err) {
     req.log.warn({ err }, "Groq drug-interaction error — returning mock");
-    res.json(MOCK);
+    res.json({ ...MOCK, _isMockResponse: true });
   }
 });
 
