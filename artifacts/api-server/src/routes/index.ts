@@ -12,6 +12,7 @@ import doctorPrepRouter from "./doctor-prep";
 import profileRouter from "./profile";
 import notificationsRouter from "./notifications";
 import paymentsRouter from "./payments";
+import feedbackRouter from "./feedback";
 
 const router: IRouter = Router();
 
@@ -28,5 +29,6 @@ router.use(doctorPrepRouter);
 router.use(profileRouter);
 router.use(notificationsRouter);
 router.use(paymentsRouter);
+router.use(feedbackRouter);
 
 export default router;

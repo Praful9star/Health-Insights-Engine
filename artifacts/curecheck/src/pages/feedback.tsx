@@ -1,35 +1,281 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { MessageSquare, Star, Bug, Lightbulb } from "lucide-react";
+import { MessageSquare, Star, Bug, Lightbulb, CheckCircle2, AlertCircle, Send, Loader2 } from "lucide-react";
 import PageHeader from "@/components/page-header";
+import { useAuth } from "@/contexts/auth-context";
+import { useLocation } from "wouter";
 
-const FORMS = [
-  {
-    icon: Star,
-    color: "text-amber-400",
-    bg: "bg-amber-500/10",
-    title: "Rate Your Experience",
-    desc: "Tell us how CureCheck is helping you understand your health.",
-    tallyId: "wgNvvP",
-  },
-  {
-    icon: Bug,
-    color: "text-red-400",
-    bg: "bg-red-500/10",
-    title: "Report a Bug",
-    desc: "Found something that isn't working? Let us know and we'll fix it.",
-    tallyId: "mJzJXQ",
-  },
-  {
-    icon: Lightbulb,
-    color: "text-primary",
-    bg: "bg-primary/10",
-    title: "Suggest a Feature",
-    desc: "Have an idea to make CureCheck better for Indians? We'd love to hear it.",
-    tallyId: "nGLeQz",
-  },
+type FormType = "rating" | "bug" | "feature";
+
+interface SubmitState { status: "idle" | "loading" | "success" | "error"; message?: string }
+
+function StarRating({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const [hover, setHover] = useState(0);
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map(n => (
+        <button
+          key={n}
+          type="button"
+          onMouseEnter={() => setHover(n)}
+          onMouseLeave={() => setHover(0)}
+          onClick={() => onChange(n)}
+          className="p-0.5 transition-transform hover:scale-110"
+          aria-label={`${n} star`}
+        >
+          <Star
+            className={`w-7 h-7 transition-colors ${(hover || value) >= n ? "fill-amber-400 text-amber-400" : "text-muted-foreground/40"}`}
+          />
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function SuccessBanner({ message }: { message: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.96 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/25 rounded-2xl px-4 py-3"
+    >
+      <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+      <p className="text-sm text-emerald-400 font-600">{message}</p>
+    </motion.div>
+  );
+}
+
+function ErrorBanner({ message }: { message: string }) {
+  return (
+    <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/25 rounded-2xl px-4 py-3">
+      <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+      <p className="text-sm text-red-400">{message}</p>
+    </div>
+  );
+}
+
+function RatingForm({ session }: { session: { access_token: string } | null }) {
+  const [rating, setRating] = useState(0);
+  const [message, setMessage] = useState("");
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<SubmitState>({ status: "idle" });
+  const [location] = useLocation();
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (rating === 0) { setState({ status: "error", message: "Please select a star rating." }); return; }
+    if (!message.trim()) { setState({ status: "error", message: "Please write a short message." }); return; }
+    setState({ status: "loading" });
+    try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (session?.access_token) headers["Authorization"] = `Bearer ${session.access_token}`;
+      const res = await fetch("/api/feedback", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ type: "rating", rating, message, email, page_url: location }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setState({ status: "error", message: data.error ?? "Submission failed." }); return; }
+      setState({ status: "success", message: "Thank you! Your rating has been saved." });
+      setRating(0); setMessage(""); setEmail("");
+    } catch {
+      setState({ status: "error", message: "Network error. Please try again." });
+    }
+  };
+
+  if (state.status === "success") return <SuccessBanner message={state.message!} />;
+
+  return (
+    <form onSubmit={submit} className="space-y-4">
+      <div>
+        <label className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-2 block">Your rating</label>
+        <StarRating value={rating} onChange={setRating} />
+      </div>
+      <div>
+        <label className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-1.5 block">What's working well or not?</label>
+        <textarea
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          placeholder="Share your experience with CureCheck…"
+          rows={3}
+          maxLength={2000}
+          className="w-full bg-muted/20 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50 focus:bg-muted/30 transition-colors resize-none"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-1.5 block">Email (optional)</label>
+        <input
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          className="w-full bg-muted/20 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50 transition-colors"
+        />
+      </div>
+      {state.status === "error" && <ErrorBanner message={state.message!} />}
+      <button
+        type="submit"
+        disabled={state.status === "loading"}
+        className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-700 hover:bg-primary/90 transition-colors disabled:opacity-60"
+      >
+        {state.status === "loading" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+        Submit Rating
+      </button>
+    </form>
+  );
+}
+
+function FeatureForm({ session }: { session: { access_token: string } | null }) {
+  const [message, setMessage] = useState("");
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<SubmitState>({ status: "idle" });
+  const [location] = useLocation();
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim()) { setState({ status: "error", message: "Please describe the feature." }); return; }
+    setState({ status: "loading" });
+    try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (session?.access_token) headers["Authorization"] = `Bearer ${session.access_token}`;
+      const res = await fetch("/api/feedback", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ type: "feature", message, email, page_url: location }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setState({ status: "error", message: data.error ?? "Submission failed." }); return; }
+      setState({ status: "success", message: "Feature idea received! We review all suggestions." });
+      setMessage(""); setEmail("");
+    } catch {
+      setState({ status: "error", message: "Network error. Please try again." });
+    }
+  };
+
+  if (state.status === "success") return <SuccessBanner message={state.message!} />;
+
+  return (
+    <form onSubmit={submit} className="space-y-4">
+      <div>
+        <label className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-1.5 block">Describe your idea</label>
+        <textarea
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          placeholder="What would make CureCheck more useful for Indians?…"
+          rows={4}
+          maxLength={2000}
+          className="w-full bg-muted/20 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50 focus:bg-muted/30 transition-colors resize-none"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-1.5 block">Email (optional — for follow-up)</label>
+        <input
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          className="w-full bg-muted/20 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50 transition-colors"
+        />
+      </div>
+      {state.status === "error" && <ErrorBanner message={state.message!} />}
+      <button
+        type="submit"
+        disabled={state.status === "loading"}
+        className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-700 hover:bg-primary/90 transition-colors disabled:opacity-60"
+      >
+        {state.status === "loading" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+        Submit Idea
+      </button>
+    </form>
+  );
+}
+
+function BugForm({ session }: { session: { access_token: string } | null }) {
+  const [description, setDescription] = useState("");
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<SubmitState>({ status: "idle" });
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!description.trim()) { setState({ status: "error", message: "Please describe the bug." }); return; }
+    setState({ status: "loading" });
+    try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (session?.access_token) headers["Authorization"] = `Bearer ${session.access_token}`;
+      const res = await fetch("/api/bug-report", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          description,
+          email,
+          page_url: window.location.href,
+          browser: navigator.userAgent,
+          device: `${window.screen.width}x${window.screen.height} · ${navigator.platform}`,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setState({ status: "error", message: data.error ?? "Submission failed." }); return; }
+      setState({ status: "success", message: "Bug report sent! We'll investigate shortly." });
+      setDescription(""); setEmail("");
+    } catch {
+      setState({ status: "error", message: "Network error. Please try again." });
+    }
+  };
+
+  if (state.status === "success") return <SuccessBanner message={state.message!} />;
+
+  return (
+    <form onSubmit={submit} className="space-y-4">
+      <div>
+        <label className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-1.5 block">What went wrong?</label>
+        <textarea
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          placeholder="Describe what you did, what you expected, and what happened instead…"
+          rows={4}
+          maxLength={3000}
+          className="w-full bg-muted/20 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50 focus:bg-muted/30 transition-colors resize-none"
+        />
+      </div>
+      <div className="bg-muted/20 rounded-xl px-3 py-2.5 text-xs text-muted-foreground space-y-0.5">
+        <p className="font-600 text-foreground/70 mb-1">Auto-captured context</p>
+        <p>Page: {window.location.pathname}</p>
+        <p className="truncate">Browser: {navigator.userAgent.slice(0, 80)}…</p>
+        <p>Screen: {window.screen.width}×{window.screen.height}</p>
+      </div>
+      <div>
+        <label className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-1.5 block">Email (optional — so we can follow up)</label>
+        <input
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          className="w-full bg-muted/20 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50 transition-colors"
+        />
+      </div>
+      {state.status === "error" && <ErrorBanner message={state.message!} />}
+      <button
+        type="submit"
+        disabled={state.status === "loading"}
+        className="w-full flex items-center justify-center gap-2 bg-red-500 text-white px-4 py-2.5 rounded-xl text-sm font-700 hover:bg-red-500/90 transition-colors disabled:opacity-60"
+      >
+        {state.status === "loading" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Bug className="w-4 h-4" />}
+        Report Bug
+      </button>
+    </form>
+  );
+}
+
+const TABS: { id: FormType; icon: typeof Star; color: string; bg: string; label: string; desc: string }[] = [
+  { id: "rating",  icon: Star,      color: "text-amber-400",  bg: "bg-amber-500/10",  label: "Rate Experience",  desc: "Tell us how we're doing"           },
+  { id: "bug",     icon: Bug,       color: "text-red-400",    bg: "bg-red-500/10",    label: "Report a Bug",     desc: "Something not working?"            },
+  { id: "feature", icon: Lightbulb, color: "text-primary",    bg: "bg-primary/10",    label: "Suggest Feature",  desc: "Ideas to make us better"           },
 ];
 
 export default function FeedbackPage() {
+  const [active, setActive] = useState<FormType>("rating");
+  const { session } = useAuth();
+
   return (
     <div className="relative z-10 max-w-2xl mx-auto px-4 py-10 pb-24 lg:pb-10">
       <PageHeader
@@ -39,43 +285,41 @@ export default function FeedbackPage() {
         badge="Always Listening"
       />
 
-      <div className="space-y-5">
-        {FORMS.map((form, i) => (
-          <motion.div
-            key={form.title}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.08 }}
-            className="glass-panel rounded-2xl overflow-hidden"
+      {/* Tab selector */}
+      <div className="grid grid-cols-3 gap-2 mb-6">
+        {TABS.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActive(tab.id)}
+            className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border transition-all text-center ${
+              active === tab.id
+                ? `${tab.bg} border-current ${tab.color}`
+                : "border-border/40 bg-muted/10 text-muted-foreground hover:bg-muted/20"
+            }`}
           >
-            <div className="p-5 pb-3">
-              <div className="flex items-center gap-3 mb-2">
-                <div className={`w-9 h-9 rounded-xl ${form.bg} flex items-center justify-center flex-shrink-0`}>
-                  <form.icon className={`w-4.5 h-4.5 ${form.color}`} />
-                </div>
-                <div>
-                  <h2 className="font-semibold text-foreground text-sm">{form.title}</h2>
-                  <p className="text-xs text-muted-foreground">{form.desc}</p>
-                </div>
-              </div>
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${active === tab.id ? tab.bg : "bg-muted/30"}`}>
+              <tab.icon className={`w-4 h-4 ${active === tab.id ? tab.color : "text-muted-foreground"}`} />
             </div>
-            <div className="w-full" style={{ height: 400 }}>
-              <iframe
-                src={`https://tally.so/embed/${form.tallyId}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1`}
-                width="100%"
-                height="400"
-                frameBorder={0}
-                title={form.title}
-                className="block"
-                loading="lazy"
-              />
-            </div>
-          </motion.div>
+            <span className="text-xs font-700 leading-tight">{tab.label}</span>
+          </button>
         ))}
       </div>
 
+      {/* Form card */}
+      <motion.div
+        key={active}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+        className="glass-panel rounded-2xl p-5"
+      >
+        {active === "rating"  && <RatingForm  session={session} />}
+        {active === "bug"     && <BugForm     session={session} />}
+        {active === "feature" && <FeatureForm session={session} />}
+      </motion.div>
+
       <p className="text-xs text-muted-foreground text-center mt-6 px-4">
-        Forms powered by Tally.so — free, no login required. Your responses go directly to the CureCheck team.
+        Responses go directly to the CureCheck team · Max 5 submissions per 15 minutes
       </p>
     </div>
   );
