@@ -158,36 +158,20 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Tally forms row — Feedback + Bug Report */}
-        <div className="mt-14 pt-10 border-t border-border/40 grid md:grid-cols-2 gap-8">
-          <div>
-            <h4 className="mono-label text-primary/80 mb-4">{t("Share Your Feedback", "अपनी राय दें")}</h4>
-            <div className="glass-panel rounded-2xl overflow-hidden p-1">
-              <iframe
-                data-tally-src="https://tally.so/embed/ZjQBjv?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
-                loading="lazy"
-                width="100%"
-                height="436"
-                frameBorder="0"
-                marginHeight={0}
-                marginWidth={0}
-                title="Health Assessment"
-              />
+        {/* Feedback CTA row */}
+        <div className="mt-14 pt-10 border-t border-border/40">
+          <div className="glass-panel rounded-2xl px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <p className="font-700 text-foreground text-sm">{t("Help us improve CureCheck", "CureCheck को बेहतर बनाने में मदद करें")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("Rate your experience, suggest a feature, or report a bug.", "अपना अनुभव शेयर करें, नया feature suggest करें, या bug report करें।")}</p>
             </div>
-          </div>
-          <div>
-            <h4 className="mono-label text-primary/80 mb-4">{t("Report a Bug", "बग रिपोर्ट करें")}</h4>
-            <div className="glass-panel rounded-2xl overflow-hidden p-1">
-              <iframe
-                data-tally-src="https://tally.so/embed/LZoLQO?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
-                loading="lazy"
-                width="100%"
-                height="200"
-                frameBorder="0"
-                marginHeight={0}
-                marginWidth={0}
-                title="Report a Bug!"
-              />
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Link href="/feedback">
+                <button className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-700 hover:bg-primary/90 transition-colors whitespace-nowrap">
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  {t("Give Feedback", "राय दें")}
+                </button>
+              </Link>
             </div>
           </div>
         </div>

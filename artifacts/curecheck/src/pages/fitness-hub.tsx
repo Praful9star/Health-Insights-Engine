@@ -5,12 +5,13 @@ import {
   Dumbbell, Flame, Beef, Wheat, Droplet, Footprints, Moon,
   GlassWater, Plus, Minus, X, Utensils, Target, ChevronRight, Sparkles,
   Zap, Trophy, TrendingUp, BedDouble, Droplets, Check, CheckCircle2,
-  User, Save, Info, ChevronLeft,
+  User, Save, Info, ChevronLeft, Lock, Crown, FileDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/language-context";
+import { useAuth } from "@/contexts/auth-context";
 import {
   useHealthStorage, computeScore, todayStr, stepPoints,
   type FitnessDay, type Challenge,
@@ -382,6 +383,28 @@ function WeeklyBars({ weeklyData }: { weeklyData: FitnessDay[] }) {
   );
 }
 
+function PremiumGate({ title, desc }: { title: string; desc: string }) {
+  return (
+    <div className="glass-panel rounded-2xl p-7 flex flex-col items-center text-center border border-amber-500/20">
+      <div className="w-12 h-12 rounded-2xl bg-amber-500/15 flex items-center justify-center mb-4">
+        <Lock className="w-5 h-5 text-amber-400" />
+      </div>
+      <div className="flex items-center gap-1.5 mb-2">
+        <Crown className="w-4 h-4 text-amber-400" />
+        <span className="text-xs font-700 text-amber-400 uppercase tracking-wider">Premium</span>
+      </div>
+      <p className="font-700 text-foreground mb-1">{title}</p>
+      <p className="text-sm text-muted-foreground mb-5 max-w-xs leading-relaxed">{desc}</p>
+      <Link href="/premium">
+        <button className="inline-flex items-center gap-2 bg-amber-500/15 text-amber-400 border border-amber-500/30 px-5 py-2.5 rounded-xl text-sm font-700 hover:bg-amber-500/25 transition-colors">
+          <Crown className="w-4 h-4" />
+          Unlock Premium
+        </button>
+      </Link>
+    </div>
+  );
+}
+
 function CalorieRing({ consumed, target }: { consumed: number; target: number }) {
   const r = 84; const circ = 2 * Math.PI * r;
   const pct = target > 0 ? Math.min(consumed / target, 1) : 0;
@@ -575,6 +598,7 @@ function ProfileModal({
 
 export default function FitnessHub() {
   const { language, t } = useLanguage();
+  const { isPremium } = useAuth();
   const { todayEntry, updateToday, weeklyData, streaks, challenges, joinChallenge, logChallengeDay } = useHealthStorage();
 
   const [activeTab, setActiveTab] = useState<TabId>("today");
@@ -898,6 +922,47 @@ export default function FitnessHub() {
                 </div>
               </div>
 
+              {/* Protein requirement calculator */}
+              <div className="glass-panel rounded-2xl p-5 border border-primary/10">
+                <div className="flex items-center gap-2 mb-3">
+                  <Beef className="w-4.5 h-4.5 text-primary" />
+                  <h3 className="font-serif font-700 text-foreground">{t("Daily Protein Target", "Daily Protein Target")}</h3>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-4xl font-serif font-800 text-primary tabular-nums">{targets.protein}g</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {profile
+                        ? `${profile.weight} kg × ${goal.protein} g/kg (${language === "hi" ? goal.label.hi : goal.label.en})`
+                        : t("Set your profile for accurate calculation", "Accurate calculation के लिए profile set करें")}
+                    </p>
+                  </div>
+                  <div className="text-right space-y-1.5 flex-shrink-0">
+                    <div className="text-xs text-muted-foreground">
+                      <span className="font-600 text-foreground">{Math.round(targets.protein / 4)}</span> {t("meals of ~", "meals of ~")}<span className="font-600 text-foreground">{Math.round(targets.protein / 4)}g</span>
+                    </div>
+                    <div className="bg-primary/10 border border-primary/20 rounded-lg px-2.5 py-1 text-xs font-600 text-primary">
+                      {Math.round(targets.protein * 4)} kcal {t("from protein", "from protein")}
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 grid grid-cols-3 gap-2 text-center border-t border-border/30 pt-3">
+                  {[
+                    { label: t("Sedentary", "Sedentary"), grams: Math.round((profile?.weight ?? 70) * 0.8)  },
+                    { label: t("Active",    "Active"),    grams: Math.round((profile?.weight ?? 70) * 1.6)  },
+                    { label: t("Athlete",   "Athlete"),   grams: Math.round((profile?.weight ?? 70) * 2.2)  },
+                  ].map(row => (
+                    <div key={row.label} className={`rounded-lg px-2 py-1.5 ${row.grams === targets.protein ? "bg-primary/10 border border-primary/20" : "bg-muted/20"}`}>
+                      <p className={`text-sm font-700 tabular-nums ${row.grams === targets.protein ? "text-primary" : "text-foreground"}`}>{row.grams}g</p>
+                      <p className="text-[10px] text-muted-foreground leading-tight">{row.label}</p>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-2 text-center">
+                  {t("Based on sports nutrition guidelines (ISSN 2017)", "Sports nutrition guidelines (ISSN 2017) पर आधारित")}
+                </p>
+              </div>
+
               {/* Quick add */}
               <div className="glass-panel rounded-2xl p-6">
                 <h3 className="font-serif font-700 text-foreground mb-3 flex items-center gap-2">
@@ -942,33 +1007,45 @@ export default function FitnessHub() {
                 </div>
               )}
 
-              {/* Diet plans */}
-              <div className="glass-panel rounded-2xl p-6">
-                <button onClick={() => setShowPlans(!showPlans)} className="flex items-center justify-between w-full">
-                  <p className="font-serif font-700 text-foreground flex items-center gap-2">
-                    <span className="text-lg">⭐</span> {t("Indian Diet Plan", "Indian Diet Plan")}
-                    <span className="text-xs font-400 text-muted-foreground">({language === "hi" ? goal.label.hi : goal.label.en})</span>
+              {/* Diet plans — Premium */}
+              {isPremium ? (
+                <div className="glass-panel rounded-2xl p-6">
+                  <button onClick={() => setShowPlans(!showPlans)} className="flex items-center justify-between w-full">
+                    <p className="font-serif font-700 text-foreground flex items-center gap-2">
+                      <span className="text-lg">⭐</span> {t("7-Day Indian Diet Plan", "7-Day Indian Diet Plan")}
+                      <span className="inline-flex items-center gap-1 text-[10px] font-700 text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded-full">
+                        <Crown className="w-2.5 h-2.5" /> Premium
+                      </span>
+                    </p>
+                    <ChevronRight className={`w-4 h-4 text-muted-foreground transition-transform ${showPlans ? "rotate-90" : ""}`} />
+                  </button>
+                  <p className="text-xs text-muted-foreground mt-1.5 text-left">
+                    {language === "hi" ? goal.label.hi : goal.label.en} · {t("Tailored to your TDEE", "आपकी TDEE के अनुसार")} {targets.kcal} kcal
                   </p>
-                  <ChevronRight className={`w-4 h-4 text-muted-foreground transition-transform ${showPlans ? "rotate-90" : ""}`} />
-                </button>
-                <AnimatePresence>
-                  {showPlans && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
-                      <div className="mt-4 space-y-3 border-t border-border/40 pt-4">
-                        {PLANS[goalId].map((row, i) => (
-                          <div key={i} className="flex gap-3">
-                            <div className="w-24 flex-shrink-0">
-                              <p className="text-xs font-700 text-primary">{language === "hi" ? row.meal.hi : row.meal.en}</p>
-                              <p className="text-[11px] text-muted-foreground tabular-nums">{row.kcal} kcal</p>
+                  <AnimatePresence>
+                    {showPlans && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
+                        <div className="mt-4 space-y-3 border-t border-border/40 pt-4">
+                          {PLANS[goalId].map((row, i) => (
+                            <div key={i} className="flex gap-3">
+                              <div className="w-24 flex-shrink-0">
+                                <p className="text-xs font-700 text-primary">{language === "hi" ? row.meal.hi : row.meal.en}</p>
+                                <p className="text-[11px] text-muted-foreground tabular-nums">{row.kcal} kcal</p>
+                              </div>
+                              <p className="text-xs text-muted-foreground leading-relaxed">{language === "hi" ? row.food.hi : row.food.en}</p>
                             </div>
-                            <p className="text-xs text-muted-foreground leading-relaxed">{language === "hi" ? row.food.hi : row.food.en}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <PremiumGate
+                  title={t("7-Day Personalised Indian Diet Plan", "7-Day Personalised Indian Diet Plan")}
+                  desc={t("Get a full week of Indian meals calibrated to your exact TDEE, goal, and bodyweight — with macros for every meal.", "अपने TDEE, goal और वज़न के हिसाब से 7-day Indian meal plan पाएं।")}
+                />
+              )}
             </motion.div>
           )}
 
@@ -976,30 +1053,63 @@ export default function FitnessHub() {
           {activeTab === "progress" && (
             <motion.div key="progress" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.22 }} className="space-y-5">
 
-              {/* Weekly chart */}
-              <div className="glass-panel rounded-2xl p-6">
-                <p className="font-serif font-700 text-foreground mb-1 flex items-center gap-2">
-                  <TrendingUp className="w-4.5 h-4.5 text-primary" /> {t("Weekly Fitness Score", "Weekly Fitness Score")}
-                </p>
-                <p className="text-xs text-muted-foreground mb-5">{t("Your score each day this week — data persists across sessions.", "इस हफ्ते हर दिन का score।")}</p>
-                <WeeklyBars weeklyData={weeklyData} />
-              </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { label: t("Consistency", "Consistency"), score: consistencyScore, emoji: "📅", color: "text-emerald-400", desc: t("Days at 40+ score", "40+ score दिन") },
-                  { label: t("Activity",    "Activity"),    score: activityScore,    emoji: "🏃", color: "text-amber-400",   desc: t("Workout days",    "Workout दिन")    },
-                  { label: t("Week Avg",    "Week Avg"),    score: weekAvg,          emoji: "📈", color: "text-primary",     desc: t("Average score",   "Average score")   },
-                ].map(stat => (
-                  <div key={stat.label} className="glass-panel rounded-2xl p-4 text-center">
-                    <p className="text-xl mb-1">{stat.emoji}</p>
-                    <p className={`text-2xl font-serif font-800 tabular-nums ${stat.color}`}>{stat.score}{stat.label === t("Week Avg", "Week Avg") ? "" : "%"}</p>
-                    <p className="text-xs font-700 text-foreground mt-0.5">{stat.label}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">{stat.desc}</p>
+              {/* Weekly chart + stats — Premium */}
+              {isPremium ? (
+                <>
+                  <div className="glass-panel rounded-2xl p-6">
+                    <p className="font-serif font-700 text-foreground mb-1 flex items-center gap-2">
+                      <TrendingUp className="w-4.5 h-4.5 text-primary" /> {t("Weekly Fitness Score", "Weekly Fitness Score")}
+                      <span className="inline-flex items-center gap-1 text-[10px] font-700 text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded-full ml-auto">
+                        <Crown className="w-2.5 h-2.5" /> Premium
+                      </span>
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-5">{t("Your score each day this week — data persists across sessions.", "इस हफ्ते हर दिन का score।")}</p>
+                    <WeeklyBars weeklyData={weeklyData} />
                   </div>
-                ))}
-              </div>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { label: t("Consistency", "Consistency"), score: consistencyScore, emoji: "📅", color: "text-emerald-400", desc: t("Days at 40+ score", "40+ score दिन") },
+                      { label: t("Activity",    "Activity"),    score: activityScore,    emoji: "🏃", color: "text-amber-400",   desc: t("Workout days",    "Workout दिन")    },
+                      { label: t("Week Avg",    "Week Avg"),    score: weekAvg,          emoji: "📈", color: "text-primary",     desc: t("Average score",   "Average score")   },
+                    ].map(stat => (
+                      <div key={stat.label} className="glass-panel rounded-2xl p-4 text-center">
+                        <p className="text-xl mb-1">{stat.emoji}</p>
+                        <p className={`text-2xl font-serif font-800 tabular-nums ${stat.color}`}>{stat.score}{stat.label === t("Week Avg", "Week Avg") ? "" : "%"}</p>
+                        <p className="text-xs font-700 text-foreground mt-0.5">{stat.label}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">{stat.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <PremiumGate
+                  title={t("Weekly Progress Charts", "Weekly Progress Charts")}
+                  desc={t("See your 7-day score trend, consistency rate, activity rate, and weekly average — all in one dashboard.", "7-day score trend, consistency, activity rate और weekly average एक dashboard में देखें।")}
+                />
+              )}
+
+              {/* PDF export — Premium */}
+              {isPremium ? (
+                <button
+                  onClick={() => window.print()}
+                  className="w-full flex items-center justify-center gap-2 glass-panel rounded-2xl p-4 text-sm font-700 text-foreground hover:bg-muted/20 transition-colors border border-border/40"
+                >
+                  <FileDown className="w-4.5 h-4.5 text-primary" />
+                  {t("Download Weekly Summary (PDF)", "Weekly Summary Download करें (PDF)")}
+                  <span className="inline-flex items-center gap-1 text-[10px] font-700 text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded-full ml-1">
+                    <Crown className="w-2.5 h-2.5" /> Premium
+                  </span>
+                </button>
+              ) : (
+                <div className="glass-panel rounded-2xl p-4 flex items-center gap-3 opacity-50 cursor-default border border-border/30">
+                  <FileDown className="w-4.5 h-4.5 text-muted-foreground" />
+                  <span className="text-sm font-700 text-muted-foreground">{t("Download Weekly Summary (PDF)", "Weekly Summary PDF")}</span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-700 text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded-full ml-auto">
+                    <Lock className="w-2.5 h-2.5" /> Premium
+                  </span>
+                </div>
+              )}
 
               {/* Age-group advice */}
               {ageAdvice && (
