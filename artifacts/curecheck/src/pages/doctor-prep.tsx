@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { ChevronLeft, Stethoscope, Plus, Trash2, Loader2, ClipboardList, AlertTriangle } from "lucide-react";
+import { ChevronLeft, Stethoscope, Plus, Trash2, Loader2, ClipboardList, AlertTriangle, FileSearch } from "lucide-react";
 import PageMeta from "@/components/page-meta";
 import { useDoctorPrep, type DoctorPrepInput } from "@workspace/api-client-react";
 
@@ -16,10 +16,25 @@ export default function DoctorPrep() {
   const [medicalHistory, setMedicalHistory] = useState("");
   const [currentMedications, setCurrentMedications] = useState("");
   const [visitType, setVisitType] = useState<DoctorPrepInput["visitType"]>("general");
+  const [fromReport, setFromReport] = useState(false);
   const [symptomInput, setSymptomInput] = useState("");
   const [symptoms, setSymptoms] = useState<string[]>([]);
 
   const { mutate, data, isPending, error } = useDoctorPrep();
+
+  // Pre-fill from Report Explainer — reads context written by handleOpenDoctorPrep()
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("cc_doctor_prep_prefill_v1");
+      if (!raw) return;
+      const prefill = JSON.parse(raw) as { concern?: string; visitType?: string };
+      if (prefill.concern) { setConcern(prefill.concern); setFromReport(true); }
+      if (prefill.visitType && VISIT_TYPES.some(v => v.value === prefill.visitType)) {
+        setVisitType(prefill.visitType as typeof visitType);
+      }
+      localStorage.removeItem("cc_doctor_prep_prefill_v1");
+    } catch {}
+  }, []);
 
   const addSymptom = () => {
     const trimmed = symptomInput.trim();
@@ -62,6 +77,17 @@ export default function DoctorPrep() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
+        {fromReport && (
+          <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-sky-500/8 border border-sky-500/20">
+            <FileSearch className="w-4 h-4 text-sky-400 flex-shrink-0" />
+            <p className="text-xs text-sky-400 font-600">
+              Pre-filled from your report analysis — review and edit before generating.
+            </p>
+            <Link href="/report-explainer">
+              <span className="text-xs text-sky-400 hover:underline ml-auto flex-shrink-0 cursor-pointer">← Back to report</span>
+            </Link>
+          </div>
+        )}
         <div className="glass-panel rounded-2xl p-5">
           <label className="block text-sm font-700 text-foreground mb-2">What is your main concern?<span className="text-red-400 ml-1">*</span></label>
           <textarea
