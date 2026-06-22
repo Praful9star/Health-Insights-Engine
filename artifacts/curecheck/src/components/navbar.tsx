@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Languages, ChevronDown, LogIn, Star, LayoutDashboard, Sun, Moon, Search } from "lucide-react";
@@ -7,7 +7,7 @@ import { useLanguage } from "@/contexts/language-context";
 import { useAuth } from "@/contexts/auth-context";
 import { CureCheckMark } from "@/components/logo";
 import { useTheme } from "@/components/theme-provider";
-import { TOOL_CATEGORIES, ALL_TOOLS } from "@/data/tool-catalog";
+import { TOOL_CATEGORIES, searchTools, type Tool } from "@/data/tool-catalog";
 
 const PRIMARY_LINKS = [
   { href: "/report-explainer",   label: { en: "Reports",  hi: "रिपोर्ट" } },
@@ -24,6 +24,8 @@ export default function Navbar() {
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({ ai: true });
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
+  const [searchResults, setSearchResults] = useState<Tool[]>([]);
+  const searchVersionRef = useRef(0);
   const { language, setLanguage, t } = useLanguage();
   const { user, profile } = useAuth();
   const { theme, setTheme } = useTheme();
@@ -57,15 +59,16 @@ export default function Navbar() {
   const isActive = (href: string) => location === href || location.startsWith(href + "/");
   const displayName = profile?.name || user?.email?.split("@")[0] || "";
 
-  const searchResults = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return [];
-    return ALL_TOOLS.filter(tool =>
-      tool.en.toLowerCase().includes(q) ||
-      tool.hi.includes(q) ||
-      tool.desc.en.toLowerCase().includes(q) ||
-      tool.desc.hi.includes(q)
-    ).slice(0, 6);
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (!q) { setSearchResults([]); return; }
+    const version = ++searchVersionRef.current;
+    const timer = setTimeout(() => {
+      if (version === searchVersionRef.current) {
+        setSearchResults(searchTools(q));
+      }
+    }, 300);
+    return () => clearTimeout(timer);
   }, [searchQuery]);
 
   const toggleCategory = (key: string) =>
@@ -82,15 +85,8 @@ export default function Navbar() {
     e.preventDefault();
     if (searchResults.length > 0) {
       handleSearchSelect(searchResults[0].href);
-    } else {
-      const q = searchQuery.trim();
-      if (q) {
-        navigate(`/claim-checker?q=${encodeURIComponent(q)}`);
-        setSearchQuery("");
-        setSearchFocused(false);
-        setOpen(false);
-      }
     }
+    // No results → do nothing (dropdown already shows "No results" state)
   };
 
   return (
@@ -176,7 +172,7 @@ export default function Navbar() {
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
           </form>
           <AnimatePresence>
-            {searchFocused && searchResults.length > 0 && (
+            {searchFocused && searchQuery.trim() && (
               <motion.div
                 initial={{ opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -184,19 +180,25 @@ export default function Navbar() {
                 transition={{ duration: 0.12 }}
                 className="absolute left-0 top-full mt-2 w-72 glass-panel rounded-2xl border border-border/60 py-1.5 shadow-xl z-50"
               >
-                {searchResults.map(tool => (
-                  <button
-                    key={tool.href}
-                    onMouseDown={() => handleSearchSelect(tool.href)}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left hover:bg-muted/40 transition-colors"
-                  >
-                    <tool.icon className={`w-4 h-4 ${tool.accent} flex-shrink-0`} />
-                    <div className="min-w-0">
-                      <p className="font-600 text-foreground truncate">{language === "hi" ? tool.hi : tool.en}</p>
-                      <p className="text-[11px] text-muted-foreground truncate">{language === "hi" ? tool.desc.hi : tool.desc.en}</p>
-                    </div>
-                  </button>
-                ))}
+                {searchResults.length > 0 ? (
+                  searchResults.map(tool => (
+                    <button
+                      key={tool.href}
+                      onMouseDown={() => handleSearchSelect(tool.href)}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left hover:bg-muted/40 transition-colors"
+                    >
+                      <tool.icon className={`w-4 h-4 ${tool.accent} flex-shrink-0`} />
+                      <div className="min-w-0">
+                        <p className="font-600 text-foreground truncate">{language === "hi" ? tool.hi : tool.en}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">{language === "hi" ? tool.desc.hi : tool.desc.en}</p>
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <p className="px-4 py-3 text-sm text-muted-foreground">
+                    {t("No tools found for", "कोई टूल नहीं मिला:")} &ldquo;{searchQuery}&rdquo;
+                  </p>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -298,19 +300,25 @@ export default function Navbar() {
                   />
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 </div>
-                {searchQuery.trim() && searchResults.length > 0 && (
+                {searchQuery.trim() && (
                   <div className="mt-1.5 rounded-xl border border-border/40 overflow-hidden">
-                    {searchResults.map(tool => (
-                      <button
-                        key={tool.href}
-                        type="button"
-                        onClick={() => handleSearchSelect(tool.href)}
-                        className="w-full flex items-center gap-3 px-3 py-3 text-sm text-left hover:bg-muted/40 transition-colors border-b border-border/20 last:border-0 min-h-[44px]"
-                      >
-                        <tool.icon className={`w-4 h-4 ${tool.accent} flex-shrink-0`} />
-                        <span className="font-600 text-foreground">{language === "hi" ? tool.hi : tool.en}</span>
-                      </button>
-                    ))}
+                    {searchResults.length > 0 ? (
+                      searchResults.map(tool => (
+                        <button
+                          key={tool.href}
+                          type="button"
+                          onClick={() => handleSearchSelect(tool.href)}
+                          className="w-full flex items-center gap-3 px-3 py-3 text-sm text-left hover:bg-muted/40 transition-colors border-b border-border/20 last:border-0 min-h-[44px]"
+                        >
+                          <tool.icon className={`w-4 h-4 ${tool.accent} flex-shrink-0`} />
+                          <span className="font-600 text-foreground">{language === "hi" ? tool.hi : tool.en}</span>
+                        </button>
+                      ))
+                    ) : (
+                      <p className="px-3 py-3 text-sm text-muted-foreground">
+                        {t("No tools found for", "कोई टूल नहीं मिला:")} &ldquo;{searchQuery}&rdquo;
+                      </p>
+                    )}
                   </div>
                 )}
               </form>
