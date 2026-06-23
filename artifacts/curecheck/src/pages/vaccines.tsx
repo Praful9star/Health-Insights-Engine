@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { ChevronLeft, Syringe, CheckCircle2 } from "lucide-react";
 import PageMeta from "@/components/page-meta";
+import { useLanguage } from "@/contexts/language-context";
 
 type Stage = "birth" | "infant" | "toddler" | "child" | "teen" | "adult" | "senior";
 
@@ -87,6 +88,7 @@ const STAGES: { id: Stage; label: string }[] = [
 export default function Vaccines() {
   const [stage, setStage] = useState<Stage>("birth");
   const data = SCHEDULE[stage];
+  const { tKey } = useLanguage();
 
   return (
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12">
@@ -95,14 +97,14 @@ export default function Vaccines() {
         description="Complete vaccine schedules for children and adults in India per the National Immunization Schedule — with FAQs and where to get vaccinated."
         path="/vaccines"
       />
-      <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
+      <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> {tKey("common.home")}</span></Link>
 
       <div className="flex items-start gap-4 mb-7">
         <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 flex items-center justify-center flex-shrink-0"><Syringe className="w-6 h-6 text-emerald-400" /></div>
         <div>
           <span className="mono-label text-emerald-400/80 mb-1 block">Immunization</span>
-          <h1 className="text-2xl sm:text-3xl font-serif font-800 text-foreground">Vaccination Schedule</h1>
-          <p className="text-sm text-muted-foreground mt-1">India's National Immunization Schedule (NIS) — select an age group.</p>
+          <h1 className="text-2xl sm:text-3xl font-serif font-800 text-foreground">{tKey("vaccines.title")}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{tKey("vaccines.subtitle")}</p>
         </div>
       </div>
 
@@ -124,7 +126,7 @@ export default function Vaccines() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <p className="text-sm font-700 text-foreground">{v.name}</p>
-                  {v.free && <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-700">FREE (Govt.)</span>}
+                  {v.free && <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-700">{tKey("vaccines.free")}</span>}
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5">{v.disease}</p>
                 <p className="text-xs text-muted-foreground/70 mt-0.5">{v.doses}</p>
@@ -139,7 +141,7 @@ export default function Vaccines() {
         <p className="text-xs text-muted-foreground mt-1">All government/free vaccines are available at your nearest PHC (Primary Health Centre), government hospital, or Urban Health Centre. Ask for the "Mission Indradhanush" schedule.</p>
       </div>
 
-      <p className="text-xs text-muted-foreground text-center mt-5">Consult your pediatrician or family doctor for a personalized vaccination plan.</p>
+      <p className="text-xs text-muted-foreground text-center mt-5">{tKey("vaccines.note")}</p>
     </div>
   );
 }

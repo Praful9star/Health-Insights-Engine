@@ -4,6 +4,7 @@ import { Link } from "wouter";
 import type { ElementType } from "react";
 import PageMeta from "@/components/page-meta";
 import { ChevronLeft, Phone, AlertTriangle, Heart, Zap, Wind, Droplets, Stethoscope, Shield, Baby, Brain, FlaskConical, PhoneCall } from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
 
 interface Contact {
   id: string;
@@ -79,6 +80,7 @@ const FIRST_AID = [
 
 export default function Emergency() {
   const [open, setOpen] = useState<string | null>(null);
+  const { tKey } = useLanguage();
   return (
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12">
       <PageMeta
@@ -86,20 +88,20 @@ export default function Emergency() {
         description="India-specific first aid guides and emergency contacts — 108, AIIMS, poison control, and local hospitals. Works offline. Free."
         path="/emergency"
       />
-      <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
+      <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> {tKey("common.home")}</span></Link>
 
       <div className="flex items-start gap-4 mb-7">
         <div className="w-12 h-12 rounded-2xl bg-red-500/15 flex items-center justify-center flex-shrink-0"><AlertTriangle className="w-6 h-6 text-red-400" /></div>
         <div>
-          <span className="mono-label text-red-400/80 mb-1 block">Emergency</span>
-          <h1 className="text-2xl sm:text-3xl font-serif font-800 text-foreground">Emergency & First Aid</h1>
-          <p className="text-sm text-muted-foreground mt-1">India emergency numbers and step-by-step first aid guides.</p>
+          <span className="mono-label text-red-400/80 mb-1 block">{tKey("emergency.title")}</span>
+          <h1 className="text-2xl sm:text-3xl font-serif font-800 text-foreground">{tKey("emergency.title")}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{tKey("emergency.subtitle")}</p>
         </div>
       </div>
 
       {/* Emergency numbers list */}
       <h2 className="text-base font-serif font-700 text-foreground mb-3 flex items-center gap-2">
-        <Phone className="w-4 h-4 text-red-400" /> Emergency Numbers
+        <Phone className="w-4 h-4 text-red-400" /> {tKey("emergency.whenToCall")}
       </h2>
       <div className="space-y-2 mb-8">
         {NATIONAL.map(n => (
@@ -129,7 +131,7 @@ export default function Emergency() {
       </div>
 
       {/* First Aid */}
-      <h2 className="text-base font-serif font-700 text-foreground mb-3">Step-by-Step First Aid</h2>
+      <h2 className="text-base font-serif font-700 text-foreground mb-3">{tKey("emergency.stepByStep")}</h2>
       <div className="space-y-3">
         {FIRST_AID.map(fa => (
           <div key={fa.id} className="glass-panel rounded-2xl overflow-hidden border border-border/40">
@@ -154,7 +156,7 @@ export default function Emergency() {
           </div>
         ))}
       </div>
-      <p className="text-xs text-muted-foreground text-center mt-6">First aid is a temporary measure. Always seek professional medical help immediately.</p>
+      <p className="text-xs text-muted-foreground text-center mt-6">{tKey("emergency.disclaimer")}</p>
     </div>
   );
 }

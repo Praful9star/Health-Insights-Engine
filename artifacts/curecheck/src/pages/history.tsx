@@ -3,14 +3,8 @@ import { motion } from "framer-motion";
 import { Clock, FileSearch, AlertTriangle, Info, CheckCircle2, LogIn, ChevronRight, Trash2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { useHealthStorage } from "@/hooks/use-health-storage";
+import { useLanguage } from "@/contexts/language-context";
 import PageMeta from "@/components/page-meta";
-
-const ASSESSMENT_CONFIG = {
-  requires_urgent_attention: { label: "Urgent",          color: "text-red-400",    bg: "bg-red-500/10",    icon: AlertTriangle  },
-  needs_follow_up:           { label: "Follow-up",       color: "text-amber-400",  bg: "bg-amber-500/10",  icon: Info           },
-  routine_monitoring:        { label: "Routine",         color: "text-sky-400",    bg: "bg-sky-500/10",    icon: Info           },
-  all_clear:                 { label: "All Clear",       color: "text-emerald-400",bg: "bg-emerald-500/10",icon: CheckCircle2   },
-} as const;
 
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
@@ -20,8 +14,16 @@ function formatDate(dateStr: string): string {
 export default function History() {
   const { user, loading } = useAuth();
   const { timeline, deleteTimelineEntry } = useHealthStorage();
+  const { tKey } = useLanguage();
 
-  // ── Auth loading ────────────────────────────────────────────────────────────
+  // Assessment config uses tKey so labels switch with language
+  const ASSESSMENT_CONFIG = {
+    requires_urgent_attention: { label: tKey("history.urgent"),  color: "text-red-400",    bg: "bg-red-500/10",    icon: AlertTriangle  },
+    needs_follow_up:           { label: tKey("history.followUp"), color: "text-amber-400",  bg: "bg-amber-500/10",  icon: Info           },
+    routine_monitoring:        { label: tKey("history.routine"), color: "text-sky-400",    bg: "bg-sky-500/10",    icon: Info           },
+    all_clear:                 { label: tKey("history.allClear"),color: "text-emerald-400",bg: "bg-emerald-500/10",icon: CheckCircle2   },
+  } as const;
+
   if (loading) {
     return (
       <div className="relative z-10 min-h-[60vh] flex items-center justify-center">
@@ -30,7 +32,6 @@ export default function History() {
     );
   }
 
-  // ── Not signed in ───────────────────────────────────────────────────────────
   if (!user) {
     return (
       <div className="relative z-10 max-w-md mx-auto px-4 py-16 text-center">
@@ -38,22 +39,19 @@ export default function History() {
         <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
           <Clock className="w-8 h-8 text-primary" />
         </div>
-        <h1 className="text-2xl font-serif font-800 text-foreground mb-2">Your Health History</h1>
-        <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
-          Sign in to save your report analyses, symptom checks, and health activity across devices. Your data is private and encrypted.
-        </p>
+        <h1 className="text-2xl font-serif font-800 text-foreground mb-2">{tKey("history.signInTitle")}</h1>
+        <p className="text-muted-foreground text-sm mb-6 leading-relaxed">{tKey("history.signInDesc")}</p>
         <Link href="/login">
           <button className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl text-sm font-700 hover:bg-primary/90 transition-colors">
             <LogIn className="w-4 h-4" />
-            Sign in — takes 30 seconds
+            {tKey("history.signInBtn")}
           </button>
         </Link>
-        <p className="text-xs text-muted-foreground mt-4">No account needed to use the tools</p>
+        <p className="text-xs text-muted-foreground mt-4">{tKey("history.noAccountNeeded")}</p>
       </div>
     );
   }
 
-  // ── Signed in, empty ────────────────────────────────────────────────────────
   if (timeline.length === 0) {
     return (
       <div className="relative z-10 max-w-md mx-auto px-4 py-16 text-center">
@@ -61,33 +59,35 @@ export default function History() {
         <div className="w-16 h-16 rounded-2xl bg-muted/30 flex items-center justify-center mx-auto mb-5">
           <FileSearch className="w-8 h-8 text-muted-foreground" />
         </div>
-        <h1 className="text-xl font-700 text-foreground mb-2">No history yet</h1>
-        <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
-          Analyze a blood test or lab report and it will appear here automatically.
-        </p>
+        <h1 className="text-xl font-700 text-foreground mb-2">{tKey("history.emptyTitle")}</h1>
+        <p className="text-muted-foreground text-sm mb-6 leading-relaxed">{tKey("history.emptyDesc")}</p>
         <Link href="/report-explainer">
           <button className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl text-sm font-700 hover:bg-primary/90 transition-colors">
             <FileSearch className="w-4 h-4" />
-            Analyze a Report
+            {tKey("history.analyzeBtn")}
           </button>
         </Link>
       </div>
     );
   }
 
-  // ── Signed in, has data ──────────────────────────────────────────────────────
+  const count = timeline.length;
+  const countLabel = count === 1
+    ? tKey("history.reportsAnalyzed_one").replace("{{count}}", String(count))
+    : tKey("history.reportsAnalyzed_other").replace("{{count}}", String(count));
+
   return (
     <div className="relative z-10 max-w-2xl mx-auto px-4 py-8">
       <PageMeta title="History — CureCheck" description="Your health analysis history." path="/history" />
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-700 text-foreground">Health History</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">{timeline.length} report{timeline.length !== 1 ? "s" : ""} analyzed</p>
+          <h1 className="text-xl font-700 text-foreground">{tKey("history.title")}</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">{countLabel}</p>
         </div>
         <Link href="/report-explainer">
           <button className="text-xs font-600 text-primary bg-primary/10 px-3 py-1.5 rounded-full hover:bg-primary/20 transition-colors">
-            + New Report
+            {tKey("history.newReport")}
           </button>
         </Link>
       </div>
@@ -126,7 +126,6 @@ export default function History() {
                     )}
                   </div>
 
-                  {/* Actions */}
                   <div className="flex items-center gap-1 flex-shrink-0">
                     <Link href="/health-timeline">
                       <button className="p-1.5 rounded-lg hover:bg-muted/40 transition-colors">
@@ -142,7 +141,6 @@ export default function History() {
                   </div>
                 </div>
 
-                {/* Key findings preview */}
                 {entry.importantFindings?.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {entry.importantFindings.slice(0, 3).map((f, j) => (
@@ -169,8 +167,8 @@ export default function History() {
       </div>
 
       <p className="text-xs text-muted-foreground text-center mt-6">
-        Data stored locally on this device ·{" "}
-        <Link href="/health-timeline"><span className="text-primary hover:underline cursor-pointer">View detailed timeline →</span></Link>
+        {tKey("history.dataStored")}
+        <Link href="/health-timeline"><span className="text-primary hover:underline cursor-pointer">{tKey("history.viewTimeline")}</span></Link>
       </p>
     </div>
   );

@@ -5,12 +5,23 @@ import { ChevronLeft, User, Save, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/auth-context";
+import { useLanguage } from "@/contexts/language-context";
 
-const GENDERS     = ["Male", "Female", "Non-binary", "Prefer not to say"];
+// Blood groups are medical codes — always keep in English
 const BLOOD_GROUPS = ["A+", "A−", "B+", "B−", "O+", "O−", "AB+", "AB−"];
 
 export default function Profile() {
   const { user, profile, profileLoading, updateProfile, refreshProfile } = useAuth();
+  const { tKey } = useLanguage();
+
+  // Gender options: keys for value, tKey for display label
+  const GENDERS = [
+    { value: "male",          label: tKey("profile.genderMale")      },
+    { value: "female",        label: tKey("profile.genderFemale")    },
+    { value: "non-binary",    label: tKey("profile.genderNonBinary") },
+    { value: "prefer not to say", label: tKey("profile.genderPreferNot") },
+  ];
+
   const [form, setForm] = useState({
     name: "", age: "", gender: "", blood_group: "", city: "", allergies: "",
   });
@@ -50,7 +61,7 @@ export default function Profile() {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <Link href="/dashboard">
           <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 cursor-pointer">
-            <ChevronLeft className="w-4 h-4" /> Dashboard
+            <ChevronLeft className="w-4 h-4" /> {tKey("profile.dashboard")}
           </span>
         </Link>
 
@@ -60,59 +71,59 @@ export default function Profile() {
               <User className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-xl font-serif font-800 text-foreground">Health Profile</h1>
+              <h1 className="text-xl font-serif font-800 text-foreground">{tKey("profile.title")}</h1>
               <p className="text-xs text-muted-foreground mt-0.5">{user?.email}</p>
             </div>
           </div>
 
           <form onSubmit={submit} className="space-y-4">
             <div>
-              <label className="block text-xs font-600 text-muted-foreground mb-1.5">Full Name</label>
+              <label className="block text-xs font-600 text-muted-foreground mb-1.5">{tKey("profile.fullName")}</label>
               <Input
                 value={form.name} onChange={(e) => set("name")(e.target.value)}
-                placeholder="Your name" className="rounded-xl"
+                placeholder={tKey("profile.namePlaceholder")} className="rounded-xl"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-600 text-muted-foreground mb-1.5">Age</label>
+                <label className="block text-xs font-600 text-muted-foreground mb-1.5">{tKey("profile.age")}</label>
                 <Input
                   type="number" min={1} max={120}
                   value={form.age} onChange={(e) => set("age")(e.target.value)}
-                  placeholder="e.g. 28" className="rounded-xl"
+                  placeholder={tKey("profile.agePlaceholder")} className="rounded-xl"
                 />
               </div>
               <div>
-                <label className="block text-xs font-600 text-muted-foreground mb-1.5">City</label>
+                <label className="block text-xs font-600 text-muted-foreground mb-1.5">{tKey("profile.city")}</label>
                 <Input
                   value={form.city} onChange={(e) => set("city")(e.target.value)}
-                  placeholder="e.g. Mumbai" className="rounded-xl"
+                  placeholder={tKey("profile.cityPlaceholder")} className="rounded-xl"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-600 text-muted-foreground mb-1.5">Gender</label>
+              <label className="block text-xs font-600 text-muted-foreground mb-1.5">{tKey("profile.gender")}</label>
               <div className="flex flex-wrap gap-2">
                 {GENDERS.map((g) => (
                   <button
-                    key={g} type="button"
-                    onClick={() => set("gender")(g.toLowerCase())}
+                    key={g.value} type="button"
+                    onClick={() => set("gender")(g.value)}
                     className={`px-3.5 py-1.5 rounded-full text-xs font-600 border transition-all ${
-                      form.gender === g.toLowerCase()
+                      form.gender === g.value
                         ? "bg-primary text-primary-foreground border-primary"
                         : "border-border/60 text-muted-foreground hover:border-primary/50"
                     }`}
                   >
-                    {g}
+                    {g.label}
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-600 text-muted-foreground mb-1.5">Blood Group</label>
+              <label className="block text-xs font-600 text-muted-foreground mb-1.5">{tKey("profile.bloodGroup")}</label>
               <div className="flex flex-wrap gap-2">
                 {BLOOD_GROUPS.map((bg) => (
                   <button
@@ -131,10 +142,10 @@ export default function Profile() {
             </div>
 
             <div>
-              <label className="block text-xs font-600 text-muted-foreground mb-1.5">Allergies / Medical Notes</label>
+              <label className="block text-xs font-600 text-muted-foreground mb-1.5">{tKey("profile.allergies")}</label>
               <Input
                 value={form.allergies} onChange={(e) => set("allergies")(e.target.value)}
-                placeholder="e.g. Penicillin, peanuts, dust" className="rounded-xl"
+                placeholder={tKey("profile.allergiesPlaceholder")} className="rounded-xl"
               />
             </div>
 
@@ -142,9 +153,9 @@ export default function Profile() {
 
             <Button type="submit" disabled={saving} className="w-full rounded-xl gap-2 mt-2">
               {saved ? (
-                <><CheckCircle className="w-4 h-4" /> Saved!</>
+                <><CheckCircle className="w-4 h-4" /> {tKey("profile.saved")}</>
               ) : (
-                <><Save className="w-4 h-4" /> {saving ? "Saving…" : "Save Profile"}</>
+                <><Save className="w-4 h-4" /> {saving ? tKey("profile.saving") : tKey("profile.save")}</>
               )}
             </Button>
           </form>

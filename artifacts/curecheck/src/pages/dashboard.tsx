@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
 import { useHealthStorage } from "@/hooks/use-health-storage";
+import { useLanguage } from "@/contexts/language-context";
 import type { SavedArticle } from "@/pages/news";
 
 const ARTICLES_KEY = "cc_saved_articles";
@@ -16,16 +17,7 @@ function readSavedArticles(): SavedArticle[] {
   try { return JSON.parse(localStorage.getItem(ARTICLES_KEY) ?? "[]") as SavedArticle[]; } catch { return []; }
 }
 
-const QUICK_LINKS = [
-  { href: "/report-explainer",   icon: FileText,  label: "Explain a Report",  color: "text-blue-400"    },
-  { href: "/symptom-checker",    icon: Activity,  label: "Symptom Checker",   color: "text-emerald-400" },
-  { href: "/fitness-hub",        icon: Flame,     label: "Fitness Hub",       color: "text-orange-400"  },
-  { href: "/health-timeline",    icon: Heart,     label: "Health Timeline",   color: "text-rose-400"    },
-  { href: "/medicine-explainer", icon: Zap,       label: "Medicine Info",     color: "text-purple-400"  },
-  { href: "/claim-checker",      icon: Target,    label: "Claim Checker",     color: "text-yellow-400"  },
-];
-
-function ScoreRing({ score }: { score: number }) {
+function ScoreRing({ score, label }: { score: number; label: string }) {
   const r = 54;
   const c = 2 * Math.PI * r;
   const offset = c - (score / 100) * c;
@@ -44,7 +36,7 @@ function ScoreRing({ score }: { score: number }) {
       </svg>
       <div className="text-center z-10">
         <p className="text-3xl font-800 font-serif text-foreground">{score}</p>
-        <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Health Score</p>
+        <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{label}</p>
       </div>
     </div>
   );
@@ -65,7 +57,17 @@ function StatChip({ icon: Icon, label, value, color }: { icon: React.ElementType
 export default function Dashboard() {
   const { user, profile, signOut } = useAuth();
   const { todayEntry, streaks, timeline } = useHealthStorage();
+  const { tKey } = useLanguage();
   const [savedArticles, setSavedArticles] = useState<SavedArticle[]>([]);
+
+  const QUICK_LINKS = [
+    { href: "/report-explainer",   icon: FileText,  label: tKey("dashboard.explainReport"),  color: "text-blue-400"    },
+    { href: "/symptom-checker",    icon: Activity,  label: tKey("dashboard.symptomChecker"), color: "text-emerald-400" },
+    { href: "/fitness-hub",        icon: Flame,     label: tKey("dashboard.fitnessHub"),      color: "text-orange-400"  },
+    { href: "/health-timeline",    icon: Heart,     label: tKey("dashboard.healthTimeline"),  color: "text-rose-400"    },
+    { href: "/medicine-explainer", icon: Zap,       label: tKey("dashboard.medicineInfo"),    color: "text-purple-400"  },
+    { href: "/claim-checker",      icon: Target,    label: tKey("dashboard.claimChecker"),    color: "text-yellow-400"  },
+  ];
 
   useEffect(() => {
     setSavedArticles(readSavedArticles().slice(0, 3));
@@ -79,21 +81,21 @@ export default function Dashboard() {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-sm text-muted-foreground mb-0.5">Welcome back</p>
+            <p className="text-sm text-muted-foreground mb-0.5">{tKey("dashboard.welcomeBack")}</p>
             <h1 className="text-2xl font-serif font-800 text-foreground">{displayName}</h1>
             {user?.email && <p className="text-xs text-muted-foreground mt-0.5">{user.email}</p>}
           </div>
           <div className="flex gap-2 flex-wrap">
             <Link href="/profile">
               <Button variant="outline" size="sm" className="rounded-xl gap-1.5">
-                <User className="w-3.5 h-3.5" /> Edit Profile
+                <User className="w-3.5 h-3.5" /> {tKey("dashboard.editProfile")}
               </Button>
             </Link>
             <Button
               variant="ghost" size="sm" className="rounded-xl gap-1.5 text-muted-foreground"
               onClick={async () => { await signOut(); }}
             >
-              <LogOut className="w-3.5 h-3.5" /> Sign out
+              <LogOut className="w-3.5 h-3.5" /> {tKey("dashboard.signOut")}
             </Button>
           </div>
         </div>
@@ -103,14 +105,14 @@ export default function Dashboard() {
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.08 }}
         className="glass-panel rounded-3xl p-6 border border-border/40"
       >
-        <h2 className="text-sm font-700 text-muted-foreground uppercase tracking-wide mb-5">Today's Health</h2>
+        <h2 className="text-sm font-700 text-muted-foreground uppercase tracking-wide mb-5">{tKey("dashboard.todayHealth")}</h2>
         <div className="flex flex-col sm:flex-row items-center gap-8">
-          <ScoreRing score={todayEntry.score} />
+          <ScoreRing score={todayEntry.score} label={tKey("dashboard.healthScore")} />
           <div className="grid grid-cols-2 gap-3 flex-1 w-full">
-            <StatChip icon={Moon}      label="Sleep"   value={`${todayEntry.sleep}h`}                        color="text-indigo-400"  />
-            <StatChip icon={Droplets}  label="Water"   value={`${todayEntry.water} glasses`}                color="text-sky-400"     />
-            <StatChip icon={Footprints} label="Steps"  value={todayEntry.steps.toLocaleString("en-IN")}     color="text-emerald-400" />
-            <StatChip icon={Flame}     label="Workout" value={todayEntry.workout ? "Done ✓" : "Not yet"}    color="text-orange-400"  />
+            <StatChip icon={Moon}      label={tKey("dashboard.sleep")}   value={`${todayEntry.sleep}h`}                                            color="text-indigo-400"  />
+            <StatChip icon={Droplets}  label={tKey("dashboard.water")}   value={`${todayEntry.water} glasses`}                                       color="text-sky-400"     />
+            <StatChip icon={Footprints} label={tKey("dashboard.steps")}  value={todayEntry.steps.toLocaleString("en-IN")}                             color="text-emerald-400" />
+            <StatChip icon={Flame}     label={tKey("dashboard.workout")} value={todayEntry.workout ? tKey("dashboard.workoutDone") : tKey("dashboard.workoutNot")} color="text-orange-400"  />
           </div>
         </div>
       </motion.div>
@@ -119,17 +121,17 @@ export default function Dashboard() {
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.14 }}
         className="glass-panel rounded-3xl p-6 border border-border/40"
       >
-        <h2 className="text-sm font-700 text-muted-foreground uppercase tracking-wide mb-4">Current Streaks</h2>
+        <h2 className="text-sm font-700 text-muted-foreground uppercase tracking-wide mb-4">{tKey("dashboard.currentStreaks")}</h2>
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: "Exercise", days: streaks.exercise, icon: Flame,     color: "text-orange-400" },
-            { label: "Water",    days: streaks.water,    icon: Droplets,  color: "text-sky-400"    },
-            { label: "Sleep",    days: streaks.sleep,    icon: Moon,      color: "text-indigo-400" },
+            { label: tKey("dashboard.exerciseDays"), days: streaks.exercise, icon: Flame,     color: "text-orange-400" },
+            { label: tKey("dashboard.waterDays"),    days: streaks.water,    icon: Droplets,  color: "text-sky-400"    },
+            { label: tKey("dashboard.sleepDays"),    days: streaks.sleep,    icon: Moon,      color: "text-indigo-400" },
           ].map(({ label, days, icon: Icon, color }) => (
             <div key={label} className="bg-muted/20 rounded-2xl p-4 text-center">
               <Icon className={`w-6 h-6 ${color} mx-auto mb-1`} />
               <p className="text-2xl font-800 font-serif text-foreground">{days}</p>
-              <p className="text-xs text-muted-foreground">{label} days</p>
+              <p className="text-xs text-muted-foreground">{label}</p>
             </div>
           ))}
         </div>
@@ -141,10 +143,10 @@ export default function Dashboard() {
           className="glass-panel rounded-3xl p-6 border border-border/40"
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-700 text-muted-foreground uppercase tracking-wide">Recent Reports</h2>
+            <h2 className="text-sm font-700 text-muted-foreground uppercase tracking-wide">{tKey("dashboard.recentReports")}</h2>
             <Link href="/health-timeline">
               <span className="text-xs text-primary hover:text-primary/80 cursor-pointer flex items-center gap-0.5">
-                View all <ChevronRight className="w-3 h-3" />
+                {tKey("dashboard.viewAll")} <ChevronRight className="w-3 h-3" />
               </span>
             </Link>
           </div>
@@ -173,10 +175,10 @@ export default function Dashboard() {
           className="glass-panel rounded-3xl p-6 border border-border/40"
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-700 text-muted-foreground uppercase tracking-wide">Saved Articles</h2>
+            <h2 className="text-sm font-700 text-muted-foreground uppercase tracking-wide">{tKey("dashboard.savedArticles")}</h2>
             <Link href="/news">
               <span className="text-xs text-primary hover:text-primary/80 cursor-pointer flex items-center gap-0.5">
-                Browse news <ChevronRight className="w-3 h-3" />
+                {tKey("dashboard.browseNews")} <ChevronRight className="w-3 h-3" />
               </span>
             </Link>
           </div>
@@ -204,19 +206,19 @@ export default function Dashboard() {
           className="glass-panel rounded-3xl p-6 border border-border/40"
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-700 text-muted-foreground uppercase tracking-wide">Health Profile</h2>
+            <h2 className="text-sm font-700 text-muted-foreground uppercase tracking-wide">{tKey("dashboard.healthProfile")}</h2>
             <Link href="/profile">
               <span className="text-xs text-primary hover:text-primary/80 cursor-pointer flex items-center gap-0.5">
-                Edit <ChevronRight className="w-3 h-3" />
+                {tKey("dashboard.edit")} <ChevronRight className="w-3 h-3" />
               </span>
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {profile.age       && <div className="bg-muted/20 rounded-2xl px-4 py-3"><p className="text-xs text-muted-foreground">Age</p><p className="text-sm font-600 text-foreground">{profile.age} yrs</p></div>}
-            {profile.gender    && <div className="bg-muted/20 rounded-2xl px-4 py-3"><p className="text-xs text-muted-foreground">Gender</p><p className="text-sm font-600 text-foreground capitalize">{profile.gender}</p></div>}
-            {profile.blood_group && <div className="bg-muted/20 rounded-2xl px-4 py-3"><p className="text-xs text-muted-foreground">Blood Group</p><p className="text-sm font-600 text-foreground">{profile.blood_group}</p></div>}
-            {profile.city      && <div className="bg-muted/20 rounded-2xl px-4 py-3"><p className="text-xs text-muted-foreground">City</p><p className="text-sm font-600 text-foreground">{profile.city}</p></div>}
-            {profile.allergies && <div className="bg-muted/20 rounded-2xl px-4 py-3 col-span-2"><p className="text-xs text-muted-foreground">Allergies</p><p className="text-sm font-600 text-foreground">{profile.allergies}</p></div>}
+            {profile.age       && <div className="bg-muted/20 rounded-2xl px-4 py-3"><p className="text-xs text-muted-foreground">{tKey("dashboard.age")}</p><p className="text-sm font-600 text-foreground">{profile.age} {tKey("dashboard.years")}</p></div>}
+            {profile.gender    && <div className="bg-muted/20 rounded-2xl px-4 py-3"><p className="text-xs text-muted-foreground">{tKey("dashboard.gender")}</p><p className="text-sm font-600 text-foreground capitalize">{profile.gender}</p></div>}
+            {profile.blood_group && <div className="bg-muted/20 rounded-2xl px-4 py-3"><p className="text-xs text-muted-foreground">{tKey("dashboard.bloodGroup")}</p><p className="text-sm font-600 text-foreground">{profile.blood_group}</p></div>}
+            {profile.city      && <div className="bg-muted/20 rounded-2xl px-4 py-3"><p className="text-xs text-muted-foreground">{tKey("dashboard.city")}</p><p className="text-sm font-600 text-foreground">{profile.city}</p></div>}
+            {profile.allergies && <div className="bg-muted/20 rounded-2xl px-4 py-3 col-span-2"><p className="text-xs text-muted-foreground">{tKey("dashboard.allergies")}</p><p className="text-sm font-600 text-foreground">{profile.allergies}</p></div>}
           </div>
         </motion.div>
       )}
@@ -225,7 +227,7 @@ export default function Dashboard() {
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.38 }}
         className="glass-panel rounded-3xl p-6 border border-border/40"
       >
-        <h2 className="text-sm font-700 text-muted-foreground uppercase tracking-wide mb-4">Quick Access</h2>
+        <h2 className="text-sm font-700 text-muted-foreground uppercase tracking-wide mb-4">{tKey("dashboard.quickAccess")}</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {QUICK_LINKS.map(({ href, icon: Icon, label, color }) => (
             <Link key={href} href={href}>

@@ -11,6 +11,7 @@ import PageMeta from "@/components/page-meta";
 import { useAuth } from "@/contexts/auth-context";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { Paywall } from "@/components/paywall";
+import { useLanguage } from "@/contexts/language-context";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -52,13 +53,6 @@ interface VaultReportDetail extends VaultReport {
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const ASSESSMENT_CONFIG: Record<string, { label: string; color: string; bg: string; border: string; icon: typeof CheckCircle }> = {
-  requires_urgent_attention: { label: "Urgent Attention",   color: "text-red-400",     bg: "bg-red-500/10",     border: "border-red-500/30",     icon: AlertTriangle },
-  needs_follow_up:           { label: "Follow Up",          color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30",   icon: Info          },
-  routine_monitoring:        { label: "Routine Monitoring", color: "text-sky-400",     bg: "bg-sky-500/10",     border: "border-sky-500/30",     icon: Info          },
-  all_clear:                 { label: "All Clear",          color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30", icon: CheckCircle   },
-};
-
 const REPORT_TYPE_LABELS: Record<string, string> = {
   cbc:     "CBC",
   thyroid: "Thyroid",
@@ -68,24 +62,24 @@ const REPORT_TYPE_LABELS: Record<string, string> = {
   other:   "Lab",
 };
 
-const RELATION_LABELS: Record<string, string> = {
-  self: "Myself", parent: "Parent", spouse: "Spouse", child: "Child", other: "Family",
-};
-
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function ReportCard({ report, token, isPremium, isLocked }: {
+type AssessmentConfig = Record<string, { label: string; color: string; bg: string; border: string; icon: typeof CheckCircle }>;
+
+function ReportCard({ report, token, isPremium, isLocked, assessmentConfig, tKey }: {
   report: VaultReport;
   token: string;
   isPremium: boolean;
   isLocked: boolean;
+  assessmentConfig: AssessmentConfig;
+  tKey: (key: string) => string;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const assessment = ASSESSMENT_CONFIG[report.overall_assessment ?? ""] ?? null;
+  const assessment = assessmentConfig[report.overall_assessment ?? ""] ?? null;
   const AssessIcon = assessment?.icon ?? Info;
 
   const { data: detail, isFetching } = useQuery<{ report: VaultReportDetail }>({
@@ -132,7 +126,7 @@ function ReportCard({ report, token, isPremium, isLocked }: {
             )}
             {isLocked && (
               <span className="text-[10px] font-700 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30">
-                Premium only
+                {tKey("vault.premiumOnly")}
               </span>
             )}
           </div>
@@ -173,7 +167,7 @@ function ReportCard({ report, token, isPremium, isLocked }: {
 
                   {abnormalValues.length > 0 && (
                     <div>
-                      <p className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-2">Abnormal values</p>
+                      <p className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-2">{tKey("vault.abnormalValues")}</p>
                       <div className="space-y-1.5">
                         {abnormalValues.map(v => (
                           <div key={v.id} className="flex items-center justify-between text-sm">
@@ -192,7 +186,7 @@ function ReportCard({ report, token, isPremium, isLocked }: {
 
                   {detail.report.ai_explanation_json?.doctorQuestions && detail.report.ai_explanation_json.doctorQuestions.length > 0 && (
                     <div>
-                      <p className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-2">Ask your doctor</p>
+                      <p className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-2">{tKey("vault.askDoctor")}</p>
                       <ul className="space-y-1">
                         {detail.report.ai_explanation_json.doctorQuestions.slice(0, 3).map((q, i) => (
                           <li key={i} className="text-xs text-muted-foreground flex gap-2">
@@ -204,7 +198,7 @@ function ReportCard({ report, token, isPremium, isLocked }: {
                   )}
 
                   <p className="text-[10px] text-muted-foreground/60 leading-relaxed">
-                    Educational only. Always discuss results with your doctor. Never a diagnosis.
+                    {tKey("vault.disclaimer")}
                   </p>
                 </>
               )}
@@ -216,10 +210,11 @@ function ReportCard({ report, token, isPremium, isLocked }: {
   );
 }
 
-function AddProfileModal({ token, onCreated, onClose }: {
+function AddProfileModal({ token, onCreated, onClose, tKey }: {
   token: string;
   onCreated: () => void;
   onClose: () => void;
+  tKey: (key: string) => string;
 }) {
   const [name, setName] = useState("");
   const [relation, setRelation] = useState("parent");
@@ -256,28 +251,28 @@ function AddProfileModal({ token, onCreated, onClose }: {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm glass-panel rounded-2xl p-6 border border-border/40"
       >
-        <h2 className="font-serif font-700 text-foreground text-lg mb-4">Add Family Member</h2>
+        <h2 className="font-serif font-700 text-foreground text-lg mb-4">{tKey("vault.addFamilyMember")}</h2>
         <form onSubmit={submit} className="space-y-3">
           <div>
-            <label className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-1.5 block">Name</label>
+            <label className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-1.5 block">{tKey("vault.name")}</label>
             <input
               value={name}
               onChange={e => setName(e.target.value)}
-              placeholder="e.g., Maa, Papa, Priya"
+              placeholder={tKey("vault.namePlaceholder")}
               className="w-full bg-muted/20 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50 transition-colors"
             />
           </div>
           <div>
-            <label className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-1.5 block">Relation</label>
+            <label className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-1.5 block">{tKey("vault.relation")}</label>
             <select
               value={relation}
               onChange={e => setRelation(e.target.value)}
               className="w-full bg-muted/20 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary/50 transition-colors"
             >
-              <option value="parent">Parent</option>
-              <option value="spouse">Spouse</option>
-              <option value="child">Child</option>
-              <option value="other">Other</option>
+              <option value="parent">{tKey("vault.relationParent")}</option>
+              <option value="spouse">{tKey("vault.relationSpouse")}</option>
+              <option value="child">{tKey("vault.relationChild")}</option>
+              <option value="other">{tKey("vault.relationOther")}</option>
             </select>
           </div>
           {error && (
@@ -288,11 +283,11 @@ function AddProfileModal({ token, onCreated, onClose }: {
           )}
           <div className="flex gap-2 pt-1">
             <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl text-sm font-600 bg-muted/30 text-muted-foreground hover:bg-muted/50 transition-colors border border-border/40">
-              Cancel
+              {tKey("vault.cancel")}
             </button>
             <button type="submit" disabled={loading} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-700 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-60">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              {loading ? "Adding…" : "Add"}
+              {loading ? tKey("vault.adding") : tKey("vault.add")}
             </button>
           </div>
         </form>
@@ -307,8 +302,21 @@ export default function VaultPage() {
   const { user, session }            = useAuth();
   const { tier, isPremium, isLoading: entitlementLoading } = useEntitlement();
   const [, navigate] = useLocation();
+  const { tKey } = useLanguage();
   const token = session?.access_token ?? "";
   const [showFamilyPaywall, setShowFamilyPaywall] = useState(false);
+
+  const ASSESSMENT_CONFIG: AssessmentConfig = {
+    requires_urgent_attention: { label: tKey("vault.assessmentUrgent"),   color: "text-red-400",     bg: "bg-red-500/10",     border: "border-red-500/30",     icon: AlertTriangle },
+    needs_follow_up:           { label: tKey("vault.assessmentFollowUp"), color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30",   icon: Info          },
+    routine_monitoring:        { label: tKey("vault.assessmentRoutine"),  color: "text-sky-400",     bg: "bg-sky-500/10",     border: "border-sky-500/30",     icon: Info          },
+    all_clear:                 { label: tKey("vault.assessmentClear"),    color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30", icon: CheckCircle   },
+  };
+
+  const RELATION_LABELS: Record<string, string> = {
+    self: tKey("vault.relationSelf"), parent: tKey("vault.relationParent"),
+    spouse: tKey("vault.relationSpouse"), child: tKey("vault.relationChild"), other: tKey("vault.relationOther"),
+  };
 
   const [activeProfileId, setActiveProfileId] = useState<string | null>(null);
   const [showAddProfile, setShowAddProfile] = useState(false);
@@ -369,7 +377,7 @@ export default function VaultPage() {
         path="/vault"
       />
 
-      <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
+      <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> {tKey("vault.home")}</span></Link>
 
       {/* Header */}
       <div className="flex items-start gap-4 mb-8">
@@ -377,8 +385,8 @@ export default function VaultPage() {
           <Archive className="w-6 h-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-serif font-800 text-foreground leading-tight">Health Vault</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Your saved report analyses, all in one place.</p>
+          <h1 className="text-2xl sm:text-3xl font-serif font-800 text-foreground leading-tight">{tKey("vault.title")}</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">{tKey("vault.subtitle")}</p>
         </div>
       </div>
 
@@ -404,14 +412,14 @@ export default function VaultPage() {
             onClick={() => setShowAddProfile(true)}
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-600 border border-dashed border-border/50 text-muted-foreground hover:border-primary/40 hover:text-primary transition-all"
           >
-            <Plus className="w-3.5 h-3.5" /> Add
+            <Plus className="w-3.5 h-3.5" /> {tKey("vault.add")}
           </button>
         ) : (
           <button
             onClick={() => setShowFamilyPaywall(true)}
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-600 border border-dashed border-amber-500/40 text-amber-500 hover:bg-amber-500/5 transition-all"
           >
-            <Star className="w-3.5 h-3.5" /> Add Family
+            <Star className="w-3.5 h-3.5" /> {tKey("vault.addFamily")}
           </button>
         )}
       </div>
@@ -432,13 +440,13 @@ export default function VaultPage() {
           <div className="w-14 h-14 rounded-2xl bg-muted/30 flex items-center justify-center mx-auto mb-4">
             <FileText className="w-7 h-7 text-muted-foreground/50" />
           </div>
-          <h2 className="font-700 text-foreground text-base mb-2">No saved reports yet</h2>
+          <h2 className="font-700 text-foreground text-base mb-2">{tKey("vault.noReports")}</h2>
           <p className="text-sm text-muted-foreground mb-5 max-w-xs mx-auto">
-            Analyse a blood report and it will be automatically saved here for future reference.
+            {tKey("vault.noReportsDesc")}
           </p>
           <Link href="/report-explainer">
             <button className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-700 hover:bg-primary/90 transition-colors">
-              <Activity className="w-4 h-4" /> Analyse a Report
+              <Activity className="w-4 h-4" /> {tKey("vault.analyseReport")}
             </button>
           </Link>
         </div>
@@ -451,6 +459,8 @@ export default function VaultPage() {
               token={token}
               isPremium={isPremium}
               isLocked={false}
+              assessmentConfig={ASSESSMENT_CONFIG}
+              tKey={tKey}
             />
           ))}
 
@@ -463,7 +473,7 @@ export default function VaultPage() {
           {!isPremium && lockedCount === 0 && reports.length > 0 && (
             <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/20 border border-border/30 text-xs text-muted-foreground">
               <Info className="w-4 h-4 flex-shrink-0 text-muted-foreground/60" />
-              Free plan: only your most recent report is kept. <Link href="/premium"><span className="text-primary font-600 hover:underline ml-1">Upgrade for unlimited history →</span></Link>
+              {tKey("vault.freePlanNotice")} <Link href="/premium"><span className="text-primary font-600 hover:underline ml-1">{tKey("vault.upgradeHistory")}</span></Link>
             </div>
           )}
         </div>
@@ -477,7 +487,7 @@ export default function VaultPage() {
       )}
 
       <p className="text-[10px] text-muted-foreground/60 text-center mt-6 leading-relaxed px-4">
-        Educational only. All analyses are AI-generated — always discuss with your doctor. Never a diagnosis or prescription.
+        {tKey("vault.disclaimer")}
       </p>
 
       {/* Add profile modal (premium users only) */}
@@ -490,6 +500,7 @@ export default function VaultPage() {
             refetchReports();
           }}
           onClose={() => setShowAddProfile(false)}
+          tKey={tKey}
         />
       )}
 
@@ -510,7 +521,7 @@ export default function VaultPage() {
               onClick={() => setShowFamilyPaywall(false)}
               className="w-full mt-2 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              Maybe later
+              {tKey("vault.maybeLater")}
             </button>
           </motion.div>
         </div>

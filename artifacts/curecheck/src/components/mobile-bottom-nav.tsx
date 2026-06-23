@@ -3,14 +3,16 @@ import { motion } from "framer-motion";
 import { Home, Compass, Search, Clock, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLanguage } from "@/contexts/language-context";
 import ExploreSheet from "./explore-sheet";
 import SearchOverlay from "./search-overlay";
 
 export default function MobileBottomNav() {
   const [location] = useLocation();
   const { user } = useAuth();
+  const { tKey } = useLanguage();
   const [exploreOpen, setExploreOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchOpen, setSearchOpen]   = useState(false);
 
   useEffect(() => {
     setExploreOpen(false);
@@ -31,17 +33,15 @@ export default function MobileBottomNav() {
         className="lg:hidden fixed bottom-0 left-0 right-0 z-50"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        {/* Outer wrapper gives room for the raised Search button to breathe above */}
         <div className="mx-2 mb-2">
           <div
             className="relative bg-background/88 backdrop-blur-2xl border border-border/50 rounded-2xl shadow-2xl"
             style={{ overflow: "visible" }}
           >
-            {/* 5-column grid — perfectly equal widths */}
             <div className="grid grid-cols-5 h-[58px]">
 
               {/* 1 — Home */}
-              <NavTab href="/" label="Home" icon={Home} active={isActive("/")} />
+              <NavTab href="/" label={tKey("nav.home")} icon={Home} active={isActive("/")} />
 
               {/* 2 — Explore */}
               <button
@@ -59,8 +59,8 @@ export default function MobileBottomNav() {
                   className={`w-[19px] h-[19px] relative z-10 transition-colors ${exploreOpen ? "text-primary" : "text-muted-foreground"}`}
                   strokeWidth={exploreOpen ? 2.2 : 1.8}
                 />
-                <span className={`text-[10px] font-600 relative z-10 transition-colors leading-none ${exploreOpen ? "text-primary" : "text-muted-foreground"}`}>
-                  Explore
+                <span className={`bottom-nav-label text-[10px] font-600 relative z-10 transition-colors leading-none ${exploreOpen ? "text-primary" : "text-muted-foreground"}`}>
+                  {tKey("nav.explore")}
                 </span>
               </button>
 
@@ -69,7 +69,7 @@ export default function MobileBottomNav() {
                 <motion.button
                   onClick={() => setSearchOpen(v => !v)}
                   whileTap={{ scale: 0.88 }}
-                  aria-label="Search"
+                  aria-label={tKey("nav.search")}
                   className="absolute w-[50px] h-[50px] rounded-full bg-primary text-primary-foreground flex items-center justify-center"
                   style={{
                     top: "-16px",
@@ -78,18 +78,18 @@ export default function MobileBottomNav() {
                 >
                   <Search className="w-[20px] h-[20px]" strokeWidth={2.2} />
                 </motion.button>
-                <span className={`text-[10px] font-600 leading-none transition-colors ${searchOpen ? "text-primary" : "text-muted-foreground"}`}>
-                  Search
+                <span className={`bottom-nav-label text-[10px] font-600 leading-none transition-colors ${searchOpen ? "text-primary" : "text-muted-foreground"}`}>
+                  {tKey("nav.search")}
                 </span>
               </div>
 
               {/* 4 — History */}
-              <NavTab href="/history" label="History" icon={Clock} active={isActive("/history")} />
+              <NavTab href="/history" label={tKey("nav.history")} icon={Clock} active={isActive("/history")} />
 
               {/* 5 — Profile */}
               <NavTab
                 href={user ? "/profile" : "/login"}
-                label="Profile"
+                label={tKey("nav.profile")}
                 icon={User}
                 active={isActive("/profile") || isActive("/login")}
               />
@@ -108,9 +108,9 @@ function NavTab({
   icon: Icon,
   active,
 }: {
-  href: string;
-  label: string;
-  icon: React.ElementType;
+  href:   string;
+  label:  string;
+  icon:   React.ElementType;
   active: boolean;
 }) {
   return (
@@ -131,7 +131,7 @@ function NavTab({
           className={`w-[19px] h-[19px] relative z-10 transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}
           strokeWidth={active ? 2.2 : 1.8}
         />
-        <span className={`text-[10px] font-600 relative z-10 leading-none transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}>
+        <span className={`bottom-nav-label text-[10px] font-600 relative z-10 leading-none transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}>
           {label}
         </span>
       </motion.div>

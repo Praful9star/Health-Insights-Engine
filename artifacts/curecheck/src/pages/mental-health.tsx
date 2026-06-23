@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
 import PageMeta from "@/components/page-meta";
 import { ChevronLeft, Phone, Brain, Wind, Heart } from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
 
 const HELPLINES = [
   { name: "iCall (TISS)", number: "9152987821", hours: "Mon–Sat, 8am–10pm", color: "text-primary", bg: "bg-primary/10" },
@@ -53,6 +54,7 @@ const SELF_CARE = [
 export default function MentalHealth() {
   const [mood, setMood] = useState<number | null>(null);
   const [openTech, setOpenTech] = useState<string | null>(null);
+  const { tKey } = useLanguage();
 
   return (
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12 space-y-10">
@@ -62,13 +64,13 @@ export default function MentalHealth() {
         path="/mental-health"
       />
       <div>
-        <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
+        <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> {tKey("common.home")}</span></Link>
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-2xl bg-violet-500/15 flex items-center justify-center flex-shrink-0"><Brain className="w-6 h-6 text-violet-400" /></div>
           <div>
             <span className="mono-label text-violet-400/80 mb-1 block">Mental Wellbeing</span>
-            <h1 className="text-2xl sm:text-3xl font-serif font-800 text-foreground">Mental Health Hub</h1>
-            <p className="text-sm text-muted-foreground mt-1">Helplines, grounding techniques, and daily self-care for your mind.</p>
+            <h1 className="text-2xl sm:text-3xl font-serif font-800 text-foreground">{tKey("mentalHealth.title")}</h1>
+            <p className="text-sm text-muted-foreground mt-1">{tKey("mentalHealth.subtitle")}</p>
           </div>
         </div>
       </div>
@@ -99,7 +101,7 @@ export default function MentalHealth() {
 
       {/* Helplines */}
       <div>
-        <h2 className="text-base font-serif font-700 text-foreground mb-3 flex items-center gap-2"><Phone className="w-4 h-4 text-violet-400" /> Indian Mental Health Helplines</h2>
+        <h2 className="text-base font-serif font-700 text-foreground mb-3 flex items-center gap-2"><Phone className="w-4 h-4 text-violet-400" /> {tKey("mentalHealth.crisis")}</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
           {HELPLINES.map(h => (
             <a key={h.name} href={`tel:${h.number.replace(/\D/g, "")}`}
@@ -158,7 +160,7 @@ export default function MentalHealth() {
         </div>
       </div>
 
-      <p className="text-xs text-muted-foreground text-center">This page provides information only, not clinical diagnosis or treatment. Please consult a mental health professional.</p>
+      <p className="text-xs text-muted-foreground text-center">{tKey("mentalHealth.disclaimer")}</p>
     </div>
   );
 }

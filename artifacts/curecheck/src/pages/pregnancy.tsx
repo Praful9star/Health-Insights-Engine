@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { ChevronLeft, Baby } from "lucide-react";
 import PageMeta from "@/components/page-meta";
+import { useLanguage } from "@/contexts/language-context";
 
 type Trimester = 1 | 2 | 3;
 
@@ -52,6 +53,7 @@ export default function Pregnancy() {
   const [selWeek, setSelWeek] = useState<number>(4);
   const [tab, setTab] = useState<"tracker" | "anc" | "danger">("tracker");
   const data = WEEKS[selWeek];
+  const { tKey } = useLanguage();
 
   return (
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12">
@@ -60,14 +62,14 @@ export default function Pregnancy() {
         description="Week-by-week pregnancy guidance for Indian mothers — nutrition, ANC tests, warning signs, and questions to ask your doctor. Free tracker."
         path="/pregnancy"
       />
-      <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
+      <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> {tKey("common.home")}</span></Link>
 
       <div className="flex items-start gap-4 mb-7">
         <div className="w-12 h-12 rounded-2xl bg-pink-500/15 flex items-center justify-center flex-shrink-0"><Baby className="w-6 h-6 text-pink-400" /></div>
         <div>
           <span className="mono-label text-pink-400/80 mb-1 block">Maternity</span>
-          <h1 className="text-2xl sm:text-3xl font-serif font-800 text-foreground">Pregnancy Tracker</h1>
-          <p className="text-sm text-muted-foreground mt-1">Week-by-week guide, ANC schedule, and danger signs for Indian mothers.</p>
+          <h1 className="text-2xl sm:text-3xl font-serif font-800 text-foreground">{tKey("pregnancy.title")}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{tKey("pregnancy.subtitle")}</p>
         </div>
       </div>
 
@@ -160,7 +162,7 @@ export default function Pregnancy() {
         </div>
       )}
 
-      <p className="text-xs text-muted-foreground text-center mt-6">This guide is educational only. Always follow advice from your obstetrician or gynecologist.</p>
+      <p className="text-xs text-muted-foreground text-center mt-6">{tKey("pregnancy.disclaimer")}</p>
     </div>
   );
 }
