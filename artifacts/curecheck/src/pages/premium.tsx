@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { ChevronLeft, Check, Zap, Shield, Brain, FileText, Pill, Activity, Star, Loader2, AlertCircle, BadgeCheck } from "lucide-react";
+import { ChevronLeft, Check, Zap, Shield, Brain, FileText, Pill, Activity, Star, Loader2, AlertCircle, BadgeCheck, Users, Link2, Clock } from "lucide-react";
 import PageMeta from "@/components/page-meta";
 import { useAuth } from "@/contexts/auth-context";
 import { useInvalidateEntitlement } from "@/hooks/useEntitlement";
@@ -20,9 +20,11 @@ const PREMIUM_FEATURES = [
   { icon: Pill,     label: "Unlimited drug interaction checker" },
   { icon: FileText, label: "AI doctor visit prep — unlimited" },
   { icon: Shield,   label: "Priority Claude AI — faster, more detailed responses" },
-  { icon: Zap,      label: "Report PDF export & WhatsApp share" },
-  { icon: Star,     label: "Save unlimited reports to your personal dashboard" },
-  { icon: Activity, label: "Disease journey maps — all conditions" },
+  { icon: Star,     label: "Save unlimited reports + full history in Health Vault" },
+  { icon: Users,    label: "Family health profiles — track reports for up to 5 members" },
+  { icon: Zap,      label: "Report PDF export & WhatsApp share", comingSoon: true },
+  { icon: Activity, label: "Health trend alerts for 40+ blood markers", comingSoon: true },
+  { icon: Link2,    label: "ABHA health record auto-sync", comingSoon: true },
 ];
 
 const FAQS = [
@@ -153,9 +155,14 @@ export default function Premium() {
           <p className="text-xs font-700 text-primary/80 uppercase tracking-wider mb-4">Your Premium features</p>
           <ul className="space-y-2.5">
             {PREMIUM_FEATURES.map((f, i) => (
-              <li key={i} className="flex gap-2.5 items-start text-sm text-foreground">
-                <f.icon className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                {f.label}
+              <li key={i} className={`flex gap-2.5 items-start text-sm ${f.comingSoon ? "text-muted-foreground/70" : "text-foreground"}`}>
+                <f.icon className={`w-4 h-4 flex-shrink-0 mt-0.5 ${f.comingSoon ? "text-muted-foreground/40" : "text-primary"}`} />
+                <span className="flex-1">{f.label}</span>
+                {f.comingSoon && (
+                  <span className="inline-flex items-center gap-1 text-[9px] font-700 uppercase tracking-wide bg-muted/40 text-muted-foreground/60 border border-border/40 px-1.5 py-0.5 rounded-full flex-shrink-0 mt-0.5">
+                    <Clock className="w-2.5 h-2.5" /> Soon
+                  </span>
+                )}
               </li>
             ))}
           </ul>
@@ -257,9 +264,14 @@ export default function Premium() {
           </div>
           <ul className="space-y-2.5 flex-1 mb-6">
             {PREMIUM_FEATURES.map((f, i) => (
-              <li key={i} className="flex gap-2.5 items-start text-sm text-foreground">
-                <f.icon className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                {f.label}
+              <li key={i} className={`flex gap-2.5 items-start text-sm ${f.comingSoon ? "text-muted-foreground/70" : "text-foreground"}`}>
+                <f.icon className={`w-4 h-4 flex-shrink-0 mt-0.5 ${f.comingSoon ? "text-muted-foreground/40" : "text-primary"}`} />
+                <span className="flex-1">{f.label}</span>
+                {f.comingSoon && (
+                  <span className="inline-flex items-center gap-1 text-[9px] font-700 uppercase tracking-wide bg-muted/40 text-muted-foreground/60 border border-border/40 px-1.5 py-0.5 rounded-full flex-shrink-0 mt-0.5">
+                    <Clock className="w-2.5 h-2.5" /> Soon
+                  </span>
+                )}
               </li>
             ))}
           </ul>

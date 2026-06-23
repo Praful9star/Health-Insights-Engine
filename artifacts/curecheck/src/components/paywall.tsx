@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import {
   Archive, Users, TrendingUp, Download, Link2,
-  Star, Lock, Loader2, ArrowRight, AlertCircle,
+  Star, Lock, Loader2, ArrowRight, AlertCircle, Clock,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { useEntitlement } from "@/hooks/useEntitlement";
@@ -23,6 +23,7 @@ const FEATURE_COPY: Record<GatedFeature, {
   free_limit:     string;
   premium_unlock: string;
   icon:           React.ComponentType<{ className?: string }>;
+  comingSoon?:    boolean;
 }> = {
   vault_history: {
     title:          "Full Report History",
@@ -44,6 +45,7 @@ const FEATURE_COPY: Record<GatedFeature, {
     free_limit:     "Manual review only",
     premium_unlock: "Automated alerts for 40+ blood markers",
     icon:           TrendingUp,
+    comingSoon:     true,
   },
   pdf_export: {
     title:          "Export Reports as PDF",
@@ -51,6 +53,7 @@ const FEATURE_COPY: Record<GatedFeature, {
     free_limit:     "Screen view only",
     premium_unlock: "One-tap PDF export, ready to share with your doctor",
     icon:           Download,
+    comingSoon:     true,
   },
   abha_sync: {
     title:          "ABHA Health Record Sync",
@@ -58,6 +61,7 @@ const FEATURE_COPY: Record<GatedFeature, {
     free_limit:     "Manual report entry only",
     premium_unlock: "Auto-sync from the government ABHA registry",
     icon:           Link2,
+    comingSoon:     true,
   },
 };
 
@@ -75,6 +79,29 @@ export function Paywall({ feature, compact = false }: PaywallProps) {
   const Icon                    = copy.icon;
   const [loading, setLoading]   = useState<"monthly" | "annual" | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
+
+  const pad = compact ? "p-4" : "p-6";
+
+  // ── Coming Soon ──
+  if (copy.comingSoon) {
+    return (
+      <div className={`glass-panel rounded-2xl border border-border/30 bg-muted/10 ${pad}`}>
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-muted/30 flex items-center justify-center flex-shrink-0">
+            <Icon className="w-5 h-5 text-muted-foreground/60" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <Clock className="w-3 h-3 text-muted-foreground/60 flex-shrink-0" />
+              <span className="text-[10px] font-700 uppercase tracking-wider text-muted-foreground/60">Coming Soon</span>
+            </div>
+            <p className="font-700 text-muted-foreground text-sm leading-snug">{copy.title}</p>
+            <p className="text-xs text-muted-foreground/60 mt-0.5 leading-relaxed">{copy.pitch}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   async function handleUpgrade(plan: "monthly" | "annual") {
     if (!user || !session) return;
@@ -97,8 +124,6 @@ export function Paywall({ feature, compact = false }: PaywallProps) {
       setLoading(null);
     }
   }
-
-  const pad = compact ? "p-4" : "p-6";
 
   // ── Not signed in ──
   if (!user) {
@@ -222,11 +247,15 @@ interface GatedProps {
 /**
  * Renders children when the user holds a premium entitlement.
  * Falls back to <Paywall> for signed-in free users.
- * Fails open (renders children) while loading or for anonymous users.
+ * Fails open (renders children) while loading, for anonymous users,
+ * and for any coming-soon feature that isn't built yet.
  */
 export function Gated({ feature, children, compact }: GatedProps) {
   const { tier, isLoading } = useEntitlement();
   const { user }            = useAuth();
+
+  // Fail open: coming-soon features have nothing to gate yet
+  if (FEATURE_COPY[feature].comingSoon) return <>{children}</>;
 
   // Fail open: anonymous users see the free experience; loading never blocks
   if (isLoading || !user || tier !== "free") return <>{children}</>;
