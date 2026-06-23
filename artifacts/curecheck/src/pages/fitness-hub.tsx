@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import PageMeta from "@/components/page-meta";
 import {
@@ -479,9 +480,9 @@ function ProfileModal({
     { id: "active",    label: { en: "Active",       hi: "Active"      }, desc: { en: "Hard training 6–7×/week",    hi: "6–7×/week कठिन training" }        },
   ];
 
-  return (
+  return createPortal(
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background backdrop-blur-sm"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-background/95 backdrop-blur-sm"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
     >
       <motion.div
@@ -590,7 +591,8 @@ function ProfileModal({
           </Button>
         </div>
       </motion.div>
-    </motion.div>
+    </motion.div>,
+    document.body
   );
 }
 
