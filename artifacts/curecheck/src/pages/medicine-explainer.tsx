@@ -212,7 +212,7 @@ export default function MedicineExplainer() {
               </Card>
 
               {/* How to take */}
-              {result.howToTake && (
+              {result.bestTimeTake && (
                 <Card>
                   <CardHeader className="pb-2 pt-4">
                     <CardTitle className="text-base flex items-center gap-2">
@@ -220,13 +220,13 @@ export default function MedicineExplainer() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <p className="text-sm text-muted-foreground leading-relaxed">{result.howToTake}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{result.bestTimeTake}</p>
                   </CardContent>
                 </Card>
               )}
 
               {/* Side effects */}
-              {result.sideEffects && result.sideEffects.length > 0 && (
+              {result.commonSideEffects && result.commonSideEffects.length > 0 && (
                 <Card>
                   <CardHeader className="pb-2 pt-4">
                     <CardTitle className="text-base flex items-center gap-2">
@@ -234,7 +234,7 @@ export default function MedicineExplainer() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0 space-y-2">
-                    {result.sideEffects.map((se, i) => {
+                    {result.commonSideEffects.map((se, i) => {
                       const cfg = FREQ_CONFIG[se.frequency as keyof typeof FREQ_CONFIG] ?? FREQ_CONFIG.common;
                       return (
                         <div key={i} className="flex items-start gap-3 p-2.5 rounded-lg bg-muted/30">
@@ -290,7 +290,7 @@ export default function MedicineExplainer() {
               )}
 
               {/* Questions for doctor */}
-              {result.questionsForDoctor && result.questionsForDoctor.length > 0 && (
+              {result.pharmacistQuestions && result.pharmacistQuestions.length > 0 && (
                 <Card>
                   <CardHeader className="pb-2 pt-4">
                     <CardTitle className="text-base flex items-center gap-2">
@@ -299,7 +299,7 @@ export default function MedicineExplainer() {
                   </CardHeader>
                   <CardContent className="pt-0">
                     <ul className="space-y-2">
-                      {result.questionsForDoctor.map((q, i) => (
+                      {result.pharmacistQuestions.map((q, i) => (
                         <li key={i} className="flex gap-2 text-sm text-muted-foreground">
                           <span className="text-primary flex-shrink-0 font-700">{i + 1}.</span> {q}
                         </li>

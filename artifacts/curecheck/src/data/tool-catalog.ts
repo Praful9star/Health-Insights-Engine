@@ -2,7 +2,7 @@ import {
   FileSearch, Pill, Stethoscope, Activity, FlaskConical,
   Dumbbell, Clock, Calculator, TrendingUp, Wind,
   MapPin, Syringe, Leaf, Shield, Baby,
-  PhoneCall, Brain, Newspaper, BookOpen,
+  PhoneCall, Brain, Newspaper, BookOpen, CalendarDays,
 } from "lucide-react";
 import type { ElementType } from "react";
 
@@ -52,6 +52,7 @@ export const TOOL_CATEGORIES: ToolCategory[] = [
       { href: "/calculators", icon: Calculator, en: "Health Calculators", hi: "कैलकुलेटर", desc: { en: "BMI, ideal weight, calorie needs and other health numbers", hi: "BMI, वजन, कैलोरी और अन्य स्वास्थ्य संख्याएं" }, accent: "text-teal-400", bg: "bg-teal-500/10", keywords: ["bmi", "body mass index", "calorie calculator", "ideal weight", "calorie need", "water intake", "heart rate", "calculate", "overweight", "obesity", "tdee", "calories per day"] },
       { href: "/myth-buster", icon: TrendingUp, en: "Myth Buster", hi: "मिथक बस्टर", desc: { en: "Bust common health myths with real science", hi: "आम स्वास्थ्य मिथकों को विज्ञान से तोड़ें" }, accent: "text-rose-400", bg: "bg-rose-500/10", keywords: ["myth", "turmeric cure", "giloy", "home remedy", "ayurveda myth", "health myth", "science", "fact", "debunk", "is it true", "misconception", "old wives tale", "popular belief"] },
       { href: "/weather", icon: Wind, en: "Weather & Health", hi: "मौसम", desc: { en: "Health tips personalised to today's weather and air quality", hi: "आज के मौसम के अनुसार स्वास्थ्य सुझाव" }, accent: "text-sky-400", bg: "bg-sky-500/10", keywords: ["air quality", "aqi", "pollution", "weather health", "pollen", "humidity", "heat", "monsoon health", "smog", "cold weather", "hot weather", "season", "dust allergy"] },
+      { href: "/cycle-tracker", icon: CalendarDays, en: "Cycle Tracker", hi: "साइकिल ट्रैकर", desc: { en: "Log periods, track symptoms and get personalised cycle predictions", hi: "पीरियड लॉग करें और साइकिल का अनुमान पाएं" }, accent: "text-primary", bg: "bg-primary/10", keywords: ["period", "menstrual", "cycle", "menstruation", "period tracker", "ovulation", "fertile", "fertility", "periods", "irregular periods", "pcos", "pcod", "reproductive health", "women health", "cycle tracker", "period calendar", "period log", "period date", "next period"] },
     ],
   },
   {

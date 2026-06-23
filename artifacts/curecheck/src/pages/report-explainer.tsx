@@ -4,6 +4,7 @@ import { Link, useLocation } from "wouter";
 import PageMeta from "@/components/page-meta";
 import { useExplainMedicalReport, useOcrReport } from "@workspace/api-client-react";
 import type { ReportParameter, ReportResult } from "@workspace/api-client-react";
+import { OcrInputMimeType } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -326,7 +327,7 @@ export default function ReportExplainer() {
     // Image → OCR via API
     try {
       const base64 = await fileToBase64(file);
-      const mimeType = file.type && file.type.startsWith("image/") ? file.type : "image/jpeg";
+      const mimeType = (file.type && file.type.startsWith("image/") ? file.type : "image/jpeg") as OcrInputMimeType;
       const result = await ocrMutation.mutateAsync({ data: { imageData: base64, mimeType } });
       if (result.extractedText && result.extractedText.length > 20) {
         setReportText(result.extractedText);

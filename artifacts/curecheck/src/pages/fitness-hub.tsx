@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import PageMeta from "@/components/page-meta";
 import {
@@ -603,7 +603,14 @@ export default function FitnessHub() {
 
   const [activeTab, setActiveTab] = useState<TabId>("today");
   const [profile, setProfile] = useState<FitnessProfile | null>(() => loadProfile());
-  const [showProfileModal, setShowProfileModal] = useState(() => !loadProfile());
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
+  // Delay showing the profile modal so any overlaying sheet (e.g. Explore) can finish closing
+  useEffect(() => {
+    if (loadProfile()) return;
+    const timer = setTimeout(() => setShowProfileModal(true), 350);
+    return () => clearTimeout(timer);
+  }, []);
 
   const [goalId, setGoalId] = useState<Goal>("bulk");
   const [meals, setMeals] = useState<LoggedItem[]>([]);
