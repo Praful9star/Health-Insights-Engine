@@ -8,10 +8,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle, XCircle, HelpCircle, Shield, ArrowRight, Lightbulb, Stethoscope, ChevronLeft } from "lucide-react";
+import { AlertTriangle, CheckCircle, XCircle, HelpCircle, Shield, ArrowRight, Lightbulb, Stethoscope, ChevronLeft, BookOpen, ExternalLink, WifiOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/language-context";
 import { WhatsAppShare } from "@/components/whatsapp-share";
+import { useNetworkStatus } from "@/hooks/use-network-status";
 
 const EXAMPLE_CLAIMS_EN = [
   "Drinking turmeric milk every day cures cancer and prevents all diseases.",
@@ -100,6 +101,7 @@ export default function ClaimChecker() {
   const [claim, setClaim] = useState("");
   const { toast } = useToast();
   const { language, t } = useLanguage();
+  const isOnline = useNetworkStatus();
   const checkClaim = useCheckHealthClaim();
   const examples = language === "hi" ? EXAMPLE_CLAIMS_HI : EXAMPLE_CLAIMS_EN;
 
@@ -136,6 +138,15 @@ export default function ClaimChecker() {
             <p className="text-sm text-muted-foreground">{t("Verify WhatsApp forwards, YouTube claims, and supplement ads", "WhatsApp forwards, YouTube claims, और supplement ads जांचें")}</p>
           </div>
         </div>
+
+        {!isOnline && (
+          <div className="mt-6 flex items-center gap-2.5 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50">
+            <WifiOff className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+            <p className="text-xs text-amber-700 dark:text-amber-400">
+              {t("You appear to be offline. Claim checking requires an internet connection.", "आप offline दिखते हैं। दावा जांच के लिए internet connection ज़रूरी है।")}
+            </p>
+          </div>
+        )}
 
         <Card className="mt-8 border-border">
           <CardContent className="pt-6">
@@ -250,6 +261,44 @@ export default function ClaimChecker() {
                       <span className="text-blue-500 font-700 mt-0.5">{i + 1}.</span><span>{q}</span>
                     </li>
                   ))}</ul>
+                </CardContent>
+              </Card>
+
+              {/* Evidence Base */}
+              <Card className="border-violet-200 dark:border-violet-800/50 bg-violet-50/50 dark:bg-violet-950/20">
+                <CardHeader className="pb-3 pt-5 px-5">
+                  <CardTitle className="text-base font-600 text-violet-700 dark:text-violet-400 flex items-center gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    {t("Evidence Base", "साक्ष्य आधार")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="px-5 pb-5">
+                  <p className="text-xs text-muted-foreground mb-3">
+                    {t(
+                      "This analysis draws from the following sources. Always discuss with a doctor before acting on health information.",
+                      "यह विश्लेषण निम्नलिखित स्रोतों पर आधारित है। किसी भी स्वास्थ्य जानकारी पर कार्रवाई करने से पहले डॉक्टर से बात करें।",
+                    )}
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {[
+                      { name: "WHO", desc: { en: "World Health Org.", hi: "विश्व स्वास्थ्य संगठन" }, color: "text-sky-600 dark:text-sky-400", bg: "bg-sky-50 dark:bg-sky-950/40 border-sky-200 dark:border-sky-800/50" },
+                      { name: "ICMR", desc: { en: "Indian Council of Medical Research", hi: "ICMR दिशानिर्देश" }, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-950/40 border-orange-200 dark:border-orange-800/50" },
+                      { name: "Cochrane", desc: { en: "Cochrane systematic reviews", hi: "Cochrane समीक्षाएं" }, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/50" },
+                      { name: "PubMed", desc: { en: "NCBI / NLM indexed studies", hi: "Peer-reviewed अध्ययन" }, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800/50" },
+                      { name: "AYUSH", desc: { en: "Ministry of AYUSH guidelines", hi: "AYUSH मंत्रालय" }, color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800/50" },
+                      { name: "NIH", desc: { en: "US National Institutes of Health", hi: "NIH डेटाबेस" }, color: "text-rose-600 dark:text-rose-400", bg: "bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/50" },
+                    ].map(src => (
+                      <div key={src.name} className={`flex items-start gap-2 p-2.5 rounded-xl border text-left ${src.bg}`}>
+                        <div className={`w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                          <ExternalLink className={`w-3 h-3 ${src.color}`} />
+                        </div>
+                        <div>
+                          <p className={`text-xs font-700 ${src.color}`}>{src.name}</p>
+                          <p className="text-[10px] text-muted-foreground leading-snug">{language === "hi" ? src.desc.hi : src.desc.en}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
 

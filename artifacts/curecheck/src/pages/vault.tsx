@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
@@ -244,8 +245,8 @@ function AddProfileModal({ token, onCreated, onClose, tKey }: {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+  return createPortal(
+    <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-4 bg-background/95 backdrop-blur-sm">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -292,7 +293,8 @@ function AddProfileModal({ token, onCreated, onClose, tKey }: {
           </div>
         </form>
       </motion.div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -505,9 +507,9 @@ export default function VaultPage() {
       )}
 
       {/* Family profiles paywall (free users clicking "Add Family") */}
-      {showFamilyPaywall && (
+      {showFamilyPaywall && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
+          className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-4 bg-background/95 backdrop-blur-sm"
           onClick={() => setShowFamilyPaywall(false)}
         >
           <motion.div
@@ -524,7 +526,8 @@ export default function VaultPage() {
               {tKey("vault.maybeLater")}
             </button>
           </motion.div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
