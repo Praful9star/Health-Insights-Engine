@@ -55,26 +55,43 @@ export default function Premium() {
   const { user, session, isPremium, premiumExpiresAt, profileLoading, refreshProfile } = useAuth();
   const [, navigate] = useLocation();
 
-  // Detect post-payment redirect params
-  const params = new URLSearchParams(window.location.search);
-  const paymentResult = params.get("payment"); // "success" | "cancelled" | "error"
+  // Detect post-payment redirect params (read once before URL is cleared)
+  const [paymentResult] = useState<string | null>(() => new URLSearchParams(window.location.search).get("payment"));
 
   const [creating, setCreating] = useState<"monthly" | "annual" | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
+  // True while we're waiting for the session to hydrate so we can refresh the profile
+  const [needsProfileRefresh, setNeedsProfileRefresh] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // After payment redirect: refresh profile so isPremium reflects the new DB state
+  // Strip payment params from URL immediately on mount
   useEffect(() => {
     if (!paymentResult) return;
     const url = new URL(window.location.href);
     url.searchParams.delete("payment");
     url.searchParams.delete("reason");
     window.history.replaceState({}, "", url.toString());
-    if (paymentResult === "success") refreshProfile();
+    if (paymentResult === "success") setNeedsProfileRefresh(true);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Retry refreshProfile once session becomes available (fixes race where session
+  // is still null when the payment=success redirect lands)
+  useEffect(() => {
+    if (!needsProfileRefresh || !session) return;
+    setNeedsProfileRefresh(false);
+    setRefreshing(true);
+    refreshProfile().finally(() => setRefreshing(false));
+  }, [needsProfileRefresh, session]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function handleManualRefresh() {
+    setRefreshing(true);
+    await refreshProfile();
+    setRefreshing(false);
+  }
 
   async function handleGetPremium(plan: "monthly" | "annual") {
     if (!user || !session) {
-      navigate("/auth");
+      navigate("/login");
       return;
     }
     setCreating(plan);
@@ -158,10 +175,21 @@ export default function Premium() {
       <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
 
       {/* Post-payment feedback banner */}
-      {paymentResult === "success" && (
+      {paymentResult === "success" && !isPremium && (
         <div className="mb-6 flex items-start gap-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3">
           <BadgeCheck className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-emerald-400">Payment received! Your Premium account is being activated — please refresh in a moment.</p>
+          <div className="flex-1">
+            <p className="text-sm text-emerald-400 font-600">Payment received! Activating your Premium account…</p>
+            <p className="text-xs text-emerald-400/70 mt-0.5">Takes a few seconds. If it doesn't update automatically, tap the button.</p>
+            <button
+              onClick={handleManualRefresh}
+              disabled={refreshing || profileLoading}
+              className="mt-2 inline-flex items-center gap-1.5 text-xs font-700 text-emerald-400 border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 px-3 py-1.5 rounded-xl transition-colors disabled:opacity-60"
+            >
+              {(refreshing || profileLoading) ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+              {(refreshing || profileLoading) ? "Checking…" : "Check Premium Status"}
+            </button>
+          </div>
         </div>
       )}
       {paymentResult === "cancelled" && (
@@ -234,6 +262,20 @@ export default function Premium() {
           {profileLoading ? (
             <div className="flex items-center justify-center py-4">
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : !user ? (
+            // Not signed in — show sign-in prompt instead of payment buttons
+            <div className="space-y-2.5">
+              <div className="text-center py-2 px-3 bg-amber-500/10 border border-amber-500/25 rounded-xl mb-1">
+                <p className="text-xs text-amber-400 font-600">Sign in first to get Premium</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Your account links your payment to Premium access.</p>
+              </div>
+              <Link href="/login">
+                <button className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-700 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+                  Sign in / Create account
+                </button>
+              </Link>
+              <p className="text-[11px] text-muted-foreground text-center">After signing in, return here to complete your upgrade.</p>
             </div>
           ) : (
             <div className="space-y-2.5">
