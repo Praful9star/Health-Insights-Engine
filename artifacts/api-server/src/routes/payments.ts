@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from "express";
 import { createHmac } from "crypto";
 import { createClient } from "@supabase/supabase-js";
 import { aiLimiter } from "../middleware/rate-limit";
+import { toSubscriptionPlan } from "../lib/entitlement";
 
 const router = Router();
 
@@ -386,6 +387,45 @@ async function activatePremium(opts: {
       .update({ status: "paid", updated_at: now.toISOString() })
       .eq("razorpay_link_id", linkId)
       .eq("user_id", userId);
+  }
+
+  // ── Write to subscriptions (server-trusted entitlement source) ──────────────
+  // Find the newest active subscription for this user and extend it (renewal),
+  // or insert a new one (first-time payment).
+  const subPlan = toSubscriptionPlan(plan);
+
+  try {
+    const { data: existingSub } = await db
+      .from("subscriptions")
+      .select("id, current_period_end")
+      .eq("user_id", userId)
+      .eq("status", "active")
+      .order("current_period_end", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (existingSub) {
+      const currentEnd = new Date(existingSub.current_period_end as string);
+      const base       = currentEnd > now ? currentEnd : now;
+      const extended   = new Date(base.getTime() + cfg.days * 24 * 60 * 60 * 1000);
+      await db.from("subscriptions").update({
+        current_period_end:  extended.toISOString(),
+        razorpay_payment_id: paymentId ?? null,
+        updated_at:          now.toISOString(),
+      }).eq("id", existingSub.id as string);
+    } else {
+      await db.from("subscriptions").insert({
+        user_id:             userId,
+        plan:                subPlan,
+        status:              "active",
+        current_period_end:  expires.toISOString(),
+        razorpay_payment_id: paymentId ?? null,
+        razorpay_link_id:    linkId ?? null,
+      });
+    }
+  } catch (subErr) {
+    // Log and continue — user_profiles was already updated; subscriptions is best-effort here
+    req.log.error({ subErr, userId }, "Failed to write to subscriptions table");
   }
 
   req.log.info({ userId, plan, paymentId, source }, "Premium activated");

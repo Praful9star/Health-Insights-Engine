@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
 import type { Request, Response } from "express";
+import { getEntitlement } from "../lib/entitlement";
 
 const ProfileSchema = z.object({
   name:        z.string().max(200).default(""),
@@ -54,7 +55,17 @@ router.get("/profile", async (req: Request, res: Response): Promise<void> => {
 
   const now = new Date();
   const expiresAt = data?.premium_expires_at ? new Date(data.premium_expires_at) : null;
-  const isPremiumActive = !!(data?.is_premium && expiresAt && expiresAt > now);
+  const isPremiumLegacy = !!(data?.is_premium && expiresAt && expiresAt > now);
+
+  // Entitlement from subscriptions table (server-trusted source)
+  const entitlement = await getEntitlement(user.id);
+
+  // isPremium = active subscription OR legacy user_profiles flag (handles existing users)
+  const isPremiumActive = isPremiumLegacy || entitlement.tier !== "free";
+
+  // tier: prefer subscriptions; fall back to legacy flag for pre-migration users
+  const tier        = entitlement.tier !== "free" ? entitlement.tier : (isPremiumLegacy ? "premium" : "free");
+  const maxProfiles = entitlement.max_profiles > 1 ? entitlement.max_profiles : (isPremiumLegacy ? 5 : 1);
 
   res.json({
     name:               data?.name         ?? "",
@@ -64,7 +75,9 @@ router.get("/profile", async (req: Request, res: Response): Promise<void> => {
     city:               data?.city         ?? "",
     allergies:          data?.allergies    ?? "",
     isPremium:          isPremiumActive,
-    premiumExpiresAt:   isPremiumActive ? data!.premium_expires_at : null,
+    premiumExpiresAt:   isPremiumActive ? (entitlement.current_period_end ?? data?.premium_expires_at ?? null) : null,
+    tier,
+    maxProfiles,
   });
 });
 
