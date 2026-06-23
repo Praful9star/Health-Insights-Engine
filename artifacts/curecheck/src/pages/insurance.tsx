@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { ChevronLeft, Shield, CheckCircle2, ExternalLink } from "lucide-react";
 import PageMeta from "@/components/page-meta";
+import { useLanguage } from "@/contexts/language-context";
 
 type Tab = "govt" | "tips" | "claims";
 
@@ -77,6 +78,7 @@ export default function Insurance() {
   const [tab, setTab] = useState<Tab>("govt");
   const [openScheme, setOpenScheme] = useState<string | null>(null);
   const [claimType, setClaimType] = useState<"cashless" | "reimbursement">("cashless");
+  const { tKey } = useLanguage();
 
   return (
     <div className="relative z-10 max-w-3xl mx-auto px-4 py-12">
@@ -85,14 +87,14 @@ export default function Insurance() {
         description="Understand your Indian health insurance policy, claim process, and coverage limits in plain language. Includes free government schemes."
         path="/insurance"
       />
-      <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> Home</span></Link>
+      <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5 cursor-pointer"><ChevronLeft className="w-4 h-4" /> {tKey("common.home")}</span></Link>
 
       <div className="flex items-start gap-4 mb-7">
         <div className="w-12 h-12 rounded-2xl bg-blue-500/15 flex items-center justify-center flex-shrink-0"><Shield className="w-6 h-6 text-blue-400" /></div>
         <div>
           <span className="mono-label text-blue-400/80 mb-1 block">Financial Protection</span>
-          <h1 className="text-2xl sm:text-3xl font-serif font-800 text-foreground">Health Insurance Guide</h1>
-          <p className="text-sm text-muted-foreground mt-1">Free government schemes, buying tips, and how to file a claim — in plain language.</p>
+          <h1 className="text-2xl sm:text-3xl font-serif font-800 text-foreground">{tKey("insurance.title")}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{tKey("insurance.subtitle")}</p>
         </div>
       </div>
 
