@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { ChevronLeft, Check, Zap, Shield, Brain, FileText, Pill, Activity, Star, Loader2, AlertCircle, BadgeCheck } from "lucide-react";
 import PageMeta from "@/components/page-meta";
 import { useAuth } from "@/contexts/auth-context";
+import { useInvalidateEntitlement } from "@/hooks/useEntitlement";
 
 const FREE_FEATURES = [
   "3 AI report analyses per month",
@@ -53,6 +54,7 @@ function formatDate(iso: string): string {
 
 export default function Premium() {
   const { user, session, isPremium, premiumExpiresAt, profileLoading, refreshProfile } = useAuth();
+  const invalidateEntitlement = useInvalidateEntitlement();
   const [, navigate] = useLocation();
 
   // Detect post-payment redirect params (read once before URL is cleared)
@@ -80,12 +82,15 @@ export default function Premium() {
     if (!needsProfileRefresh || !session) return;
     setNeedsProfileRefresh(false);
     setRefreshing(true);
-    refreshProfile().finally(() => setRefreshing(false));
+    refreshProfile()
+      .then(() => invalidateEntitlement())
+      .finally(() => setRefreshing(false));
   }, [needsProfileRefresh, session]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleManualRefresh() {
     setRefreshing(true);
     await refreshProfile();
+    await invalidateEntitlement();
     setRefreshing(false);
   }
 

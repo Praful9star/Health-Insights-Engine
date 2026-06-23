@@ -17,6 +17,8 @@ export interface UserProfile {
   allergies: string;
   isPremium: boolean;
   premiumExpiresAt: string | null;
+  tier: "free" | "premium" | "family";
+  maxProfiles: number;
 }
 
 interface AuthCtx {
@@ -27,6 +29,8 @@ interface AuthCtx {
   profileLoading: boolean;
   isPremium: boolean;
   premiumExpiresAt: string | null;
+  tier: "free" | "premium" | "family";
+  maxProfiles: number;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signUp: (email: string, password: string, name: string) => Promise<{ error: string | null }>;
   signInGoogle: () => Promise<void>;
@@ -37,7 +41,7 @@ interface AuthCtx {
 
 const AuthContext = createContext<AuthCtx | null>(null);
 
-const EMPTY_PROFILE: UserProfile = { name: "", age: "", gender: "", blood_group: "", city: "", allergies: "", isPremium: false, premiumExpiresAt: null };
+const EMPTY_PROFILE: UserProfile = { name: "", age: "", gender: "", blood_group: "", city: "", allergies: "", isPremium: false, premiumExpiresAt: null, tier: "free", maxProfiles: 1 };
 
 async function fetchProfileFromAPI(accessToken: string): Promise<UserProfile | null> {
   try {
@@ -154,11 +158,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isPremium        = profile?.isPremium       ?? false;
   const premiumExpiresAt = profile?.premiumExpiresAt ?? null;
+  const tier             = profile?.tier             ?? "free";
+  const maxProfiles      = profile?.maxProfiles      ?? 1;
 
   return (
     <AuthContext.Provider value={{
       user, session, loading, profile, profileLoading,
-      isPremium, premiumExpiresAt,
+      isPremium, premiumExpiresAt, tier, maxProfiles,
       signIn, signUp, signInGoogle, signOut, updateProfile, refreshProfile,
     }}>
       {children}
