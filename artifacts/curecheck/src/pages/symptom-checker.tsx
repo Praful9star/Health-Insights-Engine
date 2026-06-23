@@ -324,7 +324,7 @@ export default function SymptomChecker() {
               )}
 
               {/* Possible conditions */}
-              {result.possibleConditions && result.possibleConditions.length > 0 && (
+              {result.possibleCauses && result.possibleCauses.length > 0 && (
                 <Card>
                   <CardHeader className="pb-2 pt-4">
                     <CardTitle className="text-base flex items-center gap-2">
@@ -333,17 +333,17 @@ export default function SymptomChecker() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0 space-y-3">
-                    {result.possibleConditions.map((cond, i) => {
+                    {result.possibleCauses.map((cond, i) => {
                       const lCfg = LIKELIHOOD_CONFIG[cond.likelihood as keyof typeof LIKELIHOOD_CONFIG] ?? LIKELIHOOD_CONFIG.possible;
                       return (
                         <div key={i} className="p-3 rounded-xl bg-muted/30 border border-border/50">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="font-600 text-sm text-foreground">{cond.name}</span>
+                            <span className="font-600 text-sm text-foreground">{cond.cause}</span>
                             <Badge className={`text-xs ${lCfg.className}`}>
                               {language === "hi" ? lCfg.label.hi : lCfg.label.en}
                             </Badge>
                           </div>
-                          <p className="text-xs text-muted-foreground">{cond.reason}</p>
+                          <p className="text-xs text-muted-foreground">{cond.explanation}</p>
                         </div>
                       );
                     })}
@@ -372,23 +372,17 @@ export default function SymptomChecker() {
                 </Card>
               )}
 
-              {/* Questions for doctor */}
-              {result.questionsForDoctor && result.questionsForDoctor.length > 0 && (
+              {/* Doctor speciality */}
+              {result.doctorSpeciality && (
                 <Card>
                   <CardHeader className="pb-2 pt-4">
                     <CardTitle className="text-base flex items-center gap-2">
                       <MessageCircle className="w-4 h-4 text-primary" />
-                      {t("Questions to Ask Your Doctor", "डॉक्टर से पूछें")}
+                      {t("Recommended Specialist", "अनुशंसित विशेषज्ञ")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <ul className="space-y-2">
-                      {result.questionsForDoctor.map((q, i) => (
-                        <li key={i} className="flex gap-2 text-sm text-muted-foreground">
-                          <span className="text-primary font-700 flex-shrink-0">{i + 1}.</span> {q}
-                        </li>
-                      ))}
-                    </ul>
+                    <p className="text-sm text-muted-foreground">{result.doctorSpeciality}</p>
                   </CardContent>
                 </Card>
               )}

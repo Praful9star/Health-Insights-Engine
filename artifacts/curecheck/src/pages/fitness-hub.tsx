@@ -607,10 +607,9 @@ export default function FitnessHub() {
 
   // Delay showing the profile modal so any overlaying sheet (e.g. Explore) can finish closing
   useEffect(() => {
-    if (!loadProfile()) {
-      const timer = setTimeout(() => setShowProfileModal(true), 350);
-      return () => clearTimeout(timer);
-    }
+    if (loadProfile()) return;
+    const timer = setTimeout(() => setShowProfileModal(true), 350);
+    return () => clearTimeout(timer);
   }, []);
 
   const [goalId, setGoalId] = useState<Goal>("bulk");
