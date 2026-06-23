@@ -78,6 +78,21 @@ const FAQS = [
   { q: { en: "Is this service free?", hi: "क्या यह सेवा मुफ्त है?" }, a: { en: "Yes, completely free. We believe health clarity should never sit behind a paywall.", hi: "हाँ, पूरी तरह मुफ्त। हमारा मानना है कि स्वास्थ्य की स्पष्टता कभी पैसों के पीछे नहीं होनी चाहिए।" } },
 ];
 
+const USED_TOOLS_KEY = "cc_used_tools_v1";
+
+function loadUsedTools(): string[] {
+  try { return JSON.parse(localStorage.getItem(USED_TOOLS_KEY) ?? "[]") as string[]; } catch { return []; }
+}
+
+function recordToolVisit(href: string) {
+  try {
+    const prev = loadUsedTools();
+    // Keep order of most-recently-used, deduplicated, max 8
+    const next = [href, ...prev.filter(h => h !== href)].slice(0, 8);
+    localStorage.setItem(USED_TOOLS_KEY, JSON.stringify(next));
+  } catch {}
+}
+
 /* ════════════════════════════════════════════════════════════════════ */
 export default function Home() {
   const { language, t } = useLanguage();
@@ -89,6 +104,16 @@ export default function Home() {
 
   /* Toggle for hero demo card — false = abstract state (no fake numbers) */
   const [exampleShown, setExampleShown] = useState(false);
+
+  const [usedToolHrefs, setUsedToolHrefs] = useState<string[]>(() => loadUsedTools());
+
+  const allTools = TOOL_CATEGORIES.flatMap(c => c.tools);
+  const recentTools = usedToolHrefs.map(href => allTools.find(t => t.href === href)).filter(Boolean) as typeof allTools;
+
+  const handleToolClick = (href: string) => {
+    recordToolVisit(href);
+    setUsedToolHrefs(prev => [href, ...prev.filter(h => h !== href)].slice(0, 8));
+  };
 
   return (
     <div className="relative z-10">
@@ -360,6 +385,37 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ══ YOUR TOOLS (personalised) ════════════════════════════════ */}
+      {recentTools.length > 0 && (
+        <section className="py-10 px-4" aria-label="Your recently used tools">
+          <div className="max-w-[1200px] mx-auto">
+            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+              <div className="flex items-center gap-3 mb-4">
+                <p className="mono-label text-primary/80 uppercase">{t("Your Tools", "आपके टूल्स")}</p>
+                <div className="flex-1 h-px bg-border/30" />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                {recentTools.map(tool => (
+                  <Link key={tool.href} href={tool.href} onClick={() => handleToolClick(tool.href)}>
+                    <div className={`group flex flex-col gap-1.5 p-3 rounded-xl border border-primary/20 hover:border-primary/40 bg-primary/5 hover:bg-primary/8 hover:-translate-y-0.5 hover:shadow-sm transition-all cursor-pointer min-h-[80px]`}>
+                      <div className={`w-7 h-7 rounded-lg ${tool.bg} ${tool.accent} flex items-center justify-center flex-shrink-0`}>
+                        <tool.icon className="w-3.5 h-3.5" />
+                      </div>
+                      <p className="text-xs font-600 text-foreground leading-snug">
+                        {language === "hi" ? tool.hi : tool.en}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">
+                        {language === "hi" ? tool.desc.hi : tool.desc.en}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
+
       {/* ══ ALL TOOLS BY CATEGORY ════════════════════════════════════ */}
       <section className="py-16 px-4" aria-label="All tools">
         <div className="max-w-[1200px] mx-auto">
@@ -380,7 +436,7 @@ export default function Home() {
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
                   {cat.tools.map(tool => (
-                    <Link key={tool.href} href={tool.href}>
+                    <Link key={tool.href} href={tool.href} onClick={() => handleToolClick(tool.href)}>
                       <div className="group flex flex-col gap-1.5 p-3 rounded-xl border border-border/30 hover:border-border/60 bg-background/40 hover:bg-muted/30 hover:-translate-y-0.5 hover:shadow-sm transition-all cursor-pointer min-h-[80px]">
                         <div className={`w-7 h-7 rounded-lg ${tool.bg} ${tool.accent} flex items-center justify-center flex-shrink-0`}>
                           <tool.icon className="w-3.5 h-3.5" />

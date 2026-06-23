@@ -13,12 +13,13 @@ import {
   Stethoscope, BookOpen, Save, CheckCircle2, Camera,
   Upload, FileText, ChevronDown, ChevronUp, Sparkles,
   TrendingUp, TrendingDown, Minus, AlertCircle, Heart,
-  Clipboard, X, RotateCcw, ChevronLeft, History, Archive,
+  Clipboard, X, RotateCcw, ChevronLeft, History, Archive, WifiOff,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/language-context";
 import { WhatsAppShare } from "@/components/whatsapp-share";
 import { useHealthStorage, extractBiomarkers, type TimelineEntry } from "@/hooks/use-health-storage";
+import { useNetworkStatus } from "@/hooks/use-network-status";
 import { ToolModal } from "@/components/tool-modal";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -95,6 +96,32 @@ async function extractPdfText(file: File): Promise<string> {
     return text.trim();
   } catch {
     return "";
+  }
+}
+
+async function renderPdfPageToBase64(file: File, pageNum: number): Promise<string> {
+  const pdfjsLib = await import("pdfjs-dist");
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const page = await pdf.getPage(pageNum);
+  const viewport = page.getViewport({ scale: 2 });
+  const canvas = document.createElement("canvas");
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+  await page.render({ canvasContext: canvas.getContext("2d") as CanvasRenderingContext2D, canvas, viewport }).promise;
+  return canvas.toDataURL("image/jpeg", 0.85).replace(/^data:image\/[^;]+;base64,/, "");
+}
+
+async function getPdfPageCount(file: File): Promise<number> {
+  try {
+    const pdfjsLib = await import("pdfjs-dist");
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    return pdf.numPages;
+  } catch {
+    return 1;
   }
 }
 
@@ -237,6 +264,7 @@ export default function ReportExplainer() {
   const { toast } = useToast();
   const { saveToTimeline } = useHealthStorage();
   const { user, session } = useAuth();
+  const isOnline = useNetworkStatus();
   const [, navigate] = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -256,6 +284,7 @@ export default function ReportExplainer() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [ocrError, setOcrError] = useState<string | null>(null);
+  const [pdfOcrProgress, setPdfOcrProgress] = useState<{ current: number; total: number } | null>(null);
   const [saved, setSaved] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [vaultSaved, setVaultSaved] = useState(false);
@@ -313,7 +342,34 @@ export default function ReportExplainer() {
       if (text && text.length > 30) {
         setReportText(text);
         setStep("preview");
-      } else {
+        return;
+      }
+
+      // Scanned PDF: text layer empty — OCR each page as image
+      try {
+        const pageCount = await getPdfPageCount(file);
+        setPdfOcrProgress({ current: 0, total: pageCount });
+        let combined = "";
+        for (let p = 1; p <= pageCount; p++) {
+          setPdfOcrProgress({ current: p, total: pageCount });
+          const base64 = await renderPdfPageToBase64(file, p);
+          const ocr = await ocrMutation.mutateAsync({ data: { imageData: base64, mimeType: "image/jpeg" as OcrInputMimeType } });
+          if (ocr.extractedText) combined += ocr.extractedText + "\n";
+        }
+        setPdfOcrProgress(null);
+        if (combined.trim().length > 30) {
+          setReportText(combined.trim());
+          setStep("preview");
+        } else {
+          setOcrError(t(
+            "Could not read this scanned PDF. Please copy and paste the report text manually below.",
+            "इस scanned PDF को read नहीं किया जा सका। नीचे manually text paste करें।",
+          ));
+          setStep("input");
+          setUploadMode("text");
+        }
+      } catch {
+        setPdfOcrProgress(null);
         setOcrError(t(
           "Could not extract text from this PDF. Please copy and paste the text manually below.",
           "इस PDF से text extract नहीं हो सका। नीचे manually text paste करें।",
@@ -370,7 +426,24 @@ export default function ReportExplainer() {
     setSaved(false);
     explainReport.mutate(
       { data: { reportText: text, language: language as "en" | "hi" } },
-      { onSuccess: () => setStep("result") },
+      {
+        onSuccess: (data) => {
+          setStep("result");
+          // Auto-save to Health Timeline
+          const entry: TimelineEntry = {
+            id: `report_${Date.now()}`,
+            date: new Date().toISOString().split("T")[0],
+            label: fileName ? `Report: ${fileName.replace(/\.[^.]+$/, "")}` : "Report Analysis",
+            simpleSummary: data.simpleSummary,
+            overallAssessment: data.overallAssessment,
+            importantFindings: data.importantFindings,
+            doctorQuestions: data.doctorQuestions,
+            biomarkers: extractBiomarkers(text),
+          };
+          saveToTimeline(entry);
+          setSaved(true);
+        },
+      },
     );
   };
 
@@ -465,6 +538,16 @@ export default function ReportExplainer() {
             </Button>
           )}
         </div>
+
+        {/* Offline banner */}
+        {!isOnline && (
+          <div className="mb-6 flex items-center gap-2.5 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50">
+            <WifiOff className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+            <p className="text-xs text-amber-700 dark:text-amber-400">
+              {t("You appear to be offline. Report analysis requires an internet connection.", "आप offline दिखते हैं। Report analysis के लिए internet connection ज़रूरी है।")}
+            </p>
+          </div>
+        )}
 
         {/* Modal: input form (upload or paste) */}
         <ToolModal
@@ -608,8 +691,27 @@ export default function ReportExplainer() {
                   <FileSearch className="w-7 h-7 text-primary" />
                 </motion.div>
               </div>
-              <p className="font-serif font-700 text-lg text-foreground mb-2">{t("Reading your report…", "Report पढ़ी जा रही है…")}</p>
-              <p className="text-sm text-muted-foreground">{t("Our AI is extracting the text from your image. This takes 10–15 seconds.", "AI आपकी image से text extract कर रही है। 10–15 seconds लगेंगे।")}</p>
+              <p className="font-serif font-700 text-lg text-foreground mb-2">
+                {pdfOcrProgress
+                  ? t("Reading scanned PDF…", "Scanned PDF पढ़ी जा रही है…")
+                  : t("Reading your report…", "Report पढ़ी जा रही है…")}
+              </p>
+              {pdfOcrProgress ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    {t(`Processing page ${pdfOcrProgress.current} of ${pdfOcrProgress.total}…`, `Page ${pdfOcrProgress.current} / ${pdfOcrProgress.total} process हो रही है…`)}
+                  </p>
+                  <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                    <motion.div
+                      className="h-full bg-primary rounded-full"
+                      animate={{ width: `${(pdfOcrProgress.current / pdfOcrProgress.total) * 100}%` }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">{t("Our AI is extracting the text from your image. This takes 10–15 seconds.", "AI आपकी image से text extract कर रही है। 10–15 seconds लगेंगे।")}</p>
+              )}
               {fileName && <p className="text-xs text-muted-foreground/60 mt-3 mono-label">{fileName}</p>}
             </motion.div>
           )}
@@ -732,13 +834,13 @@ export default function ReportExplainer() {
                   )}
                 </div>
                 <div className="grid sm:grid-cols-2 gap-3">
-                  {/* Save to Timeline */}
+                  {/* Save to Timeline — auto-saved on analysis; manual re-save for loaded results */}
                   <button
-                    onClick={handleSaveToTimeline}
+                    onClick={saved ? undefined : handleSaveToTimeline}
                     disabled={saved}
                     className={`flex items-start gap-3 p-4 rounded-2xl border text-left transition-all ${
                       saved
-                        ? "border-emerald-500/30 bg-emerald-500/8"
+                        ? "border-emerald-500/30 bg-emerald-500/8 cursor-default"
                         : "border-border/50 hover:border-primary/40 hover:bg-primary/5 bg-muted/10"
                     }`}
                   >

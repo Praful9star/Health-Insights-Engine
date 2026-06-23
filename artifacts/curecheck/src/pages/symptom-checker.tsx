@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "wouter";
 import { useCheckSymptoms } from "@workspace/api-client-react";
 import PageMeta from "@/components/page-meta";
 import { Button } from "@/components/ui/button";
@@ -13,12 +14,14 @@ import {
 } from "@/components/ui/select";
 import {
   Activity, AlertTriangle, CheckCircle, Clock, Stethoscope,
-  ArrowRight, Phone, Heart, Info, MessageCircle
+  ArrowRight, Phone, Heart, Info, MessageCircle, BookOpen, WifiOff,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/language-context";
 import { WhatsAppShare } from "@/components/whatsapp-share";
 import { ToolModal } from "@/components/tool-modal";
+import { useHealthStorage, type TimelineEntry } from "@/hooks/use-health-storage";
+import { useNetworkStatus } from "@/hooks/use-network-status";
 
 const URGENCY_CONFIG = {
   emergency: {
@@ -86,15 +89,29 @@ function buildShareText(result: ReturnType<typeof useCheckSymptoms>["data"], lan
   return `🩺 *CureCheck Symptom Check*\n\n⚠️ *${cfg.label.en}*\n\n${result.urgencyExplanation}\n\n*Immediate Steps:*\n${result.immediateSteps.map((s, i) => `${i + 1}. ${s}`).join("\n")}\n\n❗ *Red Flags — Seek Help If:*\n${result.redFlags.map((f) => `• ${f}`).join("\n")}\n\n_CureCheck - For educational info only, not medical advice._\nVisit curecheck.in`;
 }
 
+const DOCTOR_PREP_KEY = "cc_doctor_prep_prefill_v1";
+
+const URGENCY_TO_ASSESSMENT: Record<string, string> = {
+  emergency: "requires_urgent_attention",
+  see_doctor_today: "requires_urgent_attention",
+  see_doctor_soon: "needs_follow_up",
+  home_care: "routine_monitoring",
+  monitor: "all_clear",
+};
+
 export default function SymptomChecker() {
   const [symptoms, setSymptoms] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState<string>("");
   const [duration, setDuration] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [savedToTimeline, setSavedToTimeline] = useState(false);
   const { toast } = useToast();
   const { language, t } = useLanguage();
+  const [, navigate] = useLocation();
+  const isOnline = useNetworkStatus();
   const checkSymptoms = useCheckSymptoms();
+  const { saveToTimeline } = useHealthStorage();
   const examples = language === "hi" ? EXAMPLE_SYMPTOMS_HI : EXAMPLE_SYMPTOMS_EN;
 
   const handleCheck = () => {
@@ -103,6 +120,7 @@ export default function SymptomChecker() {
       return;
     }
     setModalOpen(false);
+    setSavedToTimeline(false);
     checkSymptoms.mutate({
       data: {
         symptoms,
@@ -112,6 +130,46 @@ export default function SymptomChecker() {
         language: language as "en" | "hi",
       },
     });
+  };
+
+  const handlePrepForDoctor = () => {
+    const result = checkSymptoms.data;
+    if (!result) return;
+    const conditions = result.possibleCauses.slice(0, 3).map(c => c.cause).join(", ");
+    const urgencyNote = result.urgencyLevel !== "home_care" && result.urgencyLevel !== "monitor"
+      ? ` — Urgency: ${result.urgencyLevel.replace(/_/g, " ")}` : "";
+    const concern = `Symptoms: ${symptoms}${conditions ? `. Possible: ${conditions}` : ""}${urgencyNote}`.slice(0, 400);
+    try {
+      localStorage.setItem(DOCTOR_PREP_KEY, JSON.stringify({
+        concern,
+        visitType: result.urgencyLevel === "emergency" ? "emergency"
+          : result.urgencyLevel === "see_doctor_soon" || result.urgencyLevel === "see_doctor_today" ? "followup"
+          : "general",
+      }));
+    } catch {}
+    navigate("/doctor-prep");
+  };
+
+  const handleLogToTimeline = () => {
+    const result = checkSymptoms.data;
+    if (!result || savedToTimeline) return;
+    const entry: TimelineEntry = {
+      id: `symptom_${Date.now()}`,
+      date: new Date().toISOString().split("T")[0],
+      label: `Symptoms: ${symptoms.slice(0, 50)}`,
+      simpleSummary: result.urgencyExplanation,
+      overallAssessment: URGENCY_TO_ASSESSMENT[result.urgencyLevel] ?? "routine_monitoring",
+      importantFindings: result.possibleCauses.map(c => ({
+        finding: c.cause,
+        importance: c.likelihood === "common" ? "important" : "routine",
+        explanation: c.explanation,
+      })),
+      doctorQuestions: [],
+      biomarkers: [],
+    };
+    saveToTimeline(entry);
+    setSavedToTimeline(true);
+    toast({ title: t("Logged to Health Timeline!", "Health Timeline में लॉग हो गया!") });
   };
 
   const result = checkSymptoms.data;
@@ -150,6 +208,16 @@ export default function SymptomChecker() {
             )}
           </p>
         </div>
+
+        {/* Offline banner */}
+        {!isOnline && (
+          <div className="mt-4 flex items-center gap-2.5 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50">
+            <WifiOff className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+            <p className="text-xs text-amber-700 dark:text-amber-400">
+              {t("You appear to be offline. AI analysis requires an internet connection.", "आप offline दिखते हैं। AI analysis के लिए internet connection ज़रूरी है।")}
+            </p>
+          </div>
+        )}
 
         {/* Trigger */}
         <div className="mt-6">
@@ -386,6 +454,28 @@ export default function SymptomChecker() {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Cross-tool CTAs */}
+              <div className="space-y-2.5 pt-1">
+                <button
+                  onClick={handlePrepForDoctor}
+                  className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl bg-primary text-primary-foreground font-600 text-sm hover:opacity-90 active:scale-[0.98] transition-all"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  {t("Prepare for Doctor Visit", "डॉक्टर से मिलने की तैयारी करें")}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleLogToTimeline}
+                  disabled={savedToTimeline}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-muted/30 hover:bg-muted/50 border border-border/40 text-muted-foreground hover:text-foreground font-500 text-sm transition-colors disabled:opacity-60"
+                >
+                  <Clock className="w-4 h-4" />
+                  {savedToTimeline
+                    ? t("Saved to Health Timeline ✓", "Health Timeline में Save ✓")
+                    : t("Log to Health Timeline", "Health Timeline में Log करें")}
+                </button>
+              </div>
 
               {/* Share */}
               {shareText && (

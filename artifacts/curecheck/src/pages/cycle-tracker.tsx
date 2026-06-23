@@ -5,7 +5,7 @@ import PageMeta from "@/components/page-meta";
 import {
   CalendarDays, ChevronLeft, ChevronRight, Plus, Trash2,
   Eye, EyeOff, AlertTriangle, ArrowRight, X, Check,
-  Info, Shield, Stethoscope, Circle, DropletIcon,
+  Info, Shield, Stethoscope, Circle, DropletIcon, Bell, BellOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/language-context";
@@ -305,6 +305,24 @@ function LegendDot({ color, label }: { color: string; label: string }) {
   );
 }
 
+// ─── Notification helper ──────────────────────────────────────────────────────
+
+function scheduleReminder(nextPeriodStart: string, hi: boolean) {
+  // Show an immediate notification confirming reminders are set.
+  // A real scheduler would use a Service Worker + Push API; here we use
+  // the Notifications API to show an in-session confirmation.
+  if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
+  const date = new Date(nextPeriodStart);
+  const formatted = date.toLocaleDateString(hi ? "hi-IN" : "en-IN", { day: "numeric", month: "long" });
+  new Notification(hi ? "CureCheck — पीरियड रिमाइंडर" : "CureCheck — Period Reminder", {
+    body: hi
+      ? `आपका अगला पीरियड ${formatted} के आसपास अनुमानित है। CureCheck ऐप में cycle tracker खोलें।`
+      : `Your next period is estimated around ${formatted}. Open CureCheck to log it when it arrives.`,
+    icon: "/icon-192.png",
+    tag: "cycle-reminder",
+  });
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 type TabId = "calendar" | "log" | "insights";
@@ -322,6 +340,9 @@ export default function CycleTracker() {
   const [revealed, setRevealed] = useState(false);
   const [tab, setTab]           = useState<TabId>("calendar");
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [notifPerm, setNotifPerm] = useState<NotificationPermission>(() =>
+    typeof Notification !== "undefined" ? Notification.permission : "default"
+  );
 
   // Calendar nav
   const now = new Date();
@@ -411,6 +432,16 @@ export default function CycleTracker() {
       : `Menstrual cycle health review — average cycle length ${avgCycleLength} days.`;
     try { localStorage.setItem("cc_doctor_prep_prefill_v1", JSON.stringify({ concern, visitType: "specialist" })); } catch {}
     navigate("/doctor-prep");
+  };
+
+  // ── Notification helpers ──────────────────────────────────────────────────
+  const requestNotifPerm = async () => {
+    if (typeof Notification === "undefined") return;
+    const perm = await Notification.requestPermission();
+    setNotifPerm(perm);
+    if (perm === "granted" && predictions.nextPeriodStart) {
+      scheduleReminder(predictions.nextPeriodStart, hi);
+    }
   };
 
   // ── Calendar navigation ───────────────────────────────────────────────────
@@ -777,6 +808,35 @@ export default function CycleTracker() {
               </div>
             ) : (
               <>
+                {/* Reminder opt-in */}
+                {typeof Notification !== "undefined" && notifPerm !== "denied" && (
+                  <div className={`glass-panel rounded-2xl p-4 border flex items-center gap-3 ${notifPerm === "granted" ? "border-emerald-500/30 bg-emerald-500/5" : "border-primary/20"}`}>
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${notifPerm === "granted" ? "bg-emerald-500/15" : "bg-primary/10"}`}>
+                      {notifPerm === "granted" ? <Bell className="w-4 h-4 text-emerald-400" /> : <BellOff className="w-4 h-4 text-primary" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-700 ${notifPerm === "granted" ? "text-emerald-400" : "text-foreground"}`}>
+                        {notifPerm === "granted"
+                          ? (hi ? "रिमाइंडर चालू ✓" : "Reminders enabled ✓")
+                          : (hi ? "पीरियड रिमाइंडर पाएं" : "Get period reminders")}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {notifPerm === "granted"
+                          ? (hi ? "आपके अगले पीरियड से पहले सूचना मिलेगी" : "You'll be notified before your next period")
+                          : (hi ? "अनुमानित तारीख से पहले याद दिलाएं" : "Get reminded before your estimated date")}
+                      </p>
+                    </div>
+                    {notifPerm !== "granted" && (
+                      <button
+                        onClick={requestNotifPerm}
+                        className="px-3 py-1.5 rounded-xl bg-primary/15 border border-primary/30 text-primary text-xs font-700 hover:bg-primary/25 transition-colors flex-shrink-0"
+                      >
+                        {hi ? "चालू करें" : "Enable"}
+                      </button>
+                    )}
+                  </div>
+                )}
+
                 {/* Stats grid */}
                 <div className="grid grid-cols-2 gap-3">
                   <StatCard
