@@ -14,6 +14,7 @@ import notificationsRouter from "./notifications";
 import paymentsRouter from "./payments";
 import feedbackRouter from "./feedback";
 import vaultRouter from "./vault";
+import entitlementRouter from "./entitlement";
 
 const router: IRouter = Router();
 
@@ -32,5 +33,6 @@ router.use(notificationsRouter);
 router.use(paymentsRouter);
 router.use(feedbackRouter);
 router.use(vaultRouter);
+router.use(entitlementRouter);
 
 export default router;

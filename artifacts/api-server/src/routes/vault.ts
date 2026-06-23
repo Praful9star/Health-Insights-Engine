@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { createClient } from "@supabase/supabase-js";
 import { aiLimiter } from "../middleware/rate-limit";
+import { getEntitlement } from "../lib/entitlement";
 
 const router = Router();
 
@@ -89,18 +90,6 @@ function statusToFlag(status: string): Flag {
   return "normal";
 }
 
-async function checkPremium(userId: string, db: ReturnType<typeof getServiceSupabase>): Promise<boolean> {
-  if (!db) return false;
-  const { data } = await db
-    .from("user_profiles")
-    .select("is_premium,premium_expires_at")
-    .eq("id", userId)
-    .maybeSingle();
-  if (!data?.is_premium) return false;
-  if (!data.premium_expires_at) return false;
-  return new Date(data.premium_expires_at) > new Date();
-}
-
 async function ensurePrimaryProfile(
   userId: string,
   db: NonNullable<ReturnType<typeof getServiceSupabase>>,
@@ -165,7 +154,8 @@ router.post("/vault/save", aiLimiter, async (req: Request, res: Response): Promi
   }
 
   try {
-    const isPremium = await checkPremium(user.id, db);
+    const { tier }   = await getEntitlement(user.id);
+    const isPremium  = tier !== "free";
     const parameters = reportResult.parameters ?? [];
     const reportType = detectReportType(parameters);
     const profileId = requestedProfileId ?? await ensurePrimaryProfile(user.id, db);
@@ -295,6 +285,21 @@ router.post("/vault/profiles", aiLimiter, async (req: Request, res: Response): P
     return;
   }
 
+  // Enforce profile limit based on server-trusted entitlement
+  const entitlement = await getEntitlement(user.id);
+  const { count } = await db
+    .from("vault_profiles")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id);
+
+  if ((count ?? 0) >= entitlement.max_profiles) {
+    const msg = entitlement.tier === "free"
+      ? "Upgrade to Premium to add family profiles"
+      : "Profile limit reached for your plan";
+    res.status(403).json({ error: msg, code: "PROFILE_LIMIT_REACHED" });
+    return;
+  }
+
   const { data, error } = await db
     .from("vault_profiles")
     .insert({ user_id: user.id, display_name: display_name.trim(), relation, dob: dob ?? null, sex: sex ?? null, is_primary: false })
@@ -378,9 +383,9 @@ router.get("/vault/reports", aiLimiter, async (req: Request, res: Response): Pro
 
   if (error) { res.status(500).json({ error: "Failed to fetch reports" }); return; }
 
-  const isPremium = await checkPremium(user.id, db);
+  const { tier } = await getEntitlement(user.id);
 
-  res.json({ reports: reports ?? [], isPremium });
+  res.json({ reports: reports ?? [], isPremium: tier !== "free", tier });
 });
 
 // ── GET /vault/reports/:id ────────────────────────────────────────────────────

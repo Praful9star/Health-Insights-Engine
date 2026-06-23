@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import PageMeta from "@/components/page-meta";
 import { useAuth } from "@/contexts/auth-context";
+import { useEntitlement } from "@/hooks/useEntitlement";
+import { Paywall } from "@/components/paywall";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -302,9 +304,11 @@ function AddProfileModal({ token, onCreated, onClose }: {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function VaultPage() {
-  const { user, session, isPremium } = useAuth();
+  const { user, session }            = useAuth();
+  const { tier, isPremium, isLoading: entitlementLoading } = useEntitlement();
   const [, navigate] = useLocation();
   const token = session?.access_token ?? "";
+  const [showFamilyPaywall, setShowFamilyPaywall] = useState(false);
 
   const [activeProfileId, setActiveProfileId] = useState<string | null>(null);
   const [showAddProfile, setShowAddProfile] = useState(false);
@@ -395,12 +399,21 @@ export default function VaultPage() {
             <span className="text-[10px] opacity-60">{RELATION_LABELS[p.relation] ?? p.relation}</span>
           </button>
         ))}
-        <button
-          onClick={() => setShowAddProfile(true)}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-600 border border-dashed border-border/50 text-muted-foreground hover:border-primary/40 hover:text-primary transition-all"
-        >
-          <Plus className="w-3.5 h-3.5" /> Add
-        </button>
+        {tier !== "free" ? (
+          <button
+            onClick={() => setShowAddProfile(true)}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-600 border border-dashed border-border/50 text-muted-foreground hover:border-primary/40 hover:text-primary transition-all"
+          >
+            <Plus className="w-3.5 h-3.5" /> Add
+          </button>
+        ) : (
+          <button
+            onClick={() => setShowFamilyPaywall(true)}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-600 border border-dashed border-amber-500/40 text-amber-500 hover:bg-amber-500/5 transition-all"
+          >
+            <Star className="w-3.5 h-3.5" /> Add Family
+          </button>
+        )}
       </div>
 
       {/* Report list */}
@@ -441,28 +454,9 @@ export default function VaultPage() {
             />
           ))}
 
-          {/* Premium upsell for locked reports */}
+          {/* Paywall for locked reports — server-gated via useEntitlement */}
           {lockedCount > 0 && (
-            <div className="glass-panel rounded-2xl p-5 border border-amber-500/30 bg-amber-500/5">
-              <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                  <Star className="w-4 h-4 text-amber-500" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-700 text-foreground mb-1">
-                    {lockedCount} older report{lockedCount > 1 ? "s" : ""} — Premium only
-                  </p>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Free plan keeps your most recent report. Upgrade to Premium to store unlimited history and track trends over time.
-                  </p>
-                  <Link href="/premium">
-                    <button className="inline-flex items-center gap-1.5 bg-amber-500/15 border border-amber-500/40 text-amber-500 px-4 py-2 rounded-xl text-xs font-700 hover:bg-amber-500/25 transition-colors">
-                      Upgrade to Premium <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <Paywall feature="vault_history" />
           )}
 
           {/* Free plan notice (no locked reports but still free) */}
@@ -486,7 +480,7 @@ export default function VaultPage() {
         Educational only. All analyses are AI-generated — always discuss with your doctor. Never a diagnosis or prescription.
       </p>
 
-      {/* Add profile modal */}
+      {/* Add profile modal (premium users only) */}
       {showAddProfile && (
         <AddProfileModal
           token={token}
@@ -497,6 +491,29 @@ export default function VaultPage() {
           }}
           onClose={() => setShowAddProfile(false)}
         />
+      )}
+
+      {/* Family profiles paywall (free users clicking "Add Family") */}
+      {showFamilyPaywall && (
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
+          onClick={() => setShowFamilyPaywall(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full max-w-sm"
+            onClick={e => e.stopPropagation()}
+          >
+            <Paywall feature="family_profiles" />
+            <button
+              onClick={() => setShowFamilyPaywall(false)}
+              className="w-full mt-2 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Maybe later
+            </button>
+          </motion.div>
+        </div>
       )}
     </div>
   );
