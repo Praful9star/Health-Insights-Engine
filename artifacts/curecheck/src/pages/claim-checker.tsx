@@ -122,6 +122,27 @@ export default function ClaimChecker() {
         title="Health Claim Checker — Verify WhatsApp Health Forwards"
         description="Paste any WhatsApp health claim and get an AI-powered credibility score with red flags, safer interpretation, and doctor questions. Free for India."
         path="/claim-checker"
+        schemas={[
+          {
+            "@context": "https://schema.org",
+            "@type": "MedicalWebPage",
+            "name": "Health Claim Checker — CureCheck",
+            "url": "https://curecheck.in/claim-checker",
+            "description": "Verify health claims from WhatsApp forwards, YouTube videos, and supplement ads with a credibility score backed by WHO, ICMR, Cochrane, and PubMed.",
+            "inLanguage": ["en-IN", "hi-IN"],
+            "audience": { "@type": "Patient" },
+            "about": { "@type": "MedicalCause", "name": "Health Misinformation Fact-Checking" },
+            "isPartOf": { "@type": "WebSite", "name": "CureCheck", "url": "https://curecheck.in" },
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://curecheck.in" },
+              { "@type": "ListItem", "position": 2, "name": "Claim Checker", "item": "https://curecheck.in/claim-checker" },
+            ],
+          },
+        ]}
       />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <Link href="/">

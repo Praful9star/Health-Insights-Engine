@@ -181,6 +181,27 @@ export default function SymptomChecker() {
         title="Symptom Checker — AI-Powered Health Assessment for India"
         description="Describe your symptoms and get an AI assessment of possible causes, urgency level, and questions to ask your doctor. Free tool, built for India."
         path="/symptom-checker"
+        schemas={[
+          {
+            "@context": "https://schema.org",
+            "@type": "MedicalWebPage",
+            "name": "Symptom Checker — CureCheck",
+            "url": "https://curecheck.in/symptom-checker",
+            "description": "Describe your symptoms and get AI-powered guidance on possible causes, urgency level, and questions to ask your doctor. Free, India-focused.",
+            "inLanguage": ["en-IN", "hi-IN"],
+            "audience": { "@type": "Patient" },
+            "about": { "@type": "Symptom", "name": "General Health Symptoms" },
+            "isPartOf": { "@type": "WebSite", "name": "CureCheck", "url": "https://curecheck.in" },
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://curecheck.in" },
+              { "@type": "ListItem", "position": 2, "name": "Symptom Checker", "item": "https://curecheck.in/symptom-checker" },
+            ],
+          },
+        ]}
       />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         {/* Header */}

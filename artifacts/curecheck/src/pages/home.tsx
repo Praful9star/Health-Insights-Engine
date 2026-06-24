@@ -72,6 +72,7 @@ const HOW_IT_WORKS = [
 
 const FAQS = [
   { q: { en: "Is CureCheck a replacement for a doctor?", hi: "क्या CureCheck डॉक्टर का विकल्प है?" }, a: { en: "Absolutely not. CureCheck helps you understand your reports so you can have better conversations with your doctor. It never diagnoses or prescribes.", hi: "बिल्कुल नहीं। CureCheck आपको रिपोर्ट समझने में मदद करता है ताकि आप डॉक्टर से बेहतर बात कर सकें। यह कभी निदान या दवा नहीं देता।" } },
+  { q: { en: "Why not just ask ChatGPT or Gemini?", hi: "ChatGPT या Gemini से क्यों नहीं पूछते?" }, a: { en: "You can — but CureCheck is purpose-built for Indian health: it uses ICMR and Indian lab reference ranges (not US ranges), understands SRL/Dr. Lal/Thyrocare formats, tracks your values across visits in a Health Timeline, and never needs a prompt. Your data stays on your device, not in a training pipeline.", hi: "आप पूछ सकते हैं — लेकिन CureCheck भारतीय स्वास्थ्य के लिए खास बना है: यह ICMR और भारतीय lab reference ranges उपयोग करता है, SRL/Dr. Lal/Thyrocare formats समझता है, Health Timeline में आपकी values track करता है, और आपका डेटा आपके device पर ही रहता है।" } },
   { q: { en: "Is my health data private?", hi: "क्या मेरा डेटा सुरक्षित है?" }, a: { en: "Your queries are never stored on our servers. The Health Timeline saves data locally on your device only — nothing leaves your browser.", hi: "आपके प्रश्न हमारे सर्वर पर कभी संग्रहीत नहीं होते। स्वास्थ्य समयरेखा केवल आपके डिवाइस पर स्थानीय रूप से सहेजी जाती है।" } },
   { q: { en: "Which reports does it support?", hi: "कौन सी रिपोर्ट समझा सकता है?" }, a: { en: "CBC, thyroid panel, lipid profile, blood glucose, HbA1c, liver function, kidney function, Vitamin D, iron studies, and most other Indian lab reports.", hi: "CBC, थायरॉइड, लिपिड प्रोफ़ाइल, ब्लड ग्लूकोज़, HbA1c, लिवर फंक्शन, किडनी फंक्शन, विटामिन D और अधिकतर भारतीय लैब रिपोर्ट।" } },
   { q: { en: "Is the Fitness Hub medically accurate?", hi: "क्या फिटनेस केंद्र चिकित्सकीय रूप से सटीक है?" }, a: { en: "The Fitness Hub provides general nutrition and wellness guidance for healthy adults. It is not medical advice. Always consult a doctor for medical conditions.", hi: "फिटनेस केंद्र स्वस्थ वयस्कों के लिए सामान्य पोषण और स्वास्थ्य मार्गदर्शन देता है। यह चिकित्सा सलाह नहीं है।" } },
@@ -646,6 +647,84 @@ export default function Home() {
               </div>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ══ WHY CURECHECK (vs generic AI bots) ══════════════════════ */}
+      <section className="py-16 px-4" aria-label="Why CureCheck vs ChatGPT">
+        <div className="max-w-[1200px] mx-auto">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10">
+            <p className="mono-label text-primary/80 mb-3">{t("Why CureCheck", "CureCheck क्यों?")}</p>
+            <h2 className="text-3xl sm:text-4xl font-serif font-800 text-foreground">
+              {t("Not just another AI bot", "सिर्फ एक और AI bot नहीं")}
+            </h2>
+            <p className="text-muted-foreground mt-3 max-w-xl mx-auto text-sm leading-relaxed">
+              {t(
+                "Yes, you can ask ChatGPT. Here's what it can't do for you.",
+                "हाँ, ChatGPT से पूछ सकते हैं। लेकिन यह जो नहीं कर सकता —"
+              )}
+            </p>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              {
+                icon: MapPin,
+                accent: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/20",
+                title: { en: "Built for India", hi: "भारत के लिए बना" },
+                desc: { en: "Uses ICMR guidelines and Indian lab reference ranges — not US or UK norms. Understands SRL, Dr. Lal, Thyrocare, AIIMS formats.", hi: "ICMR दिशानिर्देश और भारतीय lab ranges — US/UK नहीं। SRL, Dr. Lal, Thyrocare formats समझता है।" },
+                vs: { en: "ChatGPT defaults to US reference ranges", hi: "ChatGPT US ranges use करता है" },
+              },
+              {
+                icon: TrendingUp,
+                accent: "text-primary", bg: "bg-primary/10", border: "border-primary/20",
+                title: { en: "Tracks you over time", hi: "समय के साथ track करता है" },
+                desc: { en: "Health Timeline remembers your Haemoglobin, Blood Sugar, Cholesterol across visits. Spot trends before your doctor does.", hi: "Health Timeline आपके Haemoglobin, Blood Sugar, Cholesterol याद रखता है। Trends पहले पहचानें।" },
+                vs: { en: "ChatGPT forgets everything after each chat", hi: "ChatGPT हर chat के बाद सब भूल जाता है" },
+              },
+              {
+                icon: Shield,
+                accent: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20",
+                title: { en: "Your data stays yours", hi: "डेटा आपका, रहेगा आपका" },
+                desc: { en: "Nothing is stored on servers. Health data lives only on your device. No account, no login, no training on your reports.", hi: "Server पर कुछ store नहीं। Health data सिर्फ आपके device पर। कोई account नहीं, कोई login नहीं।" },
+                vs: { en: "AI bots may use your data for training", hi: "AI bots आपका data training में use कर सकते हैं" },
+              },
+              {
+                icon: AlertTriangle,
+                accent: "text-rose-400", bg: "bg-rose-500/10", border: "border-rose-500/20",
+                title: { en: "Safety-first design", hi: "Safety पहले" },
+                desc: { en: "Every tool routes to 'discuss with your doctor.' Red-flag values escalate to emergency care. No dosage advice, ever.", hi: "हर tool 'डॉक्टर से बात करें' तक ले जाता है। Red-flag values emergency care suggest करते हैं।" },
+                vs: { en: "Generic AI can hallucinate drug dosages", hi: "Generic AI गलत dosage बता सकता है" },
+              },
+              {
+                icon: Globe2,
+                accent: "text-sky-400", bg: "bg-sky-500/10", border: "border-sky-500/20",
+                title: { en: "Hindi + English, not just English", hi: "हिंदी + English, सिर्फ English नहीं" },
+                desc: { en: "Switch languages mid-session. Share results in Hindi on WhatsApp. Works for the entire family, not just the English-speaker.", hi: "बीच session में भाषा बदलें। WhatsApp पर Hindi में results share करें। पूरे परिवार के लिए।" },
+                vs: { en: "Most AI tools are English-first", hi: "ज्यादातर AI tools English-first हैं" },
+              },
+              {
+                icon: Zap,
+                accent: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20",
+                title: { en: "No prompt engineering needed", hi: "Prompt लिखना नहीं पड़ता" },
+                desc: { en: "Upload your report, get an explanation. No 'act as a doctor' prompts, no jailbreaks, no system messages to craft.", hi: "Report upload करें, explanation पाएं। कोई 'डॉक्टर बनो' prompt नहीं, कोई system message नहीं।" },
+                vs: { en: "ChatGPT needs careful prompting for health", hi: "ChatGPT को health के लिए careful prompting चाहिए" },
+              },
+            ].map((item, i) => (
+              <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i % 3}
+                className={`glass-panel rounded-2xl p-5 border ${item.border}`}>
+                <div className={`w-9 h-9 rounded-xl ${item.bg} flex items-center justify-center mb-3`}>
+                  <item.icon className={`w-4.5 h-4.5 ${item.accent}`} />
+                </div>
+                <h3 className="font-700 text-foreground mb-1.5">{language === "hi" ? item.title.hi : item.title.en}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-3">{language === "hi" ? item.desc.hi : item.desc.en}</p>
+                <div className="flex items-start gap-1.5 pt-3 border-t border-border/40">
+                  <span className="text-xs text-rose-400 font-600 flex-shrink-0 mt-0.5">✕</span>
+                  <p className="text-xs text-muted-foreground/70 italic">{language === "hi" ? item.vs.hi : item.vs.en}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 

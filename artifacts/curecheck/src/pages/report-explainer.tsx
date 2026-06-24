@@ -508,6 +508,38 @@ export default function ReportExplainer() {
         title="Medical Report Explainer — Decode Your Lab Reports"
         description="Upload your CBC, thyroid, or any lab report and get a plain-language explanation of your results in Hindi and English. Free AI health tool for India."
         path="/report-explainer"
+        schemas={[
+          {
+            "@context": "https://schema.org",
+            "@type": "MedicalWebPage",
+            "name": "Medical Report Explainer — CureCheck",
+            "url": "https://curecheck.in/report-explainer",
+            "description": "Upload your CBC, thyroid, lipid profile or any Indian lab report and get a plain-language explanation of every parameter in Hindi and English.",
+            "inLanguage": ["en-IN", "hi-IN"],
+            "audience": { "@type": "Patient" },
+            "about": { "@type": "MedicalTest", "name": "Blood Test Interpretation" },
+            "isPartOf": { "@type": "WebSite", "name": "CureCheck", "url": "https://curecheck.in" },
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://curecheck.in" },
+              { "@type": "ListItem", "position": 2, "name": "Report Explainer", "item": "https://curecheck.in/report-explainer" },
+            ],
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            "name": "How to decode your blood test report",
+            "description": "Upload or paste your lab report — CureCheck explains every parameter in plain Hindi or English.",
+            "step": [
+              { "@type": "HowToStep", "position": 1, "name": "Upload your report", "text": "Upload a photo, PDF, or paste your lab report text." },
+              { "@type": "HowToStep", "position": 2, "name": "AI analysis", "text": "CureCheck AI extracts and explains every parameter using Indian lab reference ranges." },
+              { "@type": "HowToStep", "position": 3, "name": "Prepare for your doctor", "text": "Use the Doctor Visit Prep to take your questions to your next appointment." },
+            ],
+          },
+        ]}
       />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
 
