@@ -26,7 +26,7 @@ const EMERGENCY_RE = [
   /severe\s*bleed/i,
   /\bseizure\b/i,
   /\bsuicid/i,
-  /kill\s*my\s*self/i,
+  /kill\s*(my\s*)?self/i,
   /want\s*to\s*die/i,
   /\boverdos/i,
   /not\s*breathing/i,

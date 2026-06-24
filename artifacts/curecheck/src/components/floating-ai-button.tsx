@@ -133,12 +133,13 @@ export default function FloatingAIButton() {
 
   // ── Init ──────────────────────────────────────────────────────────────────
 
+  // Run once on mount to detect speech support and set initial TTS preference
   useEffect(() => {
     const SR = window.SpeechRecognition ?? window.webkitSpeechRecognition;
     setSpeechSupported(!!SR);
-    // Default TTS on for Hindi — the audience benefits most
-    setVoiceOut(language === "hi");
-  }, [language]);
+    setVoiceOut(language === "hi"); // default: on for Hindi, off for English
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // intentionally empty — only set default once, don't override user's toggle
 
   // Scroll-hide FAB while user scrolls (keeps it from covering text)
   useEffect(() => {
@@ -297,7 +298,12 @@ export default function FloatingAIButton() {
 
       outer: while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
+        if (done) {
+          // Flush any partial UTF-8 bytes buffered by the decoder (e.g. emojis, Hindi accents)
+          const tail = dec.decode();
+          if (tail) buf += tail;
+          break;
+        }
         buf += dec.decode(value, { stream: true });
         const parts = buf.split("\n\n");
         buf = parts.pop() ?? "";

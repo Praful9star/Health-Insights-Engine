@@ -334,6 +334,7 @@ export default function ReportExplainer() {
     setOcrError(null);
     setStep("processing");
     setFileName(file.name);
+    setPdfOcrProgress(null); // clear any stale progress from previous upload
 
     const isPDF = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
 
@@ -429,19 +430,23 @@ export default function ReportExplainer() {
       {
         onSuccess: (data) => {
           setStep("result");
-          // Auto-save to Health Timeline
-          const entry: TimelineEntry = {
-            id: `report_${Date.now()}`,
-            date: new Date().toISOString().split("T")[0],
-            label: fileName ? `Report: ${fileName.replace(/\.[^.]+$/, "")}` : "Report Analysis",
-            simpleSummary: data.simpleSummary,
-            overallAssessment: data.overallAssessment,
-            importantFindings: data.importantFindings,
-            doctorQuestions: data.doctorQuestions,
-            biomarkers: extractBiomarkers(text),
-          };
-          saveToTimeline(entry);
-          setSaved(true);
+          // Auto-save to Health Timeline — only once per analysis session
+          // (saved is reset to false in handleAnalyze before each call)
+          setSaved((alreadySaved) => {
+            if (alreadySaved) return true; // re-render race guard
+            const entry: TimelineEntry = {
+              id: `report_${Date.now()}`,
+              date: new Date().toISOString().split("T")[0],
+              label: fileName ? `Report: ${fileName.replace(/\.[^.]+$/, "")}` : "Report Analysis",
+              simpleSummary: data.simpleSummary,
+              overallAssessment: data.overallAssessment,
+              importantFindings: data.importantFindings,
+              doctorQuestions: data.doctorQuestions,
+              biomarkers: extractBiomarkers(text),
+            };
+            saveToTimeline(entry);
+            return true;
+          });
         },
       },
     );
