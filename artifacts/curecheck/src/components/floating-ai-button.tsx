@@ -119,6 +119,9 @@ export default function FloatingAIButton() {
   const [speechSupported, setSpeechSupported] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [scrolling, setScrolling] = useState(false);
+  // Independent voice-input language — defaults to Hindi regardless of UI locale
+  // so users who speak Hindi can use voice even when the UI is in English
+  const [voiceLang, setVoiceLang] = useState<"hi-IN" | "en-IN">("hi-IN");
 
   const abortRef = useRef<AbortController | null>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
@@ -173,7 +176,7 @@ export default function FloatingAIButton() {
     if (!SR) return;
 
     const rec = new SR();
-    rec.lang = language === "hi" ? "hi-IN" : "en-IN";
+    rec.lang = voiceLang;
     rec.interimResults = true;
     rec.continuous = false;
 
@@ -513,7 +516,22 @@ export default function FloatingAIButton() {
               </div>
 
               {/* Voice row */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                {/* Language toggle for voice — independent of UI locale */}
+                {speechSupported && (
+                  <button
+                    onClick={() => {
+                      if (isListening) stopListening();
+                      setVoiceLang((l) => l === "hi-IN" ? "en-IN" : "hi-IN");
+                    }}
+                    className="flex-shrink-0 px-2.5 py-2.5 rounded-xl border border-border/50 bg-muted/40 text-xs font-700 text-foreground hover:bg-accent/50 transition-colors w-14 text-center"
+                    title={voiceLang === "hi-IN" ? "Switch to English voice" : "हिंदी में बोलें"}
+                    aria-label={voiceLang === "hi-IN" ? "Voice: Hindi — tap to switch to English" : "Voice: English — tap to switch to Hindi"}
+                  >
+                    {voiceLang === "hi-IN" ? "हिंदी" : "EN"}
+                  </button>
+                )}
+
                 {/* Large mic button — the hero interaction */}
                 {speechSupported ? (
                   <button
