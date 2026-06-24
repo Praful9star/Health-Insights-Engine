@@ -15,10 +15,12 @@ import paymentsRouter from "./payments";
 import feedbackRouter from "./feedback";
 import vaultRouter from "./vault";
 import entitlementRouter from "./entitlement";
+import healthChatRouter from "./health-chat";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
+router.use(healthChatRouter);
 router.use(claimCheckerRouter);
 router.use(diseaseJourneyRouter);
 router.use(reportExplainerRouter);

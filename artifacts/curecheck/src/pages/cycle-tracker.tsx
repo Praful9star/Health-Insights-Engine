@@ -463,6 +463,27 @@ export default function CycleTracker() {
         title="Cycle Tracker — Private Menstrual Health Tracking | CureCheck"
         description="Private, on-device menstrual cycle tracker. Log periods, track symptoms, get personalised cycle predictions. Data never leaves your device."
         path="/cycle-tracker"
+        schemas={[
+          {
+            "@context": "https://schema.org",
+            "@type": "MedicalWebPage",
+            "name": "Period & Cycle Tracker — CureCheck",
+            "url": "https://curecheck.in/cycle-tracker",
+            "description": "Private on-device menstrual cycle tracker for Indian women. Log periods, moods, symptoms, get personalised predictions. No account required, data stays on your device.",
+            "inLanguage": ["en-IN", "hi-IN"],
+            "audience": { "@type": "Patient" },
+            "about": { "@type": "MedicalCondition", "name": "Menstrual Health" },
+            "isPartOf": { "@type": "WebSite", "name": "CureCheck", "url": "https://curecheck.in" },
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://curecheck.in" },
+              { "@type": "ListItem", "position": 2, "name": "Cycle Tracker", "item": "https://curecheck.in/cycle-tracker" },
+            ],
+          },
+        ]}
       />
 
       {/* Back nav */}

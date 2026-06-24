@@ -79,6 +79,27 @@ export default function MedicineExplainer() {
         title="Medicine Explainer — Understand Your Medications"
         description="Get plain-language explanations of any medicine prescribed in India — uses, dosage, side effects, and drug interactions. Free AI health tool."
         path="/medicine-explainer"
+        schemas={[
+          {
+            "@context": "https://schema.org",
+            "@type": "MedicalWebPage",
+            "name": "Medicine Guide — CureCheck",
+            "url": "https://curecheck.in/medicine-explainer",
+            "description": "Plain-language information on any medicine prescribed in India — uses, side effects, best time to take, food interactions, and questions for your doctor.",
+            "inLanguage": ["en-IN", "hi-IN"],
+            "audience": { "@type": "Patient" },
+            "about": { "@type": "Drug", "name": "Prescription Medicine Information" },
+            "isPartOf": { "@type": "WebSite", "name": "CureCheck", "url": "https://curecheck.in" },
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://curecheck.in" },
+              { "@type": "ListItem", "position": 2, "name": "Medicine Guide", "item": "https://curecheck.in/medicine-explainer" },
+            ],
+          },
+        ]}
       />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         {/* Header */}

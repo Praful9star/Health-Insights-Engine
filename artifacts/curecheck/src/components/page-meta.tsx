@@ -10,9 +10,11 @@ interface PageMetaProps {
   path: string;
   image?: string;
   imageAlt?: string;
+  /** Optional JSON-LD structured data objects — emitted as separate <script> blocks. */
+  schemas?: object[];
 }
 
-export default function PageMeta({ title, description, path, image = DEFAULT_IMAGE, imageAlt }: PageMetaProps) {
+export default function PageMeta({ title, description, path, image = DEFAULT_IMAGE, imageAlt, schemas }: PageMetaProps) {
   const canonical = `${BASE_URL}${path}`;
   const alt = imageAlt ?? title;
 
@@ -37,6 +39,10 @@ export default function PageMeta({ title, description, path, image = DEFAULT_IMA
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />
       <meta name="twitter:image:alt" content={alt} />
+
+      {schemas?.map((schema, i) => (
+        <script key={i} type="application/ld+json">{JSON.stringify(schema)}</script>
+      ))}
     </Helmet>
   );
 }
