@@ -31,3 +31,27 @@ export async function groqChat(systemPrompt: string, userMessage: string, maxTok
 
   return completion.choices[0]?.message?.content ?? "{}";
 }
+
+export async function groqChatStream(
+  systemPrompt: string,
+  messages: Array<{ role: "user" | "assistant"; content: string }>,
+  maxTokens = 512,
+): Promise<AsyncIterable<string>> {
+  const client = getGroqClient();
+  if (!client) throw new Error("GROQ_API_KEY not configured");
+
+  const stream = await client.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages: [{ role: "system", content: systemPrompt }, ...messages],
+    temperature: 0.5,
+    max_tokens: maxTokens,
+    stream: true,
+  });
+
+  return (async function* () {
+    for await (const chunk of stream) {
+      const text = chunk.choices[0]?.delta?.content ?? "";
+      if (text) yield text;
+    }
+  })();
+}
