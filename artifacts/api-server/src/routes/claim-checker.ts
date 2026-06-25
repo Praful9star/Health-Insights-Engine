@@ -9,7 +9,7 @@ const router: IRouter = Router();
 
 function sanitizeInput(raw: string): string {
   return raw
-    .replace(/ /g, "")
+    .replace(/\x00/g, "")
     .replace(/[\x01-\x08\x0b\x0c\x0e-\x1f\x7f]/g, "")
     .trim();
 }

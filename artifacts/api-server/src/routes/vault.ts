@@ -158,7 +158,22 @@ router.post("/vault/save", aiLimiter, async (req: Request, res: Response): Promi
     const isPremium  = tier !== "free";
     const parameters = reportResult.parameters ?? [];
     const reportType = detectReportType(parameters);
-    const profileId = requestedProfileId ?? await ensurePrimaryProfile(user.id, db);
+    let profileId: string;
+    if (requestedProfileId) {
+      const { data: profile } = await db
+        .from("profiles")
+        .select("id")
+        .eq("id", requestedProfileId)
+        .eq("user_id", user.id)
+        .single();
+      if (!profile) {
+        res.status(403).json({ error: "Profile not found or access denied" });
+        return;
+      }
+      profileId = requestedProfileId;
+    } else {
+      profileId = await ensurePrimaryProfile(user.id, db);
+    }
 
     const reportTypeLabelMap: Record<ReportType, string> = {
       cbc:     "CBC Report",

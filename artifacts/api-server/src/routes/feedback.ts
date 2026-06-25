@@ -13,13 +13,15 @@ function getServiceSupabase() {
   return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
 }
 
-function extractUserId(req: Request): string | null {
+async function extractUserId(req: Request): Promise<string | null> {
   try {
     const auth = req.headers.authorization;
     if (!auth?.startsWith("Bearer ")) return null;
     const token = auth.slice(7);
-    const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64url").toString());
-    return payload.sub ?? null;
+    const sb = getServiceSupabase();
+    if (!sb) return null;
+    const { data } = await sb.auth.getUser(token);
+    return data.user?.id ?? null;
   } catch { return null; }
 }
 
@@ -60,7 +62,7 @@ router.post("/feedback", feedbackLimiter, async (req: Request, res: Response) =>
     return;
   }
 
-  const userId = extractUserId(req);
+  const userId = await extractUserId(req);
   const { error } = await sb.from("feedback").insert({
     user_id:  userId,
     type:     parsed.data.type,
@@ -91,7 +93,7 @@ router.post("/bug-report", feedbackLimiter, async (req: Request, res: Response) 
     return;
   }
 
-  const userId = extractUserId(req);
+  const userId = await extractUserId(req);
   const { error } = await sb.from("bug_reports").insert({
     user_id:     userId,
     description: parsed.data.description,

@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { CheckDrugInteractionBody } from "@workspace/api-zod";
+import { CheckDrugInteractionBody, CheckDrugInteractionResponse } from "@workspace/api-zod";
 import { groqChat } from "../lib/groq";
 import { aiLimiter } from "../middleware/rate-limit";
 import { drugCache, TTL } from "../lib/cache";
@@ -38,7 +38,9 @@ router.post("/drug-interaction", aiLimiter, async (req, res): Promise<void> => {
 
   const medList = medicines
     .filter((m) => typeof m === "string" && m.trim().length > 1)
-    .slice(0, 5);
+    .slice(0, 5)
+    .map((m) => m.replace(/[^a-zA-Z0-9\s\-().+]/g, "").trim())
+    .filter((m) => m.length > 0);
 
   // Sort so "aspirin,ibuprofen" and "ibuprofen,aspirin" share one cache entry
   const cacheKey = medList.map((m) => m.toLowerCase().trim()).sort().join(",");
@@ -85,8 +87,9 @@ Respond ONLY with a JSON object:
       return;
     }
 
-    drugCache.set(cacheKey, result, TTL.DRUG_INTERACTION);
-    res.json(result);
+    const validated = CheckDrugInteractionResponse.parse(result);
+    drugCache.set(cacheKey, validated, TTL.DRUG_INTERACTION);
+    res.json(validated);
   } catch (err) {
     req.log.warn({ err }, "Groq drug-interaction error — returning mock");
     res.json({ ...MOCK, _isMockResponse: true });

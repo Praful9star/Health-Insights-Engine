@@ -2,6 +2,15 @@ import { ReplitConnectors } from "@replit/connectors-sdk";
 
 const connectors = new ReplitConnectors();
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export interface EmailPayload {
   to: string | string[];
   subject: string;
@@ -35,10 +44,10 @@ export function reportSummaryEmail(opts: {
   doctorQuestions: string[];
 }): string {
   const findings = opts.keyFindings
-    .map((f) => `<li style="margin-bottom:8px;color:#374151;">${f}</li>`)
+    .map((f) => `<li style="margin-bottom:8px;color:#374151;">${escapeHtml(f)}</li>`)
     .join("");
   const questions = opts.doctorQuestions
-    .map((q) => `<li style="margin-bottom:8px;color:#374151;">${q}</li>`)
+    .map((q) => `<li style="margin-bottom:8px;color:#374151;">${escapeHtml(q)}</li>`)
     .join("");
 
   return `<!DOCTYPE html>
@@ -56,8 +65,8 @@ export function reportSummaryEmail(opts: {
         </tr>
         <tr>
           <td style="padding:32px 40px;">
-            ${opts.userName ? `<p style="color:#6b7280;font-size:15px;margin-top:0;">Hi <strong>${opts.userName}</strong>,</p>` : ""}
-            <p style="color:#374151;font-size:15px;">Your <strong>${opts.reportType}</strong> report has been analyzed. Here is a plain-language summary.</p>
+            ${opts.userName ? `<p style="color:#6b7280;font-size:15px;margin-top:0;">Hi <strong>${escapeHtml(opts.userName)}</strong>,</p>` : ""}
+            <p style="color:#374151;font-size:15px;">Your <strong>${escapeHtml(opts.reportType)}</strong> report has been analyzed. Here is a plain-language summary.</p>
 
             <h2 style="font-size:16px;font-weight:700;color:#0d9488;border-bottom:2px solid #f0fdf4;padding-bottom:8px;">Key Findings</h2>
             <ul style="padding-left:20px;margin-top:12px;">${findings}</ul>

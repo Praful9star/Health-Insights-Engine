@@ -445,7 +445,7 @@ router.post("/disease-journey", aiLimiter, async (req, res): Promise<void> => {
       req.log.info("Generating disease journey with Groq");
       const raw = await groqChat(
         SYSTEM_PROMPT,
-        `Generate a disease journey map for: Disease: "${disease}", Age Group: "${ageGroup}"`,
+        `Generate a disease journey map for:\n[DISEASE START]\n${disease}\n[DISEASE END]\nAge Group: [AGEGROUP START]\n${ageGroup}\n[AGEGROUP END]`,
       );
       result = JSON.parse(raw);
     } else {
