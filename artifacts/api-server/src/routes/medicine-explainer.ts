@@ -51,7 +51,27 @@ Respond ONLY with a JSON object matching this exact schema:
 }
 
 Guidelines:
-- For common Indian medicines (Metformin, Amlodipine, Atorvastatin, Thyronorm, etc.) give accurate, helpful information
+- BRAND NAME MAPPING — always recognize these common Indian brand names and map to their generics:
+  Dolo 650 / Dolo 500 / Crocin / Calpol / Paracip → Paracetamol (Acetaminophen)
+  Combiflam / Ibugesic → Ibuprofen + Paracetamol combination
+  Brufen / Ibugesic Plus → Ibuprofen
+  Pan 40 / Pan D / Pantocid / Pantop → Pantoprazole
+  Omez / Ocid / Prilosec → Omeprazole
+  Ecosprin / Aspirin Cardio / Loprin → Aspirin (Acetylsalicylic acid)
+  Thyronorm / Eltroxin → Levothyroxine
+  Amlokind / Amlopres → Amlodipine
+  Atorva / Lipitor / Storvas → Atorvastatin
+  Azithral / Azee / Zithromax → Azithromycin
+  Augmentin / Amoxyclav → Amoxicillin + Clavulanate
+  Mox / Novamox → Amoxicillin
+  Cifran / Ciplox → Ciprofloxacin
+  Metpure / Metosartan / Betaloc → Metoprolol
+  Telma / Telmikind → Telmisartan
+  Cetrizine / Alerid / Zyrtec → Cetirizine
+  Montair / Montek → Montelukast
+  Sinarest / D-Cold / Cosome → Cold combination (Paracetamol + Phenylephrine + Chlorpheniramine)
+  If the input is a brand name not in this list, still infer the likely generic from context and provide helpful information.
+- For common Indian medicines give accurate, helpful information
 - Keep explanations at Class 8 reading level — no jargon
 - India context: mention Jan Aushadhi alternatives if available, note if it needs prescription
 - commonSideEffects: include 4-6 effects ordered by frequency
@@ -62,6 +82,59 @@ Guidelines:
 function getMockMedicineResult(medicine: string, language: string) {
   const med = medicine.toLowerCase();
   const isHindi = language === "hi";
+
+  // Paracetamol / common Indian brand names
+  const isParacetamol =
+    med.includes("paracetamol") ||
+    med.includes("dolo") ||
+    med.includes("crocin") ||
+    med.includes("calpol") ||
+    med.includes("paracip") ||
+    med.includes("acetaminophen");
+
+  if (isParacetamol) {
+    return {
+      medicineName: isHindi ? "Paracetamol (Dolo / Crocin)" : "Paracetamol (Dolo / Crocin)",
+      genericName: "Paracetamol (Acetaminophen)",
+      medicineClass: isHindi ? "दर्दनिवारक और बुखार-कम करने वाली दवा (Analgesic / Antipyretic)" : "Analgesic (pain reliever) and Antipyretic (fever reducer)",
+      whatItTreats: isHindi
+        ? ["बुखार (Fever)", "सिरदर्द", "हल्का से मध्यम दर्द", "दांत दर्द", "सर्दी-जुकाम के लक्षण"]
+        : ["Fever", "Headache", "Mild to moderate pain (body ache, toothache)", "Cold and flu symptoms", "Post-vaccination fever"],
+      howItWorks: isHindi
+        ? "Paracetamol मस्तिष्क में prostaglandins बनने से रोकती है, जो दर्द और बुखार के संकेत देते हैं। यह inflammation को NSAIDs (जैसे Ibuprofen) जितना कम नहीं करती, लेकिन पेट पर gentle होती है।"
+        : "Paracetamol blocks prostaglandins in the brain that signal pain and fever. It is gentler on the stomach than NSAIDs like Ibuprofen and does not thin blood. It does not reduce inflammation significantly.",
+      commonSideEffects: [
+        { effect: isHindi ? "सामान्य खुराक में side effects बहुत कम" : "Very few side effects at normal doses", frequency: "rare" as const, whatToDo: isHindi ? "सही मात्रा में लेना ज़रूरी है।" : "The key is not exceeding the recommended dose." },
+        { effect: isHindi ? "Liver पर असर (overdose में)" : "Liver damage (in overdose)", frequency: "rare" as const, whatToDo: isHindi ? "एक दिन में 4000 mg (8 tablets of 500 mg) से अधिक कभी न लें। शराब के साथ बिल्कुल नहीं।" : "Never exceed 4000 mg per day (8 tabs of 500 mg). Risk is higher with alcohol use." },
+        { effect: isHindi ? "Rash या एलर्जी" : "Skin rash or allergic reaction", frequency: "rare" as const, whatToDo: isHindi ? "तुरंत दवा बंद करें और डॉक्टर को बताएं।" : "Stop the medicine and consult your doctor." },
+        { effect: isHindi ? "मतली (बहुत अधिक मात्रा में)" : "Nausea (at higher doses)", frequency: "uncommon" as const, whatToDo: isHindi ? "खाने के साथ लें।" : "Take with food to minimize nausea." },
+      ],
+      foodInteractions: isHindi
+        ? ["शराब — liver damage का खतरा बढ़ता है, साथ में न लें", "खाली पेट लेने पर भी ठीक है, लेकिन खाने के साथ लेना बेहतर"]
+        : ["Alcohol — significantly increases liver damage risk, avoid completely", "Can be taken with or without food, but food may help if nausea occurs"],
+      drugInteractions: isHindi
+        ? ["Warfarin (blood thinner) — लंबे समय तक साथ लेने से bleeding बढ़ सकती है", "दूसरी Paracetamol-युक्त दवाएं (Cold syrups, Combiflam) — overdose का खतरा", "Carbamazepine (anti-epileptic) — liver damage का खतरा"]
+        : ["Warfarin / blood thinners — prolonged use may increase bleeding risk", "Other Paracetamol-containing products (cold syrups, Combiflam) — check for hidden Paracetamol to avoid overdose", "Carbamazepine (anti-epileptic) — increases liver risk"],
+      importantWarnings: isHindi
+        ? ["एक दिन में 4g (4000 mg) से अधिक न लें", "Combiflam और सर्दी की दवाओं में भी Paracetamol होती है — double dose से बचें", "Liver या kidney की बीमारी हो तो डॉक्टर से पूछें", "3 दिन से अधिक बुखार रहे तो डॉक्टर से मिलें", "बच्चों को वजन के अनुसार सही dose दें — बड़ों की गोली न दें"]
+        : ["Do not exceed 4g (4000 mg) total per day from all sources", "Many cold syrups and combination medicines also contain Paracetamol — check labels to avoid accidental overdose", "Use with caution in liver disease or heavy alcohol use", "See a doctor if fever lasts more than 3 days or is above 103°F (39.4°C)", "For children: use weight-based dosing — never give adult tablets"],
+      bestTimeTake: isHindi
+        ? "हर 4-6 घंटे पर लें जब जरूरत हो, लेकिन 24 घंटे में 4 से अधिक doses नहीं। खाने के साथ या बिना — दोनों ठीक है।"
+        : "Take every 4–6 hours as needed, no more than 4 doses in 24 hours. Can be taken with or without food. Dolo 650 (650 mg) is common in India — follow pack instructions.",
+      missedDose: isHindi
+        ? "Paracetamol 'as needed' ली जाती है — अगर दर्द या बुखार नहीं है तो अगली dose की जरूरत नहीं।"
+        : "Paracetamol is typically taken 'as needed' for pain or fever. If you feel better, you do not need to continue. If on a scheduled dose, take when remembered and space remaining doses.",
+      storage: isHindi
+        ? "कमरे के तापमान पर रखें (30°C से नीचे), नमी से दूर। बच्चों की पहुंच से दूर।"
+        : "Store below 30°C, away from moisture and direct sunlight. Keep out of children's reach.",
+      pharmacistQuestions: isHindi
+        ? ["Dolo 650 और Dolo 500 में क्या फर्क है?", "मेरी उम्र और वजन के लिए सही dose क्या है?", "क्या मेरी दूसरी दवाओं में भी Paracetamol है?", "Jan Aushadhi में generic Paracetamol मिलेगी?", "बच्चे को कितनी dose दूं?"]
+        : ["What is the difference between Dolo 650 and Dolo 500?", "Is the 650 mg dose safe for me specifically?", "Do any of my other medicines also contain Paracetamol?", "Is generic Paracetamol available cheaper at Jan Aushadhi?", "What dose should I give my child by weight?"],
+      disclaimer: isHindi
+        ? "यह जानकारी केवल शैक्षिक उद्देश्यों के लिए है। डॉक्टर की सलाह के बिना कभी दवा की मात्रा न बदलें।"
+        : "This medicine information is educational only. Never change your dose or stop taking medicine without consulting your doctor.",
+    };
+  }
 
   if (med.includes("metformin") || med.includes("glucophage")) {
     return {
