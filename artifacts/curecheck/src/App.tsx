@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, Component, type ReactNode, type ErrorInfo } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { MotionConfig, motion, AnimatePresence } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -62,9 +62,43 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
 });
 
+function PageLoading() {
+  return (
+    <div className="flex items-center justify-center min-h-[50vh]">
+      <div className="w-8 h-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+    </div>
+  );
+}
+
+interface EBState { hasError: boolean }
+class ErrorBoundary extends Component<{ children: ReactNode }, EBState> {
+  state: EBState = { hasError: false };
+  static getDerivedStateFromError(): EBState { return { hasError: true }; }
+  componentDidCatch(err: Error, info: ErrorInfo) {
+    console.error("[CureCheck] Page render error:", err, info.componentStack);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[50vh] px-4 text-center gap-4">
+          <p className="text-lg font-600 text-foreground">Something went wrong loading this page.</p>
+          <button
+            onClick={() => { this.setState({ hasError: false }); window.location.reload(); }}
+            className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-600 hover:bg-primary/90 transition-colors"
+          >
+            Reload page
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function Routes() {
   return (
-    <Suspense fallback={null}>
+    <ErrorBoundary>
+    <Suspense fallback={<PageLoading />}>
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/report-explainer" component={ReportExplainer} />
@@ -103,6 +137,7 @@ function Routes() {
         <Route component={NotFound} />
       </Switch>
     </Suspense>
+    </ErrorBoundary>
   );
 }
 
