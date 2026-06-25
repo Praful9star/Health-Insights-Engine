@@ -82,6 +82,10 @@ function writeSse(res: Response, data: string): void {
   res.write(`data: ${JSON.stringify(data)}\n\n`);
 }
 
+function writeSseError(res: Response, message: string): void {
+  res.write(`data: ${JSON.stringify({ type: "error", message })}\n\n`);
+}
+
 router.post("/health-chat", aiLimiter, async (req: Request, res: Response): Promise<void> => {
   const parsed = HealthChatBodySchema.safeParse(req.body);
   if (!parsed.success) {
@@ -131,7 +135,8 @@ router.post("/health-chat", aiLimiter, async (req: Request, res: Response): Prom
       locale === "hi"
         ? "माफ करें, कुछ गलत हो गया। फिर से कोशिश करें।"
         : "Sorry, something went wrong. Please try again.";
-    writeSse(res, msg);
+    // Use typed error event so client replaces partial content instead of appending
+    writeSseError(res, msg);
   }
 
   res.write("data: [DONE]\n\n");

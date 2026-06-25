@@ -83,10 +83,12 @@ const EXAMPLE_SYMPTOMS_HI = [
 function buildShareText(result: ReturnType<typeof useCheckSymptoms>["data"], language: "en" | "hi") {
   if (!result) return "";
   const cfg = URGENCY_CONFIG[result.urgencyLevel];
+  const URGENCY_ORDER = ["monitor", "home_care", "see_doctor_soon", "see_doctor_today", "emergency"];
+  const urgencyNum = URGENCY_ORDER.indexOf(result.urgencyLevel) + 1;
   if (language === "hi") {
-    return `🩺 *CureCheck लक्षण जांच*\n\n⚠️ *${cfg.label.hi}*\n\n${result.urgencyExplanation}\n\n*तुरंत क्या करें:*\n${result.immediateSteps.map((s, i) => `${i + 1}. ${s}`).join("\n")}\n\n❗ *चेतावनी के संकेत:*\n${result.redFlags.map((f) => `• ${f}`).join("\n")}\n\n_CureCheck - यह जानकारी केवल शैक्षिक है, चिकित्सा सलाह नहीं।_\ncurecheck.in पर जाएं`;
+    return `🩺 *CureCheck लक्षण जांच*\n\n⚠️ *${cfg.label.hi}* (तत्कालता: ${urgencyNum}/5)\n\n${result.urgencyExplanation}\n\n*तुरंत क्या करें:*\n${result.immediateSteps.map((s, i) => `${i + 1}. ${s}`).join("\n")}\n\n❗ *चेतावनी के संकेत:*\n${result.redFlags.map((f) => `• ${f}`).join("\n")}\n\n_अपने लक्षण check करें: curecheck.in_`;
   }
-  return `🩺 *CureCheck Symptom Check*\n\n⚠️ *${cfg.label.en}*\n\n${result.urgencyExplanation}\n\n*Immediate Steps:*\n${result.immediateSteps.map((s, i) => `${i + 1}. ${s}`).join("\n")}\n\n❗ *Red Flags — Seek Help If:*\n${result.redFlags.map((f) => `• ${f}`).join("\n")}\n\n_CureCheck - For educational info only, not medical advice._\nVisit curecheck.in`;
+  return `🩺 *CureCheck Symptom Check*\n\n⚠️ *${cfg.label.en}* (Urgency: ${urgencyNum}/5)\n\n${result.urgencyExplanation}\n\n*Immediate Steps:*\n${result.immediateSteps.map((s, i) => `${i + 1}. ${s}`).join("\n")}\n\n❗ *Red Flags — Seek Help If:*\n${result.redFlags.map((f) => `• ${f}`).join("\n")}\n\n_Check your symptoms: curecheck.in_`;
 }
 
 const DOCTOR_PREP_KEY = "cc_doctor_prep_prefill_v1";
@@ -371,19 +373,40 @@ export default function SymptomChecker() {
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
               className="mt-6 space-y-4"
             >
-              {/* Urgency banner */}
+              {/* Urgency banner with visual meter */}
               {(() => {
+                const URGENCY_ORDER = ["monitor", "home_care", "see_doctor_soon", "see_doctor_today", "emergency"] as const;
+                const level = URGENCY_ORDER.indexOf(result.urgencyLevel as typeof URGENCY_ORDER[number]);
                 const cfg = URGENCY_CONFIG[result.urgencyLevel] ?? URGENCY_CONFIG.monitor;
                 const Icon = cfg.icon;
                 return (
                   <div className={`p-4 rounded-2xl border-2 ${cfg.bg}`}>
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="flex items-center gap-3 mb-3">
                       <div className={`relative ${cfg.pulse ? "pulse-dot" : ""}`}>
                         <Icon className={`w-6 h-6 ${cfg.color}`} />
                       </div>
                       <h2 className={`text-lg font-serif font-700 ${cfg.color}`}>
                         {language === "hi" ? cfg.label.hi : cfg.label.en}
                       </h2>
+                    </div>
+                    {/* Urgency meter — 5 segments */}
+                    <div className="flex gap-1.5 mb-3">
+                      {URGENCY_ORDER.map((key, i) => {
+                        const segCfg = URGENCY_CONFIG[key];
+                        const filled = i <= level;
+                        return (
+                          <div
+                            key={key}
+                            className={`h-2 flex-1 rounded-full transition-all ${filled ? segCfg.color.replace("text-", "bg-") : "bg-muted/30"}`}
+                            title={language === "hi" ? segCfg.label.hi : segCfg.label.en}
+                          />
+                        );
+                      })}
+                    </div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[11px] text-muted-foreground">{t("Low urgency", "कम आवश्यक")}</span>
+                      <span className={`text-[11px] font-700 ${cfg.color}`}>{level + 1}/5</span>
+                      <span className="text-[11px] text-muted-foreground">{t("Emergency", "आपातकाल")}</span>
                     </div>
                     <p className="text-sm text-muted-foreground leading-relaxed">{result.urgencyExplanation}</p>
                   </div>
