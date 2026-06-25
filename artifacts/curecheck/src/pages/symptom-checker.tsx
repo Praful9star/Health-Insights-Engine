@@ -135,7 +135,7 @@ export default function SymptomChecker() {
   const handlePrepForDoctor = () => {
     const result = checkSymptoms.data;
     if (!result) return;
-    const conditions = result.possibleCauses.slice(0, 3).map(c => c.cause).join(", ");
+    const conditions = (result.possibleCauses ?? []).slice(0, 3).map(c => c.cause).join(", ");
     const urgencyNote = result.urgencyLevel !== "home_care" && result.urgencyLevel !== "monitor"
       ? ` — Urgency: ${result.urgencyLevel.replace(/_/g, " ")}` : "";
     const concern = `Symptoms: ${symptoms}${conditions ? `. Possible: ${conditions}` : ""}${urgencyNote}`.slice(0, 400);
@@ -159,7 +159,7 @@ export default function SymptomChecker() {
       label: `Symptoms: ${symptoms.slice(0, 50)}`,
       simpleSummary: result.urgencyExplanation,
       overallAssessment: URGENCY_TO_ASSESSMENT[result.urgencyLevel] ?? "routine_monitoring",
-      importantFindings: result.possibleCauses.map(c => ({
+      importantFindings: (result.possibleCauses ?? []).map(c => ({
         finding: c.cause,
         importance: c.likelihood === "common" ? "important" : "routine",
         explanation: c.explanation,

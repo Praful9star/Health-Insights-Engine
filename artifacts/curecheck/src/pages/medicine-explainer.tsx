@@ -152,7 +152,7 @@ export default function MedicineExplainer() {
             <ArrowRight className="w-4 h-4" />
           </button>
           <button
-            onClick={() => { setCompareMode(c => !c); setModalOpen(true); }}
+            onClick={() => { setCompareMode(c => { if (c) setMedicine2(""); return !c; }); setModalOpen(true); }}
             title={t("Compare two medicines", "दो दवाएं तुलना करें")}
             className={`h-12 px-4 rounded-2xl border font-600 text-sm flex items-center gap-2 transition-all ${compareMode ? "bg-primary/15 border-primary/40 text-primary" : "border-border/60 hover:border-border text-muted-foreground hover:text-foreground"}`}
           >

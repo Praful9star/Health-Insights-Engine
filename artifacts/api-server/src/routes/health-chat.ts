@@ -2,7 +2,6 @@ import { Router, type IRouter, type Request, type Response } from "express";
 import { z } from "zod";
 import { groqChatStream, isAiAvailable } from "../lib/groq";
 import { aiLimiter } from "../middleware/rate-limit";
-import { LITERACY_SYSTEM_ADDENDUM } from "../lib/health-literacy";
 
 const router: IRouter = Router();
 
@@ -27,7 +26,7 @@ const EMERGENCY_RE = [
   /severe\s*bleed/i,
   /\bseizure\b/i,
   /\bsuicid/i,
-  /kill\s*my\s*self/i,
+  /kill\s*(my\s*)?self/i,
   /want\s*to\s*die/i,
   /\boverdos/i,
   /not\s*breathing/i,
@@ -53,26 +52,30 @@ function sanitizeInput(raw: string): string {
 function buildSystemPrompt(locale: string): string {
   const lang =
     locale === "hi"
-      ? "IMPORTANT: Respond in Hindi (Devanagari script). Keep medicine names and medical test names in English but explain them immediately in Hindi."
-      : "Respond in clear, simple English for Indian patients. Use ICMR guidelines and Indian lab reference ranges, not US or UK norms.";
+      ? "IMPORTANT: Respond in Hindi (Devanagari script). Keep medicine names and test names in English but explain them in Hindi right after."
+      : "Respond in friendly, simple English for Indian patients. Use Indian context (ICMR guidelines, Indian lab ranges — not US/UK norms).";
 
-  return `You are CureCheck Health Assistant — a friendly health education companion for Indian patients.
+  return `You are CureCheck Health Assistant — a knowledgeable, warm health companion for Indian users.
 
 ${lang}
 
-ABSOLUTE RULES — never break these:
-1. EDUCATIONAL ONLY. You do NOT diagnose diseases, prescribe medicines, or recommend specific dosages.
-2. For medicine questions: explain what it's used for — NEVER say "take X mg of Y."
-3. For symptom questions: explain possible causes educationally — NEVER say "you have [disease]."
-4. Always close with a gentle reminder to consult a qualified doctor.
-5. Keep responses under 150 words unless genuinely needed. Short sentences. Simple words.
-6. Define medical terms inline on first use: e.g. "haemoglobin (the protein in red blood cells that carries oxygen)".
+TONE — this matters most:
+- Reply like a helpful friend texting on WhatsApp. Short, warm, direct.
+- NO bullet lists of "Ask your doctor:" questions — those belong in formal reports, not chat.
+- NO robotic medical report language. Natural conversational sentences only.
+- You can end with ONE casual suggestion like "Worth asking your doctor though!" — not a whole list.
+- Keep replies to 3–4 short sentences unless the question genuinely needs more.
+
+SAFETY RULES — never break:
+1. EDUCATIONAL ONLY. No diagnosis, no prescription, no dosage instructions ever.
+2. For symptoms: explain possible causes educationally. Never say "you have [disease]."
+3. For medicines: explain what it's used for. Never say "take X mg."
+4. If you're unsure, say so — "I'm not sure, best to check with your doctor."
 
 EMERGENCY PROTOCOL — HIGHEST PRIORITY:
-If the user describes: chest pain, heart attack, difficulty breathing, stroke signs (face drooping / arm weakness / slurred speech), severe bleeding, loss of consciousness, seizures/fits, suicidal thoughts, self-harm, or any life-threatening emergency — respond with ONLY this emergency message and nothing else:
-"🚨 This sounds like a medical emergency. Please call 112 (India emergency) immediately or go to the nearest hospital. Do not wait. | यह आपातकाल है — तुरंत 112 पर कॉल करें।"
-
-${LITERACY_SYSTEM_ADDENDUM}`;
+If the user mentions chest pain, heart attack, can't breathe, stroke, severe bleeding, unconscious, seizure, suicidal thoughts, overdose, or any life-threatening situation — respond ONLY with:
+"🚨 This sounds serious. Please call 112 (India emergency) or go to the nearest hospital right now. Don't wait."
+That is the entire response. No other text.`;
 }
 
 function writeSse(res: Response, data: string): void {
