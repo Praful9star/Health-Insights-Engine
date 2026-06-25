@@ -125,14 +125,40 @@ async function getPdfPageCount(file: File): Promise<number> {
   }
 }
 
+function computeHealthScore(result: ReportResult): number {
+  let score = 85;
+  if (result.severity === "high_concern") score -= 28;
+  else if (result.severity === "moderate_concern") score -= 14;
+  else if (result.severity === "low_concern") score -= 4;
+
+  if (result.overallAssessment === "requires_urgent_attention") score -= 14;
+  else if (result.overallAssessment === "needs_follow_up") score -= 7;
+  else if (result.overallAssessment === "all_clear") score += 8;
+
+  const params = result.parameters ?? [];
+  if (params.length > 0) {
+    const abnormal = params.filter((p) => p.status !== "normal").length;
+    score -= Math.min(18, Math.round((abnormal / params.length) * 22));
+  }
+  return Math.min(96, Math.max(24, score));
+}
+
+function healthScoreColor(score: number): { text: string; ring: string; bg: string; label: string; labelHi: string } {
+  if (score >= 75) return { text: "text-emerald-400", ring: "stroke-emerald-400", bg: "bg-emerald-500/10", label: "Good", labelHi: "अच्छा" };
+  if (score >= 55) return { text: "text-amber-400", ring: "stroke-amber-400", bg: "bg-amber-500/10", label: "Fair", labelHi: "ठीक है" };
+  return { text: "text-red-400", ring: "stroke-red-400", bg: "bg-red-500/10", label: "Needs Attention", labelHi: "ध्यान ज़रूरी" };
+}
+
 function buildWhatsAppText(result: ReportResult, language: "en" | "hi"): string {
   const sev = SEVERITY_CONFIG[result.severity ?? "moderate_concern"];
   const assess = ASSESSMENT_CONFIG[result.overallAssessment] ?? ASSESSMENT_CONFIG.needs_follow_up;
   const abnormal = (result.parameters ?? []).filter((p) => p.status !== "normal");
+  const score = computeHealthScore(result);
+  const col = healthScoreColor(score);
   if (language === "hi") {
-    return `🔬 *CureCheck — Medical Report*\n\n${sev.emoji} *चिंता स्तर:* ${sev.label.hi}\n📊 *आकलन:* ${assess.label.hi}\n\n📝 *सारांश:*\n${result.simpleSummary}\n\n${abnormal.length > 0 ? `⚠️ *असामान्य मूल्य:*\n${abnormal.slice(0, 4).map((p) => `• ${p.name}: ${p.userValue ?? ""} (${PARAM_STATUS_CONFIG[p.status].label.hi})`).join("\n")}\n\n` : ""}❓ *डॉक्टर से पूछें:*\n${result.doctorQuestions.slice(0, 3).map((q, i) => `${i + 1}. ${q}`).join("\n")}\n\n_CureCheck — curecheck.in_`;
+    return `🔬 *CureCheck — Medical Report*\n\n💯 *Health Score: ${score}/100 — ${col.labelHi}*\n${sev.emoji} *चिंता स्तर:* ${sev.label.hi}\n📊 *आकलन:* ${assess.label.hi}\n\n📝 *सारांश:*\n${result.simpleSummary}\n\n${abnormal.length > 0 ? `⚠️ *असामान्य मूल्य:*\n${abnormal.slice(0, 4).map((p) => `• ${p.name}: ${p.userValue ?? ""} (${PARAM_STATUS_CONFIG[p.status].label.hi})`).join("\n")}\n\n` : ""}❓ *डॉक्टर से पूछें:*\n${result.doctorQuestions.slice(0, 3).map((q, i) => `${i + 1}. ${q}`).join("\n")}\n\n_अपना Health Score check करें: curecheck.in_`;
   }
-  return `🔬 *CureCheck — Report Explained*\n\n${sev.emoji} *Concern Level:* ${sev.label.en}\n📊 *Assessment:* ${assess.label.en}\n\n📝 *Summary:*\n${result.simpleSummary}\n\n${abnormal.length > 0 ? `⚠️ *Abnormal Values:*\n${abnormal.slice(0, 4).map((p) => `• ${p.name}: ${p.userValue ?? ""} (${PARAM_STATUS_CONFIG[p.status].label.en})`).join("\n")}\n\n` : ""}❓ *Ask Your Doctor:*\n${result.doctorQuestions.slice(0, 3).map((q, i) => `${i + 1}. ${q}`).join("\n")}\n\n_CureCheck — curecheck.in_`;
+  return `🔬 *CureCheck — Report Explained*\n\n💯 *Health Score: ${score}/100 — ${col.label}*\n${sev.emoji} *Concern Level:* ${sev.label.en}\n📊 *Assessment:* ${assess.label.en}\n\n📝 *Summary:*\n${result.simpleSummary}\n\n${abnormal.length > 0 ? `⚠️ *Abnormal Values:*\n${abnormal.slice(0, 4).map((p) => `• ${p.name}: ${p.userValue ?? ""} (${PARAM_STATUS_CONFIG[p.status].label.en})`).join("\n")}\n\n` : ""}❓ *Ask Your Doctor:*\n${result.doctorQuestions.slice(0, 3).map((q, i) => `${i + 1}. ${q}`).join("\n")}\n\n_Check your Health Score: curecheck.in_`;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -844,6 +870,48 @@ export default function ReportExplainer() {
                           {abnormalParams.length} {t("abnormal", "असामान्य")}
                         </span>
                       )}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Health Score */}
+              {(() => {
+                const score = computeHealthScore(result);
+                const col = healthScoreColor(score);
+                const radius = 36;
+                const circ = 2 * Math.PI * radius;
+                const dash = (score / 100) * circ;
+                return (
+                  <div className={`glass-panel rounded-2xl p-5 border ${col.bg.replace("/10", "/20")} flex items-center gap-5`}>
+                    <div className="relative flex-shrink-0">
+                      <svg width="96" height="96" viewBox="0 0 96 96" className="-rotate-90">
+                        <circle cx="48" cy="48" r={radius} fill="none" strokeWidth="7" className="stroke-muted/30" />
+                        <circle
+                          cx="48" cy="48" r={radius} fill="none" strokeWidth="7"
+                          strokeDasharray={`${dash} ${circ}`}
+                          strokeLinecap="round"
+                          className={col.ring}
+                          style={{ transition: "stroke-dasharray 0.8s ease" }}
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className={`text-2xl font-800 tabular-nums ${col.text}`}>{score}</span>
+                        <span className="text-[10px] text-muted-foreground font-600 -mt-0.5">/100</span>
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-700 text-muted-foreground uppercase tracking-wider mb-1">
+                        {language === "hi" ? "स्वास्थ्य स्कोर" : "Health Score"}
+                      </p>
+                      <p className={`text-lg font-serif font-700 ${col.text}`}>
+                        {language === "hi" ? col.labelHi : col.label}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-snug">
+                        {language === "hi"
+                          ? "आपके report के parameters के आधार पर CureCheck का समग्र आकलन।"
+                          : "CureCheck's overall read based on your report parameters."}
+                      </p>
                     </div>
                   </div>
                 );

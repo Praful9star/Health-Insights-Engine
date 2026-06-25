@@ -291,8 +291,9 @@ export default function FloatingAIButton() {
       });
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.body) throw new Error("No response body");
 
-      const reader = res.body!.getReader();
+      const reader = res.body.getReader();
       const dec = new TextDecoder();
       let buf = "";
 
@@ -312,7 +313,16 @@ export default function FloatingAIButton() {
           const payload = part.slice(6);
           if (payload === "[DONE]") break outer;
           try {
-            const chunk = JSON.parse(payload) as string;
+            const parsed = JSON.parse(payload);
+            // Typed error event — replace partial content rather than appending
+            if (parsed && typeof parsed === "object" && parsed.type === "error") {
+              acc = parsed.message as string;
+              setMessages((prev) =>
+                prev.map((m) => (m.id === botId ? { ...m, content: acc } : m))
+              );
+              break outer;
+            }
+            const chunk = parsed as string;
             acc += chunk;
             setMessages((prev) =>
               prev.map((m) => (m.id === botId ? { ...m, content: acc } : m))

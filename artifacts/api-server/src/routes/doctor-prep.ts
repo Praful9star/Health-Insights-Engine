@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { DoctorPrepBody } from "@workspace/api-zod";
+import { DoctorPrepBody, DoctorPrepResponse } from "@workspace/api-zod";
 import { groqChat } from "../lib/groq";
 import { aiLimiter } from "../middleware/rate-limit";
 
@@ -66,24 +66,27 @@ Be practical and specific for the Indian healthcare context. Tailor everything t
 
   const userMessage = `Help this Indian patient prepare for their ${visitType ?? "general"} doctor's appointment.
 
-Main concern: ${concern.trim()}
-${symptomList.length > 0 ? `Symptoms: ${symptomList.join(", ")}` : ""}
-${medicalHistory ? `Medical history: ${medicalHistory}` : ""}
-${currentMedications ? `Current medications: ${currentMedications}` : ""}
+[CONCERN START]
+${concern.trim()}
+[CONCERN END]
+${symptomList.length > 0 ? `[SYMPTOMS START]\n${symptomList.join(", ")}\n[SYMPTOMS END]` : ""}
+${medicalHistory ? `[HISTORY START]\n${medicalHistory}\n[HISTORY END]` : ""}
+${currentMedications ? `[MEDICATIONS START]\n${currentMedications}\n[MEDICATIONS END]` : ""}
 
 Generate a personalised doctor visit prep guide as JSON.`;
 
   try {
     const content = await groqChat(systemPrompt, userMessage);
-    let parsed: Record<string, unknown>;
+    let raw: Record<string, unknown>;
     try {
-      parsed = JSON.parse(content);
+      raw = JSON.parse(content);
     } catch {
       req.log.warn("Doctor prep JSON parse failed — returning mock");
       res.json(MOCK);
       return;
     }
-    res.json(parsed);
+    const validated = DoctorPrepResponse.parse(raw);
+    res.json(validated);
   } catch (err) {
     req.log.warn({ err }, "Doctor prep AI error — returning mock");
     res.json(MOCK);
