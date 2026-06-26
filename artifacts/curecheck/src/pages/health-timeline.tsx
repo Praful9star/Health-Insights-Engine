@@ -286,7 +286,7 @@ export default function HealthTimeline() {
         description="Log and track your health reports, symptoms, and test results over time. Visualise trends and prepare better for doctor visits. Free tool for India."
         path="/health-timeline"
       />
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+      <motion.div initial={{ y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         {/* Header */}
         <div className="flex items-start gap-4 mb-8">
           <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 flex items-center justify-center flex-shrink-0">

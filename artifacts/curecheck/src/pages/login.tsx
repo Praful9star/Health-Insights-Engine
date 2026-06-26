@@ -44,7 +44,7 @@ export default function Login() {
 
   if (user) return (
     <div className="relative z-10 min-h-[80vh] flex items-center justify-center px-4">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-panel rounded-3xl p-10 text-center max-w-sm w-full">
+      <motion.div initial={{ y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-panel rounded-3xl p-10 text-center max-w-sm w-full">
         <div className="w-16 h-16 rounded-full bg-primary/15 flex items-center justify-center mx-auto mb-4">
           <User className="w-8 h-8 text-primary" />
         </div>
@@ -77,7 +77,7 @@ export default function Login() {
         description="Sign in to CureCheck to save your health history, access premium tools, and personalise your experience."
         path="/login"
       />
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }} className="w-full max-w-sm">
+      <motion.div initial={{ y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }} className="w-full max-w-sm">
         <Link href="/"><span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 cursor-pointer">
           <ChevronLeft className="w-4 h-4" /> {tKey("common.home")}
         </span></Link>

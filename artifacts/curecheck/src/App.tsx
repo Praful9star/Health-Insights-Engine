@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, Component, type ReactNode, type ErrorInfo } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
-import { MotionConfig, motion } from "framer-motion";
+import { MotionConfig } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
@@ -95,67 +95,54 @@ class ErrorBoundary extends Component<{ children: ReactNode }, EBState> {
   }
 }
 
-// PageSwitch is the motion-animated layer. It ONLY contains the Switch so
-// that Suspense (above it in AnimatedRouter) can show its fallback at full
-// opacity while the lazy chunk is in-flight — the motion.div never hides
-// the spinner because Suspense is outside it.
-function PageSwitch() {
-  const [location] = useLocation();
-  return (
-    <motion.div
-      key={location}
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.15, ease: "easeOut" }}
-    >
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/report-explainer" component={ReportExplainer} />
-        <Route path="/medicine-explainer" component={MedicineExplainer} />
-        <Route path="/health-timeline" component={HealthTimeline} />
-        <Route path="/fitness-hub" component={FitnessHub} />
-        <Route path="/myth-buster/:slug" component={MythBusterDetail} />
-        <Route path="/myth-buster" component={MythBuster} />
-        <Route path="/symptom-checker" component={SymptomChecker} />
-        <Route path="/disease-journey" component={DiseaseJourney} />
-        <Route path="/claim-checker" component={ClaimChecker} />
-        <Route path="/about" component={About} />
-        <Route path="/login" component={Login} />
-        <Route path="/hospitals" component={HospitalFinder} />
-        <Route path="/calculators" component={Calculators} />
-        <Route path="/emergency" component={Emergency} />
-        <Route path="/mental-health" component={MentalHealth} />
-        <Route path="/vaccines" component={Vaccines} />
-        <Route path="/ayurveda" component={Ayurveda} />
-        <Route path="/insurance" component={Insurance} />
-        <Route path="/pregnancy" component={Pregnancy} />
-        <Route path="/news" component={News} />
-        <Route path="/drug-interaction" component={DrugInteraction} />
-        <Route path="/doctor-prep" component={DoctorPrep} />
-        <Route path="/premium" component={Premium} />
-        <Route path="/weather" component={Weather} />
-        <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
-        <Route path="/profile" component={() => <ProtectedRoute component={Profile} />} />
-        <Route path="/admin-curecheck-secure" component={AdminPanel} />
-        <Route path="/feedback" component={Feedback} />
-        <Route path="/privacy" component={Privacy} />
-        <Route path="/terms" component={Terms} />
-        <Route path="/history" component={History} />
-        <Route path="/vault" component={() => <ProtectedRoute component={Vault} />} />
-        <Route path="/cycle-tracker" component={CycleTracker} />
-        <Route component={NotFound} />
-      </Switch>
-    </motion.div>
-  );
-}
-
 function AnimatedRouter() {
+  const [location] = useLocation();
+  // key on ErrorBoundary resets error state on every navigation so a crash
+  // on one page doesn't leave the error UI stuck when the user navigates away.
+  // Suspense outside the keyed subtree shows the spinner at full opacity while
+  // a lazy chunk is in-flight — no opacity:0 container ever hides it.
   return (
-    <ErrorBoundary>
-      <Suspense fallback={<PageLoading />}>
-        <PageSwitch />
-      </Suspense>
-    </ErrorBoundary>
+    <Suspense fallback={<PageLoading />}>
+      <ErrorBoundary key={location}>
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/report-explainer" component={ReportExplainer} />
+          <Route path="/medicine-explainer" component={MedicineExplainer} />
+          <Route path="/health-timeline" component={HealthTimeline} />
+          <Route path="/fitness-hub" component={FitnessHub} />
+          <Route path="/myth-buster/:slug" component={MythBusterDetail} />
+          <Route path="/myth-buster" component={MythBuster} />
+          <Route path="/symptom-checker" component={SymptomChecker} />
+          <Route path="/disease-journey" component={DiseaseJourney} />
+          <Route path="/claim-checker" component={ClaimChecker} />
+          <Route path="/about" component={About} />
+          <Route path="/login" component={Login} />
+          <Route path="/hospitals" component={HospitalFinder} />
+          <Route path="/calculators" component={Calculators} />
+          <Route path="/emergency" component={Emergency} />
+          <Route path="/mental-health" component={MentalHealth} />
+          <Route path="/vaccines" component={Vaccines} />
+          <Route path="/ayurveda" component={Ayurveda} />
+          <Route path="/insurance" component={Insurance} />
+          <Route path="/pregnancy" component={Pregnancy} />
+          <Route path="/news" component={News} />
+          <Route path="/drug-interaction" component={DrugInteraction} />
+          <Route path="/doctor-prep" component={DoctorPrep} />
+          <Route path="/premium" component={Premium} />
+          <Route path="/weather" component={Weather} />
+          <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
+          <Route path="/profile" component={() => <ProtectedRoute component={Profile} />} />
+          <Route path="/admin-curecheck-secure" component={AdminPanel} />
+          <Route path="/feedback" component={Feedback} />
+          <Route path="/privacy" component={Privacy} />
+          <Route path="/terms" component={Terms} />
+          <Route path="/history" component={History} />
+          <Route path="/vault" component={() => <ProtectedRoute component={Vault} />} />
+          <Route path="/cycle-tracker" component={CycleTracker} />
+          <Route component={NotFound} />
+        </Switch>
+      </ErrorBoundary>
+    </Suspense>
   );
 }
 

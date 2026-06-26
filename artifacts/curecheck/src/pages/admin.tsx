@@ -62,7 +62,7 @@ export default function AdminPanel() {
     return (
       <div className="relative z-10 min-h-[80vh] flex items-center justify-center px-4">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="glass-panel rounded-3xl p-8 w-full max-w-sm"
         >

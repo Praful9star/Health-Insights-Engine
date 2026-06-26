@@ -58,7 +58,7 @@ export default function Profile() {
 
   return (
     <div className="relative z-10 max-w-xl mx-auto px-4 py-10">
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+      <motion.div initial={{ y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <Link href="/dashboard">
           <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 cursor-pointer">
             <ChevronLeft className="w-4 h-4" /> {tKey("profile.dashboard")}
