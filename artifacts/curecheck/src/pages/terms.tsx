@@ -14,7 +14,7 @@ export default function Terms() {
         description="Terms and conditions for using CureCheck, the AI-powered health information platform."
         path="/terms"
       />
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+      <motion.div initial={{ y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
 
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-2xl bg-primary/15 flex items-center justify-center">

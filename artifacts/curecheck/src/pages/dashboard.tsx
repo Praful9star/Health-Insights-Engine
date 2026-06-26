@@ -78,7 +78,7 @@ export default function Dashboard() {
 
   return (
     <div className="relative z-10 max-w-4xl mx-auto px-4 py-10 space-y-8">
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+      <motion.div initial={{ y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <p className="text-sm text-muted-foreground mb-0.5">{tKey("dashboard.welcomeBack")}</p>
