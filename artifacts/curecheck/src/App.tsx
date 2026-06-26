@@ -95,10 +95,19 @@ class ErrorBoundary extends Component<{ children: ReactNode }, EBState> {
   }
 }
 
-function Routes() {
+// PageSwitch is the motion-animated layer. It ONLY contains the Switch so
+// that Suspense (above it in AnimatedRouter) can show its fallback at full
+// opacity while the lazy chunk is in-flight — the motion.div never hides
+// the spinner because Suspense is outside it.
+function PageSwitch() {
+  const [location] = useLocation();
   return (
-    <ErrorBoundary>
-    <Suspense fallback={<PageLoading />}>
+    <motion.div
+      key={location}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.15, ease: "easeOut" }}
+    >
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/report-explainer" component={ReportExplainer} />
@@ -136,22 +145,17 @@ function Routes() {
         <Route path="/cycle-tracker" component={CycleTracker} />
         <Route component={NotFound} />
       </Switch>
-    </Suspense>
-    </ErrorBoundary>
+    </motion.div>
   );
 }
 
 function AnimatedRouter() {
-  const [location] = useLocation();
   return (
-    <motion.div
-      key={location}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.18 }}
-    >
-      <Routes />
-    </motion.div>
+    <ErrorBoundary>
+      <Suspense fallback={<PageLoading />}>
+        <PageSwitch />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
