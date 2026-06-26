@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, Component, type ReactNode, type ErrorInfo } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
-import { MotionConfig, motion, AnimatePresence } from "framer-motion";
+import { MotionConfig, motion } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
@@ -144,17 +144,14 @@ function Routes() {
 function AnimatedRouter() {
   const [location] = useLocation();
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={location}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -6 }}
-        transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
-      >
-        <Routes />
-      </motion.div>
-    </AnimatePresence>
+    <motion.div
+      key={location}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.18 }}
+    >
+      <Routes />
+    </motion.div>
   );
 }
 
