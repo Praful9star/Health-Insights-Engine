@@ -730,7 +730,7 @@ export default function ReportExplainer() {
 
           {/* ── STEP: INPUT — trigger button ────────────────────────────────── */}
           {step === "input" && (
-            <motion.div key="input" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.2 }}>
+            <motion.div key="input" initial={{ y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.2 }}>
               <button
                 onClick={() => { setOcrError(null); setModalOpen(true); }}
                 className="w-full h-14 flex items-center justify-center gap-3 rounded-2xl bg-primary text-primary-foreground font-600 text-lg hover:opacity-90 active:scale-[0.98] transition-all shimmer-btn"

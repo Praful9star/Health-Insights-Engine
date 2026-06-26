@@ -11,7 +11,7 @@ interface PageHeaderProps {
 export default function PageHeader({ icon, title, subtitle, badge }: PageHeaderProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       className="mb-8"
     >
