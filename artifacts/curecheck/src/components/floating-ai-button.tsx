@@ -168,8 +168,6 @@ export default function FloatingAIButton() {
     };
   }, []);
 
-  if (HIDE_ON.includes(location)) return null;
-
   // ── Voice Input ───────────────────────────────────────────────────────────
 
   function startListening() {
@@ -239,6 +237,8 @@ export default function FloatingAIButton() {
     window.speechSynthesis?.cancel();
     setSpeakingId(null);
   }
+
+  if (HIDE_ON.includes(location)) return null;
 
   // ── Send Message ──────────────────────────────────────────────────────────
 
